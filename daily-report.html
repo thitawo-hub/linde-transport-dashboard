@@ -11,39 +11,40 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       background: #f5f7fa;
       color: #1f2937;
     }
 
-    .daily-page {
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 30px;
+    .page {
+      padding: 24px;
     }
 
     .page-header {
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      margin: 0 0 6px;
-      font-size: 28px;
-    }
-
-    .page-header p {
-      margin: 0;
-      color: #6b7280;
-    }
-
-    .filters {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
       margin-bottom: 20px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .page-subtitle {
+      margin-top: 5px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .filter-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
       display: flex;
-      gap: 16px;
       align-items: end;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
@@ -56,45 +57,99 @@
     .filter-group label {
       font-size: 13px;
       font-weight: 600;
+      color: #4b5563;
     }
 
     .filter-group input,
     .filter-group select {
       height: 40px;
-      padding: 0 12px;
+      min-width: 190px;
       border: 1px solid #d1d5db;
       border-radius: 8px;
+      padding: 0 12px;
+      background: #fff;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
-    .summary {
+    .summary-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(8, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
     .summary-card {
       background: #fff;
-      padding: 20px;
       border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+      border-left: 4px solid #d1d5db;
+    }
+
+    .summary-card.card-total {
+      border-left-color: #374151;
+    }
+
+    .summary-card.card-job {
+      border-left-color: #16a34a;
+    }
+
+    .summary-card.card-no-job {
+      border-left-color: #9ca3af;
+    }
+
+    .summary-card.card-work {
+      border-left-color: #2563eb;
+    }
+
+    .summary-card.card-off {
+      border-left-color: #eab308;
+    }
+
+    .summary-card.card-leave {
+      border-left-color: #6366f1;
+    }
+
+    .summary-card.card-standby {
+      border-left-color: #f97316;
+    }
+
+    .summary-card.card-unknown {
+      border-left-color: #9ca3af;
     }
 
     .summary-label {
-      font-size: 14px;
+      font-size: 12px;
       color: #6b7280;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
+      white-space: nowrap;
     }
 
     .summary-value {
-      font-size: 30px;
+      font-size: 26px;
       font-weight: 700;
+      line-height: 1;
     }
 
     .table-card {
       background: #fff;
-      border-radius: 12px;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
       overflow: hidden;
+    }
+
+    .table-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-size: 17px;
+      font-weight: 700;
     }
 
     .table-wrapper {
@@ -104,32 +159,40 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1100px;
+      min-width: 1350px;
     }
 
-    th,
-    td {
-      padding: 12px 14px;
+    thead th {
+      background: #f9fafb;
+      color: #4b5563;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 12px 10px;
       text-align: left;
       border-bottom: 1px solid #e5e7eb;
       white-space: nowrap;
     }
 
-    th {
-      background: #f9fafb;
+    tbody td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #f0f1f3;
       font-size: 13px;
+      vertical-align: middle;
     }
 
-    td {
-      font-size: 14px;
+    tbody tr:hover {
+      background: #fafafa;
     }
 
     .status {
-      display: inline-block;
-      padding: 5px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 9px;
       border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
+      white-space: nowrap;
     }
 
     .status-job {
@@ -142,19 +205,75 @@
       color: #6b7280;
     }
 
-    .loading {
-      text-align: center;
-      padding: 40px;
+    .driver-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .driver-work {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .driver-off {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .driver-leave {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
+
+    .driver-standby {
+      background: #ffedd5;
+      color: #c2410c;
+    }
+
+    .driver-unknown {
+      background: #f3f4f6;
       color: #6b7280;
     }
 
+    .loading {
+      text-align: center;
+      padding: 40px !important;
+      color: #6b7280;
+    }
+
+    .report-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 1200px) {
+      .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
     @media (max-width: 700px) {
-      .daily-page {
-        padding: 16px;
+      .page {
+        padding: 12px;
       }
 
-      .summary {
-        grid-template-columns: 1fr;
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filter-card {
+        align-items: stretch;
+      }
+
+      .filter-group input,
+      .filter-group select {
+        width: 100%;
       }
     }
   </style>
@@ -162,87 +281,122 @@
 
 <body>
 
-<div class="daily-page">
+  <div class="page">
 
-  <div class="page-header">
-    <h1>📋 รายงานประจำวัน</h1>
-    <p>ตรวจสอบสถานะการจัดรถและงานของรถแต่ละคัน</p>
+    <div class="page-header">
+      <h1 class="page-title">LINDE TRANSPORT</h1>
+      <div class="page-subtitle">
+        รายงานประจำวัน — สถานะรถและ พขร.
+      </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-card">
+
+      <div class="filter-group">
+        <label for="reportDate">วันที่</label>
+        <input type="date" id="reportDate">
+      </div>
+
+      <div class="filter-group">
+        <label for="branchFilter">สาขา</label>
+        <select id="branchFilter">
+          <option value="">ทุกสาขา</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-grid">
+
+      <div class="summary-card card-total">
+        <div class="summary-label">🚛 รถทั้งหมด</div>
+        <div class="summary-value" id="totalCars">-</div>
+      </div>
+
+      <div class="summary-card card-job">
+        <div class="summary-label">🟢 รถมีงาน</div>
+        <div class="summary-value" id="jobCars">-</div>
+      </div>
+
+      <div class="summary-card card-no-job">
+        <div class="summary-label">⚪ รถไม่มีงาน</div>
+        <div class="summary-value" id="noJobCars">-</div>
+      </div>
+
+      <div class="summary-card card-work">
+        <div class="summary-label">👨‍✈️ พขร.ทำงาน</div>
+        <div class="summary-value" id="workingDrivers">-</div>
+      </div>
+
+      <div class="summary-card card-off">
+        <div class="summary-label">🟡 วันหยุด</div>
+        <div class="summary-value" id="offDrivers">-</div>
+      </div>
+
+      <div class="summary-card card-leave">
+        <div class="summary-label">🔵 ลางาน</div>
+        <div class="summary-value" id="leaveDrivers">-</div>
+      </div>
+
+      <div class="summary-card card-standby">
+        <div class="summary-label">🟠 สแตนบาย</div>
+        <div class="summary-value" id="standbyDrivers">-</div>
+      </div>
+
+      <div class="summary-card card-unknown">
+        <div class="summary-label">⚪ ไม่ระบุ</div>
+        <div class="summary-value" id="unknownDrivers">-</div>
+      </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+
+      <div class="table-header">
+        <div class="table-title">รายละเอียดรถและ พขร. ประจำวัน</div>
+        <div class="report-info" id="reportInfo"></div>
+      </div>
+
+      <div class="table-wrapper">
+
+        <table>
+          <thead>
+            <tr>
+              <th>สาขา</th>
+              <th>เบอร์รถ</th>
+              <th>ทะเบียน</th>
+              <th>ประเภทรถ</th>
+              <th>สถานะรถ</th>
+              <th>สถานะรถจากระบบ</th>
+              <th>ประเภทงาน</th>
+              <th>LTS</th>
+              <th>พขร.</th>
+              <th>สถานะ พขร.</th>
+              <th>ช่วงเวลา</th>
+              <th>หนัก / เบา</th>
+            </tr>
+          </thead>
+
+          <tbody id="reportTableBody">
+            <tr>
+              <td colspan="12" class="loading">
+                กำลังโหลดข้อมูล...
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="filters">
-
-    <div class="filter-group">
-      <label>วันที่</label>
-      <input type="date" id="reportDate">
-    </div>
-
-    <div class="filter-group">
-      <label>สาขา</label>
-      <select id="branchFilter">
-        <option value="">ทั้งหมด</option>
-      </select>
-    </div>
-
-  </div>
-
-  <div class="summary">
-
-    <div class="summary-card">
-      <div class="summary-label">🚛 รถทั้งหมด</div>
-      <div class="summary-value" id="totalCars">-</div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-label">🟢 มีงาน</div>
-      <div class="summary-value" id="jobCars">-</div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-label">⚪ ไม่มีงาน</div>
-      <div class="summary-value" id="noJobCars">-</div>
-    </div>
-
-  </div>
-
-  <div class="table-card">
-
-    <div class="table-wrapper">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>สาขา</th>
-            <th>เบอร์รถ</th>
-            <th>ทะเบียน</th>
-            <th>ประเภทรถ</th>
-            <th>สถานะ</th>
-            <th>สถานะรถ</th>
-            <th>ประเภทงาน</th>
-            <th>LTS</th>
-            <th>พขร.</th>
-            <th>ช่วงเวลา</th>
-            <th>หนัก / เบา</th>
-          </tr>
-        </thead>
-
-        <tbody id="reportTableBody">
-          <tr>
-            <td colspan="11" class="loading">
-              กำลังโหลดข้อมูล...
-            </td>
-          </tr>
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</div>
-
-<script src="daily-report.js"></script>
+  <script src="daily-report.js"></script>
 
 </body>
 </html>
