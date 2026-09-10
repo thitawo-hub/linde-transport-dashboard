@@ -504,11 +504,23 @@ function updateForecast(
       )
     );
 
-  const remainingDays =
-    Math.max(
-      0,
-      cycleDays - elapsedDays
-    );
+// จำนวนวันปฏิทินที่เหลือ
+const remainingCalendarDays =
+  Math.max(
+    0,
+    cycleDays - elapsedDays
+  );
+
+// สัดส่วนวันวิ่งจริงต่อวันปฏิทิน
+const workingDayRate =
+  elapsedDays > 0
+    ? workingDays / elapsedDays
+    : 0;
+
+// ประมาณจำนวนวันวิ่งที่เหลือ
+const estimatedRemainingWorkingDays =
+  remainingCalendarDays *
+  workingDayRate;
 
   /*
    * Forecast:
@@ -518,11 +530,11 @@ function updateForecast(
    */
 
   const forecastTotalKm =
-    totalKm +
-    (
-      avgKmDay *
-      remainingDays
-    );
+  totalKm +
+  (
+    avgKmDay *
+    estimatedRemainingWorkingDays
+  );
 
   const forecastKmCar =
     targetCars > 0
@@ -566,10 +578,10 @@ setAchievementStatus(
   forecastAchievement
 );
 
-  setText(
-    'forecastNote',
-    'คำนวณจาก Actual + ค่าเฉลี่ย KM/วัน × วันที่เหลือ'
-  );
+setText(
+  'forecastNote',
+  'ประมาณการจากสัดส่วนวันวิ่งจริงในช่วงที่ผ่านมา'
+);
 
 }
 
