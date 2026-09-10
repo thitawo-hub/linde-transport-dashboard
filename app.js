@@ -41,7 +41,6 @@ function setDefaultBillingCycle() {
 
   if (today.getDate() >= 26) {
 
-    // 26 เดือนนี้ → 25 เดือนถัดไป
     start = new Date(
       today.getFullYear(),
       today.getMonth(),
@@ -56,7 +55,6 @@ function setDefaultBillingCycle() {
 
   } else {
 
-    // 26 เดือนก่อน → 25 เดือนนี้
     start = new Date(
       today.getFullYear(),
       today.getMonth() - 1,
@@ -89,6 +87,25 @@ function formatDateInput(date) {
     String(date.getDate()).padStart(2, '0');
 
   return `${year}-${month}-${day}`;
+}
+
+
+/* =========================
+   DATE FILTER
+========================= */
+
+function getSelectedDateRange() {
+
+  const start =
+    document.getElementById('startDate').value;
+
+  const end =
+    document.getElementById('endDate').value;
+
+  return {
+    start,
+    end
+  };
 }
 
 
@@ -163,6 +180,86 @@ function getBranchMasterData(data) {
 
 
 /* =========================
+   FILTER DATA
+========================= */
+
+function getFilteredData(data) {
+
+  const {
+    start,
+    end
+  } = getSelectedDateRange();
+
+  const selectedBranch =
+    document.getElementById('branchFilter').value;
+
+  return data.filter(row => {
+
+    /* Branch */
+
+    if (
+      selectedBranch &&
+      row.branch !== selectedBranch
+    ) {
+      return false;
+    }
+
+
+    /* Date */
+
+    if (row.work_date) {
+
+      const date =
+        String(row.work_date).substring(0, 10);
+
+      if (start && date < start) {
+        return false;
+      }
+
+      if (end && date > end) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+
+/* =========================
+   GET COCO KM
+========================= */
+
+function getCocoKm(row) {
+
+  /*
+   * v_dashboard ใช้ค่า COCO KM
+   * ถ้าชื่อ field ต่างกัน ให้ fallback
+   */
+
+  const candidates = [
+    row.coco_km,
+    row.total_coco_km,
+    row.daily_coco_km,
+    row.actual_coco_km
+  ];
+
+  for (const value of candidates) {
+
+    if (
+      value !== null &&
+      value !== undefined &&
+      value !== ''
+    ) {
+      return Number(value) || 0;
+    }
+  }
+
+  return 0;
+}
+
+
+/* =========================
    UPDATE DASHBOARD
 ========================= */
 
@@ -170,6 +267,11 @@ function updateDashboard(data) {
 
   const selectedBranch =
     document.getElementById('branchFilter').value;
+
+
+  /* =========================
+     MASTER
+  ========================= */
 
   const masterData =
     getBranchMasterData(data);
@@ -182,27 +284,35 @@ function updateDashboard(data) {
       : masterData;
 
 
-  /* รถ COCO */
+  /* =========================
+     CAR
+  ========================= */
 
   const totalCars =
     filteredMaster.reduce(
       (sum, x) =>
-        sum + Number(x.actual_coco_cars || 0),
+        sum +
+        Number(x.actual_coco_cars || 0),
       0
     );
 
 
-  /* พขร. */
+  /* =========================
+     DRIVER
+  ========================= */
 
   const totalDrivers =
     filteredMaster.reduce(
       (sum, x) =>
-        sum + Number(x.actual_coco_drivers || 0),
+        sum +
+        Number(x.actual_coco_drivers || 0),
       0
     );
 
 
-  /* Driver Ratio */
+  /* =========================
+     DRIVER RATIO
+  ========================= */
 
   const ratio =
     totalCars > 0
@@ -210,7 +320,9 @@ function updateDashboard(data) {
       : 0;
 
 
-  /* Target KM */
+  /* =========================
+     TARGET KM
+  ========================= */
 
   let targetKm = '-';
 
@@ -219,7 +331,10 @@ function updateDashboard(data) {
     const branch =
       filteredMaster[0];
 
-    if (branch && branch.target_km_per_car) {
+    if (
+      branch &&
+      branch.target_km_per_car
+    ) {
 
       targetKm =
         Number(
@@ -228,6 +343,103 @@ function updateDashboard(data) {
     }
   }
 
+
+  /* =========================
+     FILTERED DATA
+  ========================= */
+
+  const filteredData =
+    getFilteredData(data);
+
+
+  /* =========================
+     TOTAL COCO KM
+  ========================= */
+
+  const totalKm =
+    filteredData.reduce(
+      (sum, row) =>
+        sum + getCocoKm(row),
+      0
+    );
+
+
+  /* =========================
+     WORKING DAYS
+  ========================= */
+
+  const workingDates =
+    new Set();
+
+  filteredData.forEach(row => {
+
+    const km =
+      getCocoKm(row);
+
+    if (
+      km > 0 &&
+      row.work_date
+    ) {
+
+      workingDates.add(
+        String(row.work_date)
+          .substring(0, 10)
+      );
+    }
+  });
+
+  const workingDays =
+    workingDates.size;
+
+
+  /* =========================
+     AVG KM / DAY
+  ========================= */
+
+  const avgKmDay =
+    workingDays > 0
+      ? totalKm / workingDays
+      : 0;
+
+
+  /* =========================
+     AVG KM / CAR
+  ========================= */
+
+  const avgKmCar =
+    totalCars > 0
+      ? totalKm / totalCars
+      : 0;
+
+
+  /* =========================
+     ACHIEVEMENT
+  ========================= */
+
+  let achievement = 0;
+
+  if (
+    totalCars > 0 &&
+    selectedBranch &&
+    filteredMaster[0] &&
+    Number(
+      filteredMaster[0].target_km_per_car
+    ) > 0
+  ) {
+
+    achievement =
+      (
+        avgKmCar /
+        Number(
+          filteredMaster[0].target_km_per_car
+        )
+      ) * 100;
+  }
+
+
+  /* =========================
+     UPDATE OLD KPI
+  ========================= */
 
   document.getElementById('cocoCars').textContent =
     totalCars.toLocaleString();
@@ -242,8 +454,31 @@ function updateDashboard(data) {
     targetKm;
 
 
+  /* =========================
+     UPDATE KM KPI
+  ========================= */
+
+  document.getElementById('totalKm').textContent =
+    Math.round(totalKm).toLocaleString();
+
+  document.getElementById('avgKmDay').textContent =
+    Math.round(avgKmDay).toLocaleString();
+
+  document.getElementById('avgKmCar').textContent =
+    Math.round(avgKmCar).toLocaleString();
+
+  document.getElementById('kmAchievement').textContent =
+    selectedBranch
+      ? achievement.toFixed(1) + '%'
+      : '-';
+
+
+  /* =========================
+     STATUS
+  ========================= */
+
   document.getElementById('status').textContent =
-    `ข้อมูล ${data.length.toLocaleString()} รายการ`;
+    `ข้อมูล ${filteredData.length.toLocaleString()} รายการ`;
 }
 
 
@@ -289,11 +524,17 @@ async function loadDashboard() {
     dashboardData =
       await fetchDashboard();
 
-    setupBranchFilter(dashboardData);
+    setupBranchFilter(
+      dashboardData
+    );
 
-    setupEvents(dashboardData);
+    setupEvents(
+      dashboardData
+    );
 
-    updateDashboard(dashboardData);
+    updateDashboard(
+      dashboardData
+    );
 
     console.log(
       'Dashboard data:',
