@@ -235,6 +235,13 @@ function updateDashboard() {
     branch
   );
 
+  updateCumulativeKmChart(
+  rows,
+  startDate,
+  endDate,
+  branch
+);
+
 }
 
 
@@ -1361,5 +1368,386 @@ function setAchievementStatus(
     );
 
   }
+
+}
+
+function updateCumulativeKmChart(
+  rows,
+  startDate,
+  endDate,
+  branch
+) {
+
+  const canvas =
+    document.getElementById(
+      'kmCumulativeChart'
+    );
+
+  if (!canvas) return;
+
+
+  // ---------------------------------------------------------
+  // วันที่ทั้งหมดในรอบ
+  // ---------------------------------------------------------
+
+  const dates =
+    getDateRange(
+      startDate,
+      endDate
+    );
+
+
+  // ---------------------------------------------------------
+  // รวม Actual KM ต่อวัน
+  // ---------------------------------------------------------
+
+  const dailyKm = {};
+
+  rows.forEach(row => {
+
+    const date =
+      String(row.work_date)
+        .substring(0, 10);
+
+    if (!date) return;
+
+    if (!dailyKm[date]) {
+      dailyKm[date] = 0;
+    }
+
+    dailyKm[date] +=
+      getCocoKm(row);
+
+  });
+
+
+  // ---------------------------------------------------------
+  // Target
+  // ---------------------------------------------------------
+
+  const targetCars =
+    getSingleTargetValue(
+      rows,
+      'target_coco_cars'
+    ) || 0;
+
+  const targetKmPerCar =
+    getSingleTargetValue(
+      rows,
+      'target_km_per_car'
+    ) || 0;
+
+  const cycleDays =
+    dates.length;
+
+  const targetTotalKm =
+    targetCars *
+    targetKmPerCar;
+
+  const targetPerDay =
+    cycleDays > 0
+      ? targetTotalKm / cycleDays
+      : 0;
+
+
+  // ---------------------------------------------------------
+  // Actual Cumulative
+  // ---------------------------------------------------------
+
+  let actualRunning = 0;
+
+  const actualCumulative =
+    dates.map(date => {
+
+      actualRunning +=
+        dailyKm[date] || 0;
+
+      return actualRunning;
+
+    });
+
+
+  // ---------------------------------------------------------
+  // Target Cumulative
+  // ---------------------------------------------------------
+
+  const targetCumulative =
+    dates.map(
+      (_, index) =>
+        targetPerDay *
+        (index + 1)
+    );
+
+
+  // ---------------------------------------------------------
+  // Forecast
+  // ---------------------------------------------------------
+
+  const today =
+    formatDateInput(
+      new Date()
+    );
+
+  const workingDates =
+    Object.keys(dailyKm)
+      .filter(date =>
+        dailyKm[date] > 0
+      );
+
+  const totalActual =
+    Object.values(dailyKm)
+      .reduce(
+        (sum, value) =>
+          sum + value,
+        0
+      );
+
+  const workingDays =
+    workingDates.length;
+
+  const avgKmDay =
+    workingDays > 0
+      ? totalActual / workingDays
+      : 0;
+
+
+  /*
+   * Forecast จะเริ่มจาก Actual ล่าสุด
+   * แล้วลากต่อด้วยค่าเฉลี่ย KM/วัน
+   */
+
+  let lastActual =
+    totalActual;
+
+  let forecastStarted = false;
+
+  const forecastData =
+    dates.map(date => {
+
+      if (date <= today) {
+
+        return null;
+
+      }
+
+      if (!forecastStarted) {
+
+        forecastStarted = true;
+
+        return lastActual;
+
+      }
+
+      const daysAfterToday =
+        Math.max(
+          0,
+          Math.floor(
+            (
+              parseDate(date) -
+              parseDate(today)
+            ) /
+            86400000
+          )
+        );
+
+      return (
+        lastActual +
+        (
+          avgKmDay *
+          daysAfterToday
+        )
+      );
+
+    });
+
+
+  // ---------------------------------------------------------
+  // ถ้าเลือกช่วงวันที่ย้อนหลัง
+  // Forecast ไม่ต้องแสดง
+  // ---------------------------------------------------------
+
+  if (today > endDate) {
+
+    for (
+      let i = 0;
+      i < forecastData.length;
+      i++
+    ) {
+
+      forecastData[i] = null;
+
+    }
+
+  }
+
+
+  // ---------------------------------------------------------
+  // Destroy chart เดิม
+  // ---------------------------------------------------------
+
+  if (kmCumulativeChart) {
+
+    kmCumulativeChart.destroy();
+
+  }
+
+
+  // ---------------------------------------------------------
+  // สร้าง Chart
+  // ---------------------------------------------------------
+
+  kmCumulativeChart =
+    new Chart(
+      canvas.getContext('2d'),
+      {
+
+        type: 'line',
+
+        data: {
+
+          labels:
+            dates.map(
+              formatDateDisplay
+            ),
+
+          datasets: [
+
+            {
+              label:
+                'Actual KM สะสม',
+
+              data:
+                actualCumulative,
+
+              borderWidth: 3,
+
+              pointRadius: 2,
+
+              tension: 0.25,
+
+              fill: false
+            },
+
+            {
+              label:
+                'Target KM สะสม',
+
+              data:
+                targetCumulative,
+
+              borderWidth: 2,
+
+              pointRadius: 0,
+
+              borderDash: [6, 5],
+
+              tension: 0,
+
+              fill: false
+            },
+
+            {
+              label:
+                'Forecast',
+
+              data:
+                forecastData,
+
+              borderWidth: 2,
+
+              pointRadius: 0,
+
+              borderDash: [3, 4],
+
+              tension: 0,
+
+              fill: false
+            }
+
+          ]
+
+        },
+
+        options: {
+
+          responsive: true,
+
+          maintainAspectRatio: false,
+
+          interaction: {
+
+            mode: 'index',
+
+            intersect: false
+
+          },
+
+          plugins: {
+
+            legend: {
+
+              position: 'top'
+
+            },
+
+            tooltip: {
+
+              callbacks: {
+
+                label:
+                  function(context) {
+
+                    return (
+                      context.dataset.label +
+                      ': ' +
+                      formatNumber(
+                        context.raw
+                      ) +
+                      ' KM'
+                    );
+
+                  }
+
+              }
+
+            }
+
+          },
+
+          scales: {
+
+            x: {
+
+              grid: {
+                display: false
+              }
+
+            },
+
+            y: {
+
+              beginAtZero: true,
+
+              ticks: {
+
+                callback:
+                  function(value) {
+
+                    return formatNumber(
+                      value
+                    );
+
+                  }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+    );
 
 }
