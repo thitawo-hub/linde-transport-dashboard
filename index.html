@@ -1,100 +1,389 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>LINDE TRANSPORT OVERVIEW</title>
 
   <link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
+
+  <!-- =========================
+       HEADER
+  ========================= -->
+
   <header class="header">
-    <h1>LINDE TRANSPORT OVERVIEW</h1>
-    <p>Transport Performance & Operational Monitoring</p>
+
+    <h1>
+      LINDE TRANSPORT OVERVIEW
+    </h1>
+
+    <p>
+      Transport Performance & Operational Monitoring
+    </p>
+
   </header>
+
+
 
   <main class="container">
 
-<div class="filters">
 
-  <div>
-    <label for="startDate">วันที่เริ่ม</label>
-    <input type="date" id="startDate">
-  </div>
+    <!-- =========================
+         FILTER
+    ========================= -->
 
-  <div>
-    <label for="endDate">วันที่สิ้นสุด</label>
-    <input type="date" id="endDate">
-  </div>
+    <div class="filters">
 
-  <div>
-    <label for="branchFilter">สาขา</label>
-    <select id="branchFilter">
-      <option value="">ทุกสาขา</option>
-    </select>
-  </div>
 
-</div>
+      <div>
+
+        <label for="startDate">
+          วันที่เริ่ม
+        </label>
+
+        <input
+          type="date"
+          id="startDate"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label for="endDate">
+          วันที่สิ้นสุด
+        </label>
+
+        <input
+          type="date"
+          id="endDate"
+        >
+
+      </div>
+
+
+      <div>
+
+        <label for="branchFilter">
+          สาขา
+        </label>
+
+        <select id="branchFilter">
+
+          <option value="">
+            ทุกสาขา
+          </option>
+
+        </select>
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         MASTER KPI
+    ========================= -->
 
     <div class="cards">
 
-<div class="cards">
 
-  <div class="card">
-    <div class="card-title">🚚 รถ COCO</div>
-    <div class="card-value" id="cocoCars">-</div>
-  </div>
+      <div class="card">
 
-  <div class="card">
-    <div class="card-title">👨‍✈️ พขร.</div>
-    <div class="card-value" id="cocoDrivers">-</div>
-  </div>
+        <div class="card-title">
+          🚚 รถ COCO
+        </div>
 
-  <div class="card">
-    <div class="card-title">📊 Driver Ratio</div>
-    <div class="card-value" id="driverRatio">-</div>
-  </div>
+        <div
+          class="card-value"
+          id="cocoCars"
+        >
+          -
+        </div>
 
-  <div class="card">
-    <div class="card-title">🎯 Target KM/คัน/เดือน</div>
-    <div class="card-value" id="targetKm">-</div>
-  </div>
+      </div>
 
-  <div class="card">
-    <div class="card-title">🚚 KM รวม</div>
-    <div class="card-value" id="totalKm">-</div>
-  </div>
 
-  <div class="card">
-    <div class="card-title">📅 KM เฉลี่ย/วัน</div>
-    <div class="card-value" id="avgKmDay">-</div>
-  </div>
 
-  <div class="card">
-    <div class="card-title">🚛 KM เฉลี่ย/คัน</div>
-    <div class="card-value" id="avgKmCar">-</div>
-  </div>
+      <div class="card">
 
-  <div class="card">
-    <div class="card-title">🎯 Achievement</div>
-    <div class="card-value" id="kmAchievement">-</div>
-  </div>
+        <div class="card-title">
+          👨‍✈️ พขร.
+        </div>
 
-</div>
+        <div
+          class="card-value"
+          id="cocoDrivers"
+        >
+          -
+        </div>
 
-    <section class="section">
-      <h2>ข้อมูลจาก Supabase</h2>
-      <div id="status">กำลังโหลดข้อมูล...</div>
+      </div>
+
+
+
+      <div class="card">
+
+        <div class="card-title">
+          📊 Driver Ratio
+        </div>
+
+        <div
+          class="card-value"
+          id="driverRatio"
+        >
+          -
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+
+        <div class="card-title">
+          🎯 Target KM/คัน/เดือน
+        </div>
+
+        <div
+          class="card-value"
+          id="targetKm"
+        >
+          -
+        </div>
+
+      </div>
+
+
+
+    </div>
+
+
+
+    <!-- =========================
+         KM KPI
+    ========================= -->
+
+    <div class="cards">
+
+
+      <div class="card">
+
+        <div class="card-title">
+          🚚 KM วิ่งงานสะสม
+        </div>
+
+        <div
+          class="card-value"
+          id="totalKm"
+        >
+          -
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+
+        <div class="card-title">
+          📅 KM เฉลี่ย/วัน
+        </div>
+
+        <div
+          class="card-value"
+          id="avgKmDay"
+        >
+          -
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+
+        <div class="card-title">
+          🚛 KM/คัน
+        </div>
+
+        <div
+          class="card-value"
+          id="avgKmCar"
+        >
+          -
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+
+        <div class="card-title">
+          🎯 Achievement
+        </div>
+
+        <div
+          class="card-value"
+          id="kmAchievement"
+        >
+          -
+        </div>
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         FORECAST
+    ========================= -->
+
+    <section class="section forecast-section">
+
+
+      <h2>
+        🔮 ประมาณการณ์เมื่อจบรอบบิล
+      </h2>
+
+
+      <div class="forecast-grid">
+
+
+        <div class="forecast-item">
+
+          <div class="forecast-label">
+            KM รวมประมาณการณ์
+          </div>
+
+          <div
+            class="forecast-value"
+            id="forecastTotalKm"
+          >
+            -
+          </div>
+
+        </div>
+
+
+
+        <div class="forecast-item">
+
+          <div class="forecast-label">
+            KM/คันประมาณการณ์
+          </div>
+
+          <div
+            class="forecast-value"
+            id="forecastKmCar"
+          >
+            -
+          </div>
+
+        </div>
+
+
+
+        <div class="forecast-item">
+
+          <div class="forecast-label">
+            Forecast Achievement
+          </div>
+
+          <div
+            class="forecast-value"
+            id="forecastAchievement"
+          >
+            -
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <div
+        class="forecast-note"
+        id="forecastNote"
+      >
+      </div>
+
+
     </section>
 
+
+
+    <!-- =========================
+         CAR BREAKDOWN
+    ========================= -->
+
+    <section
+      class="section"
+      id="carBreakdownSection"
+    >
+
+
+      <h2>
+        🚛 โครงสร้างรถ COCO
+      </h2>
+
+
+      <div
+        id="carBreakdown"
+        class="breakdown"
+      >
+      </div>
+
+
+    </section>
+
+
+
+    <!-- =========================
+         STATUS
+    ========================= -->
+
+    <section class="section">
+
+
+      <h2>
+        ข้อมูลจาก Supabase
+      </h2>
+
+
+      <div id="status">
+        กำลังโหลดข้อมูล...
+      </div>
+
+
+    </section>
+
+
   </main>
+
 
   <script src="app.js"></script>
 
 </body>
 
-  
 </html>
