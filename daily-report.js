@@ -7,7 +7,7 @@ const SUPABASE_URL = 'https://hhsqijlcebaijtklskag.supabase.co';
 
 // ใช้ Publishable Key เท่านั้น
 // ใส่ค่าเดียวกับที่ใช้ใน app.js ปัจจุบัน
-const SUPABASE_KEY = 'ใส่_PUBLISHABLE_KEY_ตัวเดิมของคุณตรงนี้';
+const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 
 // ============================================================
