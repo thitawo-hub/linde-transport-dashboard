@@ -18,15 +18,26 @@
 
   <main class="container">
 
-    <div class="filters">
-      <select id="branchFilter">
-        <option value="">ทุกสาขา</option>
-        <option value="ระยอง">ระยอง</option>
-        <option value="ท่าลาน">ท่าลาน</option>
-        <option value="บางปะอิน">บางปะอิน</option>
-        <option value="หาดใหญ่">หาดใหญ่</option>
-      </select>
-    </div>
+<div class="filters">
+
+  <div>
+    <label for="startDate">วันที่เริ่ม</label>
+    <input type="date" id="startDate">
+  </div>
+
+  <div>
+    <label for="endDate">วันที่สิ้นสุด</label>
+    <input type="date" id="endDate">
+  </div>
+
+  <div>
+    <label for="branchFilter">สาขา</label>
+    <select id="branchFilter">
+      <option value="">ทุกสาขา</option>
+    </select>
+  </div>
+
+</div>
 
     <div class="cards">
 
@@ -62,4 +73,6 @@
   <script src="app.js"></script>
 
 </body>
+
+  
 </html>
