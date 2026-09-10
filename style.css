@@ -545,4 +545,102 @@ body {
   height: 100% !important;
 }
 
+.performance-status {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 20px;
+  align-items: center;
+
+  margin: 20px 0;
+  padding: 22px 24px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.performance-status-main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.status-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.performance-status-main strong {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.performance-status-main p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.performance-status-achievement {
+  padding-left: 20px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.performance-status-achievement span {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 5px;
+}
+
+.performance-status-achievement strong {
+  font-size: 26px;
+}
+
+
+/* Status Colors */
+
+.status-on-track {
+  border-left: 5px solid #16a34a;
+}
+
+.status-on-track
+.performance-status-main strong {
+  color: #16a34a;
+}
+
+.status-at-risk {
+  border-left: 5px solid #f59e0b;
+}
+
+.status-at-risk
+.performance-status-main strong {
+  color: #d97706;
+}
+
+.status-below-target {
+  border-left: 5px solid #dc2626;
+}
+
+.status-below-target
+.performance-status-main strong {
+  color: #dc2626;
+}
+
+
+@media (max-width: 700px) {
+
+  .performance-status {
+    grid-template-columns: 1fr;
+  }
+
+  .performance-status-achievement {
+    padding-left: 0;
+    padding-top: 15px;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+  }
+
+}
 
