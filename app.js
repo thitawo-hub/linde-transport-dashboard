@@ -4,7 +4,7 @@ const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 let dashboardData = [];
 let kmChart = null;
 let kmCumulativeChart = null;
-
+let carPerformanceData = [];
 
 // ============================================================
 // INIT
@@ -242,6 +242,12 @@ function updateDashboard() {
   branch
 );
 
+  updateCarPerformance(
+  rows,
+  startDate,
+  endDate,
+  branch
+);
 }
 
 
@@ -1874,4 +1880,133 @@ function updatePerformanceStatus(
 
   }
 
+}
+
+// ==================== KM PERFORMANCE BY CAR ====================
+
+function updateCarPerformance(rows, startDate, endDate, branch) {
+  const tbody = document.getElementById('carPerformanceBody');
+  if (!tbody) return;
+
+  const carMap = new Map();
+
+  rows.forEach(row => {
+    const carNo = String(row.car_no || '').trim();
+    const plate = String(row.license_plate || '').trim();
+
+    if (!carNo) return;
+
+    // ต้องเป็นรถ COCO เท่านั้น
+    if (!plate) return;
+
+    const workDate = normalizeDate(row.work_date);
+
+    if (!workDate) return;
+    if (workDate < startDate || workDate > endDate) return;
+
+    const km = getCocoKm(row);
+
+    if (!Number.isFinite(km) || km <= 0) return;
+
+    if (!carMap.has(carNo)) {
+      carMap.set(carNo, {
+        carNo: carNo,
+        plate: plate,
+        km: 0
+      });
+    }
+
+    carMap.get(carNo).km += km;
+  });
+
+  const targetKm = getTargetKm(rows, branch);
+
+  const cars = Array.from(carMap.values())
+    .sort((a, b) => a.carNo.localeCompare(b.carNo, undefined, {
+      numeric: true
+    }));
+
+  carPerformanceData = cars;
+
+  if (!cars.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-state">
+          ไม่พบข้อมูล KM ของรถ COCO
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = cars.map(car => {
+
+    const achievement =
+      targetKm > 0
+        ? (car.km / targetKm) * 100
+        : null;
+
+    let statusText = '-';
+    let statusClass = '';
+
+    if (achievement !== null) {
+      if (achievement < 100) {
+        statusText = '🔴 ต่ำกว่าเป้า';
+        statusClass = 'status-low';
+      } else if (achievement === 100) {
+        statusText = '🟢 ถึงเป้า';
+        statusClass = 'status-ok';
+      } else {
+        statusText = '🔵 เกินเป้า';
+        statusClass = 'status-high';
+      }
+    }
+
+    return `
+      <tr>
+        <td><strong>${escapeHtml(car.carNo)}</strong></td>
+
+        <td>${escapeHtml(car.plate || '-')}</td>
+
+        <td>${formatNumber(car.km)}</td>
+
+        <td>${targetKm > 0 ? formatNumber(targetKm) : '-'}</td>
+
+        <td>
+          ${achievement !== null
+            ? achievement.toFixed(1) + '%'
+            : '-'}
+        </td>
+
+        <td>
+          <span class="car-status ${statusClass}">
+            ${statusText}
+          </span>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function normalizeDate(value) {
+  if (!value) return null;
+
+  const date = new Date(value);
+
+  if (isNaN(date.getTime())) return null;
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  );
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
