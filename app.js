@@ -1350,7 +1350,11 @@ function setAchievementStatus(
     'status-high'
   );
 
-  if (!achievement) {
+  if (
+    achievement === null ||
+    achievement === undefined ||
+    !Number.isFinite(Number(achievement))
+  ) {
 
     element.textContent = '-';
 
