@@ -1544,6 +1544,11 @@ function updatePerformanceStatus(
   ) return;
 
 
+  // ป้องกันค่าจาก Supabase เป็น string
+  forecastAchievement =
+    Number(forecastAchievement) || 0;
+
+
   container.classList.remove(
     'status-on-track',
     'status-at-risk',
