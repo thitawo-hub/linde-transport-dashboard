@@ -384,12 +384,16 @@ function updateKmKPI(
   );
 
   setText(
-    'kmAchievement',
-    achievement
-      ? achievement.toFixed(1) + '%'
-      : '-'
-  );
+  'kmAchievement',
+  achievement
+    ? achievement.toFixed(1) + '%'
+    : '-'
+);
 
+setAchievementStatus(
+  'kmAchievementStatus',
+  achievement
+);
   setText(
     'status',
     'ข้อมูล ' +
@@ -537,11 +541,16 @@ function updateForecast(
   );
 
   setText(
-    'forecastAchievement',
-    forecastAchievement
-      ? forecastAchievement.toFixed(1) + '%'
-      : '-'
-  );
+  'forecastAchievement',
+  forecastAchievement
+    ? forecastAchievement.toFixed(1) + '%'
+    : '-'
+);
+
+setAchievementStatus(
+  'forecastAchievementStatus',
+  forecastAchievement
+);
 
   setText(
     'forecastNote',
@@ -1295,6 +1304,61 @@ function setText(
 
   if (element) {
     element.textContent = value;
+  }
+
+}
+
+function setAchievementStatus(
+  elementId,
+  achievement
+) {
+
+  const element =
+    document.getElementById(elementId);
+
+  if (!element) return;
+
+  element.classList.remove(
+    'status-low',
+    'status-ok',
+    'status-high'
+  );
+
+  if (!achievement) {
+
+    element.textContent = '-';
+
+    return;
+
+  }
+
+  if (achievement < 100) {
+
+    element.textContent =
+      'ต่ำกว่าเป้า';
+
+    element.classList.add(
+      'status-low'
+    );
+
+  } else if (achievement === 100) {
+
+    element.textContent =
+      'ถึงเป้า';
+
+    element.classList.add(
+      'status-ok'
+    );
+
+  } else {
+
+    element.textContent =
+      'เกินเป้า';
+
+    element.classList.add(
+      'status-high'
+    );
+
   }
 
 }
