@@ -337,26 +337,42 @@
          CAR BREAKDOWN
     ========================= -->
 
-    <section
-      class="section"
-      id="carBreakdownSection"
-    >
+    <!-- =========================
+     KM PERFORMANCE
+========================= -->
 
+<section class="section">
 
-      <h2>
-        🚛 โครงสร้างรถ COCO
-      </h2>
+  <h2>
+    📈 KM วิ่งงานรายวัน
+  </h2>
 
+  <div class="chart-summary">
 
-      <div
-        id="carBreakdown"
-        class="breakdown"
-      >
-      </div>
+    <div>
+      <span>Actual KM</span>
+      <strong id="chartActualKm">-</strong>
+    </div>
 
+    <div>
+      <span>Target KM</span>
+      <strong id="chartTargetKm">-</strong>
+    </div>
 
-    </section>
+    <div>
+      <span>Forecast KM</span>
+      <strong id="chartForecastKm">-</strong>
+    </div>
 
+  </div>
+
+  <div class="chart-wrapper">
+
+    <canvas id="kmChart"></canvas>
+
+  </div>
+
+</section>
 
 
     <!-- =========================
@@ -382,7 +398,8 @@
   </main>
 
 
-  <script src="app.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
 
 </body>
 
