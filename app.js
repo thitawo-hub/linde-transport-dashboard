@@ -1,12 +1,14 @@
 const SUPABASE_URL = 'https://hhsqijlcebaijtklskag.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
+let dashboardData = [];
 
-/* =========================================================
+
+/* =========================
    SUPABASE
-========================================================= */
+========================= */
 
-async function getDashboardData() {
+async function fetchDashboard() {
 
   const url =
     `${SUPABASE_URL}/rest/v1/v_dashboard?select=*`;
@@ -26,48 +28,120 @@ async function getDashboardData() {
 }
 
 
-/* =========================================================
-   FORMAT
-========================================================= */
+/* =========================
+   BILLING CYCLE 26 - 25
+========================= */
 
-function formatNumber(value, decimals = 0) {
+function setDefaultBillingCycle() {
 
-  if (
-    value === null ||
-    value === undefined ||
-    value === '' ||
-    Number.isNaN(Number(value))
-  ) {
-    return '-';
+  const today = new Date();
+
+  let start;
+  let end;
+
+  if (today.getDate() >= 26) {
+
+    // 26 เดือนนี้ → 25 เดือนถัดไป
+    start = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      26
+    );
+
+    end = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      25
+    );
+
+  } else {
+
+    // 26 เดือนก่อน → 25 เดือนนี้
+    start = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      26
+    );
+
+    end = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      25
+    );
   }
 
-  return Number(value).toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+  document.getElementById('startDate').value =
+    formatDateInput(start);
+
+  document.getElementById('endDate').value =
+    formatDateInput(end);
+}
+
+
+function formatDateInput(date) {
+
+  const year = date.getFullYear();
+
+  const month =
+    String(date.getMonth() + 1).padStart(2, '0');
+
+  const day =
+    String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+
+/* =========================
+   BRANCH
+========================= */
+
+function setupBranchFilter(data) {
+
+  const select =
+    document.getElementById('branchFilter');
+
+  const branches = [
+    ...new Set(
+      data
+        .map(row => row.branch)
+        .filter(Boolean)
+    )
+  ].sort();
+
+  select.innerHTML =
+    `<option value="">ทุกสาขา</option>`;
+
+  branches.forEach(branch => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = branch;
+    option.textContent = branch;
+
+    select.appendChild(option);
   });
 }
 
 
-/* =========================================================
-   UNIQUE MASTER DATA
-   v_dashboard มีหลายแถวต่อสาขา
-   ดังนั้น Master Car / Master Driver ต้องนับครั้งเดียวต่อสาขา
-========================================================= */
+/* =========================
+   MASTER DATA
+========================= */
 
 function getBranchMasterData(data) {
 
-  const branchMap = new Map();
+  const map = new Map();
 
   data.forEach(row => {
 
-    const branch = String(row.branch || '').trim();
+    if (!row.branch) return;
 
-    if (!branch) return;
+    if (!map.has(row.branch)) {
 
-    if (!branchMap.has(branch)) {
+      map.set(row.branch, {
 
-      branchMap.set(branch, {
-        branch: branch,
+        branch: row.branch,
 
         actual_coco_cars:
           Number(row.actual_coco_cars || 0),
@@ -76,297 +150,164 @@ function getBranchMasterData(data) {
           Number(row.actual_coco_drivers || 0),
 
         actual_driver_ratio:
-          row.actual_driver_ratio !== null &&
-          row.actual_driver_ratio !== undefined
-            ? Number(row.actual_driver_ratio)
-            : null,
+          Number(row.actual_driver_ratio || 0),
 
         target_km_per_car:
-          row.target_km_per_car !== null &&
-          row.target_km_per_car !== undefined
-            ? Number(row.target_km_per_car)
-            : null
+          Number(row.target_km_per_car || 0)
       });
-
     }
-
   });
 
-  return Array.from(branchMap.values());
+  return [...map.values()];
 }
 
 
-/* =========================================================
+/* =========================
    UPDATE DASHBOARD
-========================================================= */
+========================= */
 
-function updateDashboard(data, selectedBranch = '') {
+function updateDashboard(data) {
 
-  const status = document.getElementById('status');
+  const selectedBranch =
+    document.getElementById('branchFilter').value;
 
-  if (!data || data.length === 0) {
+  const masterData =
+    getBranchMasterData(data);
 
-    status.textContent =
-      'ไม่พบข้อมูลจาก Supabase';
-
-    return;
-  }
-
-
-  /* -------------------------------------------------------
-     เอาเฉพาะข้อมูล Master ที่ไม่ซ้ำสาขา
-  ------------------------------------------------------- */
-
-  const branchData = getBranchMasterData(data);
+  const filteredMaster =
+    selectedBranch
+      ? masterData.filter(
+          x => x.branch === selectedBranch
+        )
+      : masterData;
 
 
-  /* -------------------------------------------------------
-     FILTER สาขา
-  ------------------------------------------------------- */
+  /* รถ COCO */
 
-  let selectedData;
+  const totalCars =
+    filteredMaster.reduce(
+      (sum, x) =>
+        sum + Number(x.actual_coco_cars || 0),
+      0
+    );
+
+
+  /* พขร. */
+
+  const totalDrivers =
+    filteredMaster.reduce(
+      (sum, x) =>
+        sum + Number(x.actual_coco_drivers || 0),
+      0
+    );
+
+
+  /* Driver Ratio */
+
+  const ratio =
+    totalCars > 0
+      ? totalDrivers / totalCars
+      : 0;
+
+
+  /* Target KM */
+
+  let targetKm = '-';
 
   if (selectedBranch) {
 
-    selectedData = branchData.filter(
-      item => item.branch === selectedBranch
-    );
+    const branch =
+      filteredMaster[0];
 
-  } else {
+    if (branch && branch.target_km_per_car) {
 
-    selectedData = branchData;
-
+      targetKm =
+        Number(
+          branch.target_km_per_car
+        ).toLocaleString();
+    }
   }
 
-
-  /* -------------------------------------------------------
-     รถ COCO
-  ------------------------------------------------------- */
-
-  const cocoCars = selectedData.reduce(
-    (sum, item) =>
-      sum + Number(item.actual_coco_cars || 0),
-    0
-  );
-
-
-  /* -------------------------------------------------------
-     พขร.
-  ------------------------------------------------------- */
-
-  const cocoDrivers = selectedData.reduce(
-    (sum, item) =>
-      sum + Number(item.actual_coco_drivers || 0),
-    0
-  );
-
-
-  /* -------------------------------------------------------
-     DRIVER RATIO
-     
-     สำคัญ:
-     ไม่เฉลี่ย Ratio ของแต่ละสาขา
-     
-     ต้องคำนวณจาก:
-     พขร. ÷ รถ
-  ------------------------------------------------------- */
-
-  const driverRatio =
-    cocoCars > 0
-      ? cocoDrivers / cocoCars
-      : null;
-
-
-  /* -------------------------------------------------------
-     TARGET KM
-     
-     ถ้าเลือกสาขา → แสดง Target ของสาขานั้น
-     
-     ถ้า "ทุกสาขา" → ไม่เอา MAX มั่ว ๆ
-  ------------------------------------------------------- */
-
-  let targetKm = null;
-
-  if (selectedBranch && selectedData.length > 0) {
-
-    targetKm = selectedData[0].target_km_per_car;
-
-  }
-
-
-  /* -------------------------------------------------------
-     UPDATE CARD
-  ------------------------------------------------------- */
 
   document.getElementById('cocoCars').textContent =
-    formatNumber(cocoCars);
-
+    totalCars.toLocaleString();
 
   document.getElementById('cocoDrivers').textContent =
-    formatNumber(cocoDrivers);
-
+    totalDrivers.toLocaleString();
 
   document.getElementById('driverRatio').textContent =
-    formatNumber(driverRatio, 2);
-
+    ratio.toFixed(2);
 
   document.getElementById('targetKm').textContent =
-    targetKm !== null
-      ? formatNumber(targetKm)
-      : '-';
+    targetKm;
 
 
-  /* -------------------------------------------------------
-     STATUS
-  ------------------------------------------------------- */
-
-  if (selectedBranch) {
-
-    status.textContent =
-      `สาขา ${selectedBranch} • เชื่อมต่อ Supabase สำเร็จ`;
-
-  } else {
-
-    status.textContent =
-      `ทุกสาขา • เชื่อมต่อ Supabase สำเร็จ • ${branchData.length} สาขา`;
-
-  }
-
+  document.getElementById('status').textContent =
+    `ข้อมูล ${data.length.toLocaleString()} รายการ`;
 }
 
 
-/* =========================================================
-   BRANCH FILTER
-========================================================= */
+/* =========================
+   EVENTS
+========================= */
 
-function setupBranchFilter(data) {
+function setupEvents(data) {
 
-  const filter =
-    document.getElementById('branchFilter');
-
-  if (!filter) return;
-
-
-  /* -------------------------------------------------------
-     รายชื่อสาขาจากข้อมูลจริง
-  ------------------------------------------------------- */
-
-  const branches = [
-    ...new Set(
-      data
-        .map(row => String(row.branch || '').trim())
-        .filter(Boolean)
-    )
-  ];
-
-
-  /* -------------------------------------------------------
-     สร้าง Option ใหม่
-  ------------------------------------------------------- */
-
-  filter.innerHTML = '';
-
-  const allOption =
-    document.createElement('option');
-
-  allOption.value = '';
-  allOption.textContent = 'ทุกสาขา';
-
-  filter.appendChild(allOption);
-
-
-  branches
-    .sort((a, b) => a.localeCompare(b, 'th'))
-    .forEach(branch => {
-
-      const option =
-        document.createElement('option');
-
-      option.value = branch;
-      option.textContent = branch;
-
-      filter.appendChild(option);
-
-    });
-
-
-  /* -------------------------------------------------------
-     เปลี่ยนสาขา
-  ------------------------------------------------------- */
-
-  filter.addEventListener('change', () => {
-
-    updateDashboard(
-      data,
-      filter.value
+  document
+    .getElementById('branchFilter')
+    .addEventListener(
+      'change',
+      () => updateDashboard(data)
     );
 
-  });
+  document
+    .getElementById('startDate')
+    .addEventListener(
+      'change',
+      () => updateDashboard(data)
+    );
 
+  document
+    .getElementById('endDate')
+    .addEventListener(
+      'change',
+      () => updateDashboard(data)
+    );
 }
 
 
-/* =========================================================
-   LOAD DASHBOARD
-========================================================= */
+/* =========================
+   LOAD
+========================= */
 
 async function loadDashboard() {
 
-  const status =
-    document.getElementById('status');
-
   try {
 
-    status.textContent =
-      'กำลังโหลดข้อมูล...';
+    setDefaultBillingCycle();
 
+    dashboardData =
+      await fetchDashboard();
 
-    const data =
-      await getDashboardData();
+    setupBranchFilter(dashboardData);
 
+    setupEvents(dashboardData);
+
+    updateDashboard(dashboardData);
 
     console.log(
       'Dashboard data:',
-      data
+      dashboardData
     );
-
-
-    /* -----------------------------------------------------
-       ตั้งค่า Filter
-    ----------------------------------------------------- */
-
-    setupBranchFilter(data);
-
-
-    /* -----------------------------------------------------
-       โหลดหน้าแรก = ทุกสาขา
-    ----------------------------------------------------- */
-
-    updateDashboard(
-      data,
-      ''
-    );
-
 
   } catch (error) {
 
-    console.error(
-      'Dashboard error:',
-      error
-    );
+    console.error(error);
 
-
-    status.textContent =
-      'เกิดข้อผิดพลาด: ' +
-      error.message;
-
+    document.getElementById('status').textContent =
+      `เกิดข้อผิดพลาด: ${error.message}`;
   }
-
 }
 
-
-/* =========================================================
-   START
-========================================================= */
 
 loadDashboard();
