@@ -533,6 +533,12 @@ function updateForecast(
     targetKm > 0
       ? forecastKmCar / targetKm * 100
       : 0;
+  updatePerformanceStatus(
+  forecastAchievement,
+  totalKm,
+  forecastTotalKm,
+  targetCars * targetKm
+);
 
   setText(
     'forecastTotalKm',
