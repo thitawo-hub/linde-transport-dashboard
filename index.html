@@ -343,29 +343,32 @@
 
 <section class="section">
 
-  <h2>
-    📈 KM วิ่งงานรายวัน
-  </h2>
+  <h2>📈 KM Performance</h2>
+<p class="section-subtitle">
+  Actual vs Target และแนวโน้มประมาณการ รอบวันที่ 26–25
+</p>
 
   <div class="chart-summary">
 
-    <div>
-      <span>Actual KM</span>
-      <strong id="chartActualKm">-</strong>
-    </div>
-
-    <div>
-      <span>Target KM</span>
-      <strong id="chartTargetKm">-</strong>
-    </div>
-
-    <div>
-      <span>Forecast KM</span>
-      <strong id="chartForecastKm">-</strong>
-    </div>
-
+  <div class="chart-summary-card actual">
+    <span>Actual KM</span>
+    <strong id="chartActualKm">-</strong>
+    <small>KM ที่วิ่งแล้ว</small>
   </div>
 
+  <div class="chart-summary-card target">
+    <span>Target KM</span>
+    <strong id="chartTargetKm">-</strong>
+    <small>เป้าหมายทั้งรอบ</small>
+  </div>
+
+  <div class="chart-summary-card forecast">
+    <span>Forecast KM</span>
+    <strong id="chartForecastKm">-</strong>
+    <small>ประมาณการสิ้นรอบ</small>
+  </div>
+
+</div>
   <div class="chart-wrapper">
 
     <canvas id="kmChart"></canvas>
