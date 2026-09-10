@@ -1751,3 +1751,105 @@ function updateCumulativeKmChart(
     );
 
 }
+
+function updatePerformanceStatus(
+  forecastAchievement,
+  totalKm,
+  forecastTotalKm,
+  targetTotalKm
+) {
+
+  const container =
+    document.getElementById(
+      'performanceStatus'
+    );
+
+  if (!container) return;
+
+
+  container.classList.remove(
+    'status-on-track',
+    'status-at-risk',
+    'status-below-target'
+  );
+
+
+  const statusText =
+    document.getElementById(
+      'performanceStatusText'
+    );
+
+  const detail =
+    document.getElementById(
+      'performanceStatusDetail'
+    );
+
+  const achievement =
+    document.getElementById(
+      'performanceStatusAchievement'
+    );
+
+
+  if (!forecastAchievement) {
+
+    statusText.textContent =
+      'ไม่มีข้อมูล';
+
+    detail.textContent =
+      'ไม่สามารถคำนวณ Forecast ได้';
+
+    achievement.textContent =
+      '-';
+
+    return;
+
+  }
+
+
+  achievement.textContent =
+    forecastAchievement.toFixed(1) + '%';
+
+
+  if (forecastAchievement >= 100) {
+
+    container.classList.add(
+      'status-on-track'
+    );
+
+    statusText.textContent =
+      '🟢 ON TRACK';
+
+    detail.textContent =
+      'Forecast มีแนวโน้มถึงเป้าหมายภายในรอบนี้';
+
+  }
+
+  else if (forecastAchievement >= 80) {
+
+    container.classList.add(
+      'status-at-risk'
+    );
+
+    statusText.textContent =
+      '🟡 AT RISK';
+
+    detail.textContent =
+      'Forecast ยังต่ำกว่าเป้าหมาย ควรติดตามผลงานอย่างใกล้ชิด';
+
+  }
+
+  else {
+
+    container.classList.add(
+      'status-below-target'
+    );
+
+    statusText.textContent =
+      '🔴 BELOW TARGET';
+
+    detail.textContent =
+      'Forecast ต่ำกว่าเป้าหมาย ควรเร่งเพิ่ม KM วิ่งงาน';
+
+  }
+
+}
