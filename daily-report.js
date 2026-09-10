@@ -1,4 +1,3 @@
-```javascript
 const SUPABASE_URL =
   'https://hhsqijlcebaijtklskag.supabase.co';
 
@@ -1397,4 +1396,3 @@ document.addEventListener(
 
   }
 );
-```
