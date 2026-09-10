@@ -539,3 +539,10 @@ body {
 .status-high {
   color: #2563eb !important;
 }
+
+#kmCumulativeChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
