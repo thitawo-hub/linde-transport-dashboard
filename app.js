@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://hhsqijlcebaijtklskag.supabase.co';
-const SUPABASE_KEY = 'ใส่-PUBLISHABLE-KEY-ของ-Supabase-ตรงนี้';
+const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 async function getDashboardData() {
   const url = `${SUPABASE_URL}/rest/v1/v_dashboard?select=*`;
