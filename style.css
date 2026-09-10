@@ -527,3 +527,15 @@ body {
   }
 
 }
+
+.status-low {
+  color: #dc2626 !important;
+}
+
+.status-ok {
+  color: #16a34a !important;
+}
+
+.status-high {
+  color: #2563eb !important;
+}
