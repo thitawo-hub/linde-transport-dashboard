@@ -2,6 +2,7 @@
   box-sizing: border-box;
 }
 
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -9,11 +10,17 @@ body {
   color: #1f2937;
 }
 
+
+/* =========================
+   HEADER
+========================= */
+
 .header {
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   padding: 24px 32px;
 }
+
 
 .header h1 {
   margin: 0;
@@ -21,16 +28,23 @@ body {
   font-weight: 700;
 }
 
+
 .header p {
   margin: 6px 0 0;
   color: #6b7280;
 }
+
+
+/* =========================
+   CONTAINER
+========================= */
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 24px 32px;
 }
+
 
 /* =========================
    FILTER
@@ -47,17 +61,20 @@ body {
   border-radius: 12px;
 }
 
+
 .filters > div {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
+
 .filters label {
   font-size: 13px;
   font-weight: 600;
   color: #4b5563;
 }
+
 
 .filters input,
 .filters select {
@@ -72,20 +89,18 @@ body {
   outline: none;
 }
 
-.filters input:focus,
-.filters select:focus {
-  border-color: #6b7280;
-}
 
 /* =========================
-   KPI CARDS
+   CARDS
 ========================= */
 
 .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  margin-bottom: 16px;
 }
+
 
 .card {
   background: #ffffff;
@@ -94,16 +109,19 @@ body {
   padding: 20px;
 }
 
+
 .card-title {
   font-size: 14px;
   color: #6b7280;
   margin-bottom: 8px;
 }
 
+
 .card-value {
   font-size: 28px;
   font-weight: 700;
 }
+
 
 /* =========================
    SECTION
@@ -117,30 +135,120 @@ body {
   padding: 20px;
 }
 
+
 .section h2 {
   margin-top: 0;
   font-size: 18px;
 }
 
+
+/* =========================
+   FORECAST
+========================= */
+
+.forecast-section {
+  margin-top: 24px;
+}
+
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+
+.forecast-item {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+
+.forecast-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+
+.forecast-value {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+
+.forecast-note {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+
+/* =========================
+   CAR BREAKDOWN
+========================= */
+
+.breakdown {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+
+.breakdown-name {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+
+.breakdown-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
 #status {
   color: #6b7280;
 }
+
 
 /* =========================
    RESPONSIVE
 ========================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
 
   .cards {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .filters {
-    flex-wrap: wrap;
+  .forecast-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .breakdown {
+    grid-template-columns: 1fr;
   }
 
 }
+
 
 @media (max-width: 600px) {
 
@@ -148,18 +256,22 @@ body {
     padding: 16px;
   }
 
+
   .header {
     padding: 20px 16px;
   }
+
 
   .cards {
     grid-template-columns: 1fr;
   }
 
+
   .filters {
     flex-direction: column;
     align-items: stretch;
   }
+
 
   .filters input,
   .filters select {
