@@ -3,6 +3,7 @@ const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 let dashboardData = [];
 let kmChart = null;
+let kmCumulativeChart = null;
 
 
 // ============================================================
