@@ -880,21 +880,57 @@
 
       <div class="filter-bar">
 
-        <div class="filter-group">
+  <div class="filter-group">
 
-          <div class="filter-label">
-            วันที่
-          </div>
+    <div class="filter-label">
+      วันที่
+    </div>
 
-          <input
-            type="date"
-            id="dateFilter"
-            onchange="loadReport()"
-          >
+    <input
+      type="date"
+      id="dateFilter"
+      onchange="loadReport()"
+    >
 
-        </div>
+  </div>
 
-      </div>
+
+  <div class="filter-group">
+
+    <div class="filter-label">
+      สาขา
+    </div>
+
+    <select
+      id="branchFilter"
+      onchange="applyFilters()"
+    >
+
+      <option value="ทั้งหมด">
+        ทั้งหมด
+      </option>
+
+      <option value="ระยอง">
+        ระยอง
+      </option>
+
+      <option value="ท่าลาน">
+        ท่าลาน
+      </option>
+
+      <option value="บางปะอิน">
+        บางปะอิน
+      </option>
+
+      <option value="หาดใหญ่">
+        หาดใหญ่
+      </option>
+
+    </select>
+
+  </div>
+
+</div>
 
 
       <!-- =================================================
