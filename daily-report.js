@@ -1565,14 +1565,24 @@ function getCanonicalDriverKey(
 // ============================================================
 // DRIVER SECTION
 //
-// หลักการใหม่:
+// RULE
+// ------------------------------------------------------------
+// พขร.ทั้งหมด  = Master Person
 //
-// 1. จำนวนรถ = ไม่เกี่ยวกับส่วนนี้
-// 2. พขร.ทำงาน = นับ "คน" ที่มีงานจริงจาก vehicle_schedules
-// 3. คนเดิมหลายเที่ยว / หลายรอบ = นับ 1 คน
-// 4. รถคันเดิม แต่ พขร.คนละคน = นับ 2 คน
-// 5. COCO / LOCO ยังคงแยกประเภทเหมือนเดิม
-// 6. พขร. LOCO ต้องถูกนับรวมใน "พขร.ทำงาน"
+// ทำงาน COCO
+//   = พขร.ที่ถูกจัดรถ และทะเบียนอยู่ใน Master Car
+//
+// วิ่งงาน LOCO
+//   = พขร.ที่ถูกจัดรถ และทะเบียนไม่อยู่ใน Master Car
+//
+// คนเดียวกันหลายเที่ยว / หลายรอบ
+//   = นับ 1 คน
+//
+// คนเดียวกันมีทั้ง COCO + LOCO
+//   = นับ 1 คน และให้ COCO เป็นหลัก
+//
+// ไม่มีงาน
+//   = พขร.ทั้งหมด - พขร.ที่มีงานจริง
 // ============================================================
 
 function renderDriverSection() {
@@ -1580,10 +1590,8 @@ function renderDriverSection() {
   const filteredDrivers =
     getFilteredMasterDrivers();
 
-
   const filteredSchedules =
     getFilteredVehicleSchedules();
-
 
   const filteredCars =
     getFilteredMasterCars();
@@ -1592,23 +1600,30 @@ function renderDriverSection() {
   // ==========================================================
   // MASTER CAR PLATE
   //
-  // ใช้แยก COCO / LOCO เท่านั้น
-  // ไม่ได้ใช้กำหนดว่าคนไหน "ทำงาน"
+  // ใช้แยก COCO / LOCO
   // ==========================================================
 
   const masterCarPlates =
-    new Set(
+    new Set();
 
-      filteredCars
-        .map(
-          car =>
-            normalizePlate(
-              car.license_plate
-            )
-        )
-        .filter(Boolean)
+  filteredCars.forEach(
+    car => {
 
-    );
+      const plate =
+        normalizePlate(
+          car.license_plate
+        );
+
+      if (plate) {
+
+        masterCarPlates.add(
+          plate
+        );
+
+      }
+
+    }
+  );
 
 
   // ==========================================================
@@ -1620,29 +1635,47 @@ function renderDriverSection() {
 
 
   // ==========================================================
-  // DRIVER SET
+  // MASTER DRIVER KEY
   //
-  // สำคัญ:
-  //
-  // cocoDrivers = คนที่มีงานกับรถ Master Car
-  // locoDrivers = คนที่มีงานกับรถที่ไม่อยู่ Master Car
-  //
-  // workingDrivers = COCO + LOCO
+  // เอาเฉพาะคนที่อยู่ใน Master Person
+  // ==========================================================
+
+  const masterDriverKeys =
+    new Set();
+
+  filteredDrivers.forEach(
+    driver => {
+
+      const key =
+        getCanonicalDriverKey(
+          driver
+        );
+
+      if (key) {
+
+        masterDriverKeys.add(
+          key
+        );
+
+      }
+
+    }
+  );
+
+
+  // ==========================================================
+  // WORKING DRIVER SET
   // ==========================================================
 
   const cocoDrivers =
     new Set();
-
 
   const locoDrivers =
     new Set();
 
 
   // ==========================================================
-  // ตรวจทุกแถวใน vehicle_schedules
-  //
-  // ไม่สนใจว่ารถคันเดียวกันมีกี่รอบ
-  // สนใจว่า "คน" ถูกจัดงานหรือไม่
+  // LOOP VEHICLE SCHEDULES
   // ==========================================================
 
   filteredSchedules.forEach(
@@ -1654,7 +1687,7 @@ function renderDriverSection() {
         ).trim();
 
 
-      // ไม่มีชื่อ พขร. = ไม่นับ
+      // ไม่มีชื่อคน
       if (!rawDriverName) {
 
         return;
@@ -1663,7 +1696,7 @@ function renderDriverSection() {
 
 
       // ------------------------------------------------------
-      // หา Driver Key จาก Master Person
+      // หา Master Person
       // ------------------------------------------------------
 
       const normalizedName =
@@ -1678,12 +1711,22 @@ function renderDriverSection() {
         );
 
 
-      // ถ้าหา Master Person ไม่เจอ
-      // ยังไม่ควรเอาไปนับ เพราะเราไม่รู้ว่าเป็น พขร. คนไหน
-      if (!driverKey) {
+      // ------------------------------------------------------
+      // สำคัญมาก
+      //
+      // ถ้าไม่เจอใน Master Person
+      // ไม่นับเป็น พขร.
+      // ------------------------------------------------------
+
+      if (
+        !driverKey ||
+        !masterDriverKeys.has(
+          driverKey
+        )
+      ) {
 
         console.warn(
-          'ไม่พบ Master Person:',
+          'Driver ไม่พบใน Master Person:',
           rawDriverName
         );
 
@@ -1693,7 +1736,7 @@ function renderDriverSection() {
 
 
       // ------------------------------------------------------
-      // Plate ใช้แค่ตัดสิน COCO / LOCO
+      // ทะเบียนรถ
       // ------------------------------------------------------
 
       const plate =
@@ -1709,9 +1752,9 @@ function renderDriverSection() {
       }
 
 
-      // ------------------------------------------------------
+      // ======================================================
       // COCO
-      // ------------------------------------------------------
+      // ======================================================
 
       if (
         masterCarPlates.has(
@@ -1725,9 +1768,10 @@ function renderDriverSection() {
 
       }
 
-      // ------------------------------------------------------
+
+      // ======================================================
       // LOCO
-      // ------------------------------------------------------
+      // ======================================================
 
       else {
 
@@ -1744,9 +1788,10 @@ function renderDriverSection() {
   // ==========================================================
   // COCO PRIORITY
   //
-  // ถ้าคนเดียวกันมีทั้ง COCO และ LOCO
-  // ให้แสดงเป็น COCO
-  // แต่ยังนับเป็นคนทำงานเพียง 1 คน
+  // ถ้าคนเดียวกันอยู่ทั้ง COCO และ LOCO
+  // ต้องนับเป็นคนเดียว
+  //
+  // และให้แสดงเป็น COCO
   // ==========================================================
 
   locoDrivers.forEach(
@@ -1769,22 +1814,11 @@ function renderDriverSection() {
 
 
   // ==========================================================
-  // จำนวน พขร. ทั้งหมด
+  // WORKING DRIVER
   //
-  // Master Person ตามสาขา
-  // ==========================================================
-
-  const totalDrivers =
-    filteredDrivers.length;
-
-
-  // ==========================================================
-  // จำนวนคนทำงานจริง
+  // รวม COCO + LOCO
   //
-  // 🔥 จุดที่แก้สำคัญ
-  //
-  // COCO + LOCO
-  // แต่แต่ละคน DISTINCT แล้ว
+  // Set = DISTINCT
   // ==========================================================
 
   const workingDriverSet =
@@ -1794,31 +1828,25 @@ function renderDriverSection() {
     ]);
 
 
-  const workingDrivers =
-    workingDriverSet.size;
-
-
   // ==========================================================
-  // LOCO
+  // KPI
   // ==========================================================
 
-  const locoDriverCount =
-    locoDrivers.size;
+  const totalDrivers =
+    masterDriverKeys.size;
 
-
-  // ==========================================================
-  // COCO
-  // ==========================================================
 
   const cocoDriverCount =
     cocoDrivers.size;
 
 
-  // ==========================================================
-  // คนที่ไม่มีงาน
-  //
-  // Master Person - คนที่มีงานจริง
-  // ==========================================================
+  const locoDriverCount =
+    locoDrivers.size;
+
+
+  const workingDrivers =
+    workingDriverSet.size;
+
 
   const noJobDrivers =
     Math.max(
@@ -1840,7 +1868,7 @@ function renderDriverSection() {
 
   setText(
     'driverWorking',
-    workingDrivers
+    cocoDriverCount
   );
 
 
@@ -1865,7 +1893,7 @@ function renderDriverSection() {
   );
 
   console.log(
-    'Driver Report'
+    'DAILY DRIVER REPORT'
   );
 
   console.log(
@@ -1874,27 +1902,33 @@ function renderDriverSection() {
   );
 
   console.log(
-    'Master Drivers:',
+    'Master Person:',
     totalDrivers
   );
 
   console.log(
-    'COCO Drivers:',
+    'COCO:',
     cocoDriverCount
   );
 
   console.log(
-    'LOCO Drivers:',
+    'LOCO:',
     locoDriverCount
   );
 
   console.log(
-    'Working Drivers:',
+    'Working DISTINCT:',
     workingDrivers
   );
 
   console.log(
-    'No Job Drivers:',
+    'No Job:',
+    noJobDrivers
+  );
+
+  console.log(
+    'Check:',
+    workingDrivers +
     noJobDrivers
   );
 
@@ -1913,14 +1947,18 @@ function renderDriverSection() {
     );
 
 
-  if (!tbody) return;
+  if (!tbody) {
+
+    return;
+
+  }
 
 
   tbody.innerHTML = '';
 
 
   // ==========================================================
-  // แสดง Master Person ทุกคน
+  // MASTER PERSON ทุกคน
   // ==========================================================
 
   filteredDrivers
@@ -1952,10 +1990,13 @@ function renderDriverSection() {
         let workType =
           'ไม่มีงาน';
 
-
         let statusClass =
           'status-gray';
 
+
+        // ----------------------------------------------------
+        // COCO
+        // ----------------------------------------------------
 
         if (
           cocoDrivers.has(
@@ -1970,6 +2011,11 @@ function renderDriverSection() {
             'status-green';
 
         }
+
+
+        // ----------------------------------------------------
+        // LOCO
+        // ----------------------------------------------------
 
         else if (
           locoDrivers.has(
@@ -1988,11 +2034,6 @@ function renderDriverSection() {
 
         // ====================================================
         // ASSIGNED CARS
-        //
-        // รถที่คนนี้ถูกจัดงาน
-        //
-        // รถคันเดียวกันหลายรอบ
-        // ให้แสดงรถไม่ซ้ำ
         // ====================================================
 
         const assignedCars = [
@@ -2035,11 +2076,11 @@ function renderDriverSection() {
 
 
         // ====================================================
-        // ASSIGNED JOB COUNT
+        // JOB COUNT
         //
-        // จำนวนรายการงานของคนนี้
+        // จำนวนรายการจัดรถของคนนี้
         //
-        // ไม่เอาไปใช้เป็นจำนวนคน
+        // ไม่ใช่จำนวนคน
         // ====================================================
 
         const assignedJobCount =
@@ -2064,7 +2105,7 @@ function renderDriverSection() {
 
 
         // ====================================================
-        // ROW
+        // TABLE ROW
         // ====================================================
 
         const tr =
@@ -2090,13 +2131,11 @@ function renderDriverSection() {
           </td>
 
           <td>
-
             <span class="status-badge ${statusClass}">
               ${escapeHtml(
                 workType
               )}
             </span>
-
           </td>
 
           <td>
@@ -2141,7 +2180,6 @@ function renderDriverSection() {
     );
 
 }
-
 // ============================================================
 // DRIVER SHIFT STATUS
 // ============================================================
