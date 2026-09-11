@@ -1,58 +1,11 @@
 // ============================================================
-// DAILY REPORT
-// Google Sheets → Supabase
-//
-// SOURCE
-// 🚛 รถ
-//    = Master Car + ตารางจัดรถ
-//
-// 👨‍✈️ พขร.
-//    = Master Person + ตารางจัดรถ
-//
-// 📋 สถานะการทำงาน
-//    = ตารางกะ / driver_shifts
-//    = ใช้ description เป็นสถานะที่แสดง
-//
-// LOGIC พขร.
-// 1. พขร.ทั้งหมด
-//    = Master Person
-//
-// 2. พขร.ทำงาน
-//    = คนที่จัดรถ Master Car
-//
-// 3. พขร.วิ่งงาน LOCO
-//    = คนที่จัดรถ แต่ทะเบียนรถไม่อยู่ใน Master Car
-//
-// 4. พขร.ไม่มีงาน
-//    = พขร.ทั้งหมด - ทำงาน - LOCO
-//
-// IMPORTANT
-// - ไม่เอา driver_shifts มาปนกับ Card สถานะ พขร.
-// - driver_shifts ใช้สำหรับ "สถานะการทำงานจากตารางกะ"
+// LINDE TRANSPORT - DAILY REPORT
 // ============================================================
 
+const SUPABASE_URL = 'https://hhsqijlcebaijtklskag.supabase.co';
 
-
-// ============================================================
-// SUPABASE
-// ============================================================
-
-const SUPABASE_URL =
-  'https://hhsqijlcebaijtklskag.supabase.co';
-
-// ใส่ Publishable Key เดิมของเธอ
-const SUPABASE_KEY =
-  'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
-
-
-
-// ============================================================
-// CONFIG
-// ============================================================
-
-const PAGE_SIZE = 1000;
-
-
+// ใช้ Publishable Key เดิมของเธอ
+const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 // ============================================================
 // GLOBAL DATA
@@ -60,13 +13,9 @@ const PAGE_SIZE = 1000;
 
 let masterCars = [];
 let masterDrivers = [];
-
-let dailyReport = [];
+let vehicleSchedules = [];
+let dailyVehicleData = [];
 let driverShifts = [];
-
-let currentDate = '';
-let currentBranch = '';
-
 
 
 // ============================================================
@@ -75,1391 +24,536 @@ let currentBranch = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-  setDefaultDate();
+  setToday();
 
-  const dateInput =
-    document.getElementById('reportDate');
-
-  const branchSelect =
-    document.getElementById('branchFilter');
-
-
-  if (dateInput) {
-
-    dateInput.addEventListener(
-      'change',
-      loadReport
-    );
-
-  }
-
-
-  if (branchSelect) {
-
-    branchSelect.addEventListener(
-      'change',
-      loadReport
-    );
-
-  }
-
-
-  await initReport();
+  await loadReport();
 
 });
 
 
+// ============================================================
+// DATE
+// ============================================================
+
+function setToday() {
+
+  const el = document.getElementById('dateFilter');
+
+  if (!el) return;
+
+  if (!el.value) {
+
+    const today = new Date();
+
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    el.value = `${yyyy}-${mm}-${dd}`;
+  }
+
+}
+
 
 // ============================================================
-// INIT REPORT
+// MAIN LOAD
 // ============================================================
 
-async function initReport() {
+async function loadReport() {
+
+  const date =
+    document.getElementById('dateFilter')?.value;
+
+  if (!date) return;
+
+  showLoading(true);
 
   try {
 
-    showLoading(true);
-
-    clearError();
-
-
-    // --------------------------------------------------------
     // โหลด Master
-    // --------------------------------------------------------
-
     await Promise.all([
       loadMasterCars(),
       loadMasterDrivers()
     ]);
 
+    // โหลดข้อมูล Daily Report + ตารางจัดรถ + ตารางกะ
+    await Promise.all([
+      loadDailyVehicleData(date),
+      loadVehicleSchedules(date),
+      loadDriverShifts(date)
+    ]);
 
-    // --------------------------------------------------------
-    // เติม Dropdown สาขา
-    // --------------------------------------------------------
-
-    populateBranchFilter();
-
-
-    // --------------------------------------------------------
-    // โหลดข้อมูลรายวัน
-    // --------------------------------------------------------
-
-    await loadReport();
-
-
-    showLoading(false);
-
-  }
-
-  catch (error) {
-
-    console.error(
-      'INIT ERROR:',
-      error
-    );
-
-    showError(
-      error.message ||
-      'ไม่สามารถโหลดข้อมูลได้'
-    );
-
-    showLoading(false);
-
-  }
-
-}
-
-
-
-// ============================================================
-// DEFAULT DATE
-// ============================================================
-
-function setDefaultDate() {
-
-  const input =
-    document.getElementById(
-      'reportDate'
-    );
-
-  if (!input) return;
-
-
-  const now =
-    new Date();
-
-
-  const yyyy =
-    now.getFullYear();
-
-  const mm =
-    String(
-      now.getMonth() + 1
-    ).padStart(2, '0');
-
-  const dd =
-    String(
-      now.getDate()
-    ).padStart(2, '0');
-
-
-  input.value =
-    `${yyyy}-${mm}-${dd}`;
-
-}
-
-
-
-// ============================================================
-// LOAD MASTER CARS
-// ============================================================
-
-async function loadMasterCars() {
-
-  const url =
-    `${SUPABASE_URL}/rest/v1/master_cars` +
-    `?select=id,branch,car_no,license_plate,vehicle_type,target_km` +
-    `&order=branch.asc,car_no.asc`;
-
-
-  masterCars =
-    await supabaseFetchAll(url);
-
-
-  console.log(
-    'Master Cars:',
-    masterCars.length
-  );
-
-}
-
-
-
-// ============================================================
-// LOAD MASTER DRIVERS
-// ============================================================
-
-async function loadMasterDrivers() {
-
-  const url =
-    `${SUPABASE_URL}/rest/v1/master_drivers` +
-    `?select=id,branch,driver_name,driver_name_en,position,resigned_date,driver_key` +
-    `&order=branch.asc,driver_name.asc`;
-
-
-  masterDrivers =
-    await supabaseFetchAll(url);
-
-
-  console.log(
-    'Master Drivers:',
-    masterDrivers.length
-  );
-
-}
-
-
-
-// ============================================================
-// POPULATE BRANCH FILTER
-// ============================================================
-
-function populateBranchFilter() {
-
-  const select =
-    document.getElementById(
-      'branchFilter'
-    );
-
-  if (!select) return;
-
-
-  const currentValue =
-    select.value;
-
-
-  const branches =
-    getBranches();
-
-
-  select.innerHTML = '';
-
-
-  const allOption =
-    document.createElement('option');
-
-  allOption.value = '';
-
-  allOption.textContent =
-    'ทั้งหมด';
-
-  select.appendChild(
-    allOption
-  );
-
-
-  branches.forEach(branch => {
-
-    const option =
-      document.createElement('option');
-
-    option.value =
-      branch;
-
-    option.textContent =
-      branch;
-
-    select.appendChild(
-      option
-    );
-
-  });
-
-
-  if (
-    currentValue &&
-    branches.includes(currentValue)
-  ) {
-
-    select.value =
-      currentValue;
-
-  }
-
-}
-
-
-
-// ============================================================
-// GET UNIQUE BRANCHES
-// ============================================================
-
-function getBranches() {
-
-  const branches =
-    new Set();
-
-
-  masterCars.forEach(car => {
-
-    if (!car.branch) return;
-
-    const branch =
-      String(car.branch).trim();
-
-    if (branch) {
-      branches.add(branch);
-    }
-
-  });
-
-
-  masterDrivers.forEach(driver => {
-
-    if (!driver.branch) return;
-
-    const branch =
-      String(driver.branch).trim();
-
-    if (branch) {
-      branches.add(branch);
-    }
-
-  });
-
-
-  return [...branches]
-    .sort(
-      (a, b) =>
-        a.localeCompare(
-          b,
-          'th'
-        )
-    );
-
-}
-
-
-
-// ============================================================
-// LOAD REPORT
-// ============================================================
-
-async function loadReport() {
-
-  try {
-
-    const dateInput =
-      document.getElementById(
-        'reportDate'
-      );
-
-    const branchInput =
-      document.getElementById(
-        'branchFilter'
-      );
-
-
-    currentDate =
-      dateInput
-        ? dateInput.value
-        : '';
-
-
-    currentBranch =
-      branchInput
-        ? branchInput.value
-        : '';
-
-
-    if (!currentDate) {
-      return;
-    }
-
-
-    showLoading(true);
-
-    clearError();
-
-
-    // --------------------------------------------------------
-    // โหลดข้อมูลวันนั้น
-    // --------------------------------------------------------
-
-    const [
-      vehicleData,
-      shiftData
-    ] =
-      await Promise.all([
-
-        loadDailyVehicleData(
-          currentDate
-        ),
-
-        loadDriverShifts(
-          currentDate
-        )
-
-      ]);
-
-
-    dailyReport =
-      vehicleData || [];
-
-
-    driverShifts =
-      shiftData || [];
-
-
-    console.log(
-      'Daily Vehicle:',
-      dailyReport.length
-    );
-
-
-    console.log(
-      'Driver Shifts:',
-      driverShifts.length
-    );
-
-
-    // --------------------------------------------------------
     // Render
-    // --------------------------------------------------------
-
     renderVehicleSection();
 
     renderDriverSection();
 
-    renderShiftSection();
+    renderDriverShiftSection();
 
-
-    updateReportInfo();
-
+    updateReportInfo(date);
 
     showLoading(false);
 
-  }
+  } catch (error) {
 
-  catch (error) {
+    console.error(error);
 
-    console.error(
-      'LOAD REPORT ERROR:',
-      error
-    );
+    showLoading(false);
 
     showError(
-      error.message ||
-      'โหลดข้อมูลไม่สำเร็จ'
+      error?.message ||
+      'ไม่สามารถโหลดข้อมูลได้'
     );
 
-    showLoading(false);
-
   }
 
 }
 
 
-
 // ============================================================
-// UPDATE REPORT INFO
+// SUPABASE FETCH
 // ============================================================
 
-function updateReportInfo() {
+async function supabaseFetchAll(table, query = '') {
 
-  const el =
-    document.getElementById(
-      'reportInfo'
+  const url =
+    `${SUPABASE_URL}/rest/v1/${table}` +
+    (query ? `?${query}` : '');
+
+  // ใช้เฉพาะ apikey
+  // ไม่ส่ง Authorization เพื่อป้องกัน browser header error
+  const response = await fetch(url, {
+
+    method: 'GET',
+
+    headers: {
+      'apikey': SUPABASE_KEY
+    }
+
+  });
+
+  if (!response.ok) {
+
+    const text = await response.text();
+
+    throw new Error(
+      `${table}: HTTP ${response.status} ${text}`
     );
 
-  if (!el) return;
-
-
-  let text =
-    `ข้อมูลวันที่ ${formatDateThai(currentDate)}`;
-
-
-  if (
-    currentBranch &&
-    currentBranch !== 'ALL'
-  ) {
-
-    text +=
-      ` · ${currentBranch}`;
-
   }
 
-
-  el.textContent =
-    text;
+  return await response.json();
 
 }
 
 
-
 // ============================================================
-// FORMAT DATE THAI
+// MASTER CAR
 // ============================================================
 
-function formatDateThai(dateString) {
+async function loadMasterCars() {
 
-  if (!dateString) {
-    return '-';
-  }
+  const params = new URLSearchParams();
 
+  params.set(
+    'select',
+    'id,branch,car_no,license_plate,vehicle_type,target_km'
+  );
 
-  const parts =
-    String(dateString).split('-');
+  params.set(
+    'order',
+    'car_no.asc'
+  );
 
-
-  if (parts.length !== 3) {
-    return dateString;
-  }
-
-
-  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  masterCars =
+    await supabaseFetchAll(
+      'master_cars',
+      params.toString()
+    );
 
 }
 
 
+// ============================================================
+// MASTER DRIVER
+// ============================================================
+
+async function loadMasterDrivers() {
+
+  const params = new URLSearchParams();
+
+  params.set(
+    'select',
+    'id,branch,driver_name,driver_name_en,position,resigned_date,driver_key'
+  );
+
+  params.set(
+    'order',
+    'driver_name.asc'
+  );
+
+  masterDrivers =
+    await supabaseFetchAll(
+      'master_drivers',
+      params.toString()
+    );
+
+}
+
 
 // ============================================================
-// LOAD VEHICLE DAILY DATA
+// DAILY VEHICLE VIEW
 // ============================================================
 
 async function loadDailyVehicleData(date) {
 
-  const url =
-    `${SUPABASE_URL}/rest/v1/v_daily_report` +
-    `?work_date=eq.${encodeURIComponent(date)}` +
-    `&select=*`;
+  const params = new URLSearchParams();
 
+  params.set(
+    'select',
+    '*'
+  );
 
-  return await supabaseFetchAll(url);
+  params.set(
+    'work_date',
+    `eq.${date}`
+  );
+
+  params.set(
+    'order',
+    'car_no.asc'
+  );
+
+  dailyVehicleData =
+    await supabaseFetchAll(
+      'v_daily_report',
+      params.toString()
+    );
 
 }
 
 
+// ============================================================
+// VEHICLE SCHEDULES
+// ============================================================
+
+async function loadVehicleSchedules(date) {
+
+  const params = new URLSearchParams();
+
+  params.set(
+    'select',
+    '*'
+  );
+
+  params.set(
+    'work_date',
+    `eq.${date}`
+  );
+
+  params.set(
+    'order',
+    'id.asc'
+  );
+
+  vehicleSchedules =
+    await supabaseFetchAll(
+      'vehicle_schedules',
+      params.toString()
+    );
+
+}
+
 
 // ============================================================
-// LOAD DRIVER SHIFTS
+// DRIVER SHIFTS
 // ============================================================
 
 async function loadDriverShifts(date) {
 
-  const url =
-    `${SUPABASE_URL}/rest/v1/driver_shifts` +
-    `?work_date=eq.${encodeURIComponent(date)}` +
-    `&select=id,work_date,driver_name,driver_name_en,status,description,driver_name_master,driver_key,shift_id` +
-    `&order=id.asc`;
-
-
-  return await supabaseFetchAll(url);
-
-}
-
-
-
-// ============================================================
-// BUILD MASTER CAR MAP
-// ============================================================
-
-function buildMasterCarMap() {
-
-  const map =
-    new Map();
-
-
-  masterCars.forEach(car => {
-
-    const plate =
-      normalizePlate(
-        car.license_plate
-      );
-
-
-    if (!plate) {
-      return;
-    }
-
-
-    map.set(
-      plate,
-      car
-    );
-
-  });
-
-
-  return map;
-
-}
-
-
-
-// ============================================================
-// BUILD MASTER DRIVER MAP
-//
-// Map หลาย key เพื่อรองรับ:
-// - driver_key
-// - ชื่อไทย
-// - ชื่ออังกฤษ
-// ============================================================
-
-function buildMasterDriverMap() {
-
-  const map =
-    new Map();
-
-
-  masterDrivers.forEach(driver => {
-
-    const keys = [
-
-      normalizeKey(
-        driver.driver_key
-      ),
-
-      normalizeName(
-        driver.driver_name
-      ),
-
-      normalizeName(
-        driver.driver_name_en
-      )
-
-    ];
-
-
-    keys.forEach(key => {
-
-      if (!key) return;
-
-
-      if (!map.has(key)) {
-
-        map.set(
-          key,
-          driver
-        );
-
-      }
-
-    });
-
-  });
-
-
-  return map;
-
-}
-
-
-
-// ============================================================
-// BUILD CANONICAL DRIVER MAP
-//
-// ใช้สำหรับแก้ปัญหา:
-// ตารางจัดรถใช้ชื่อ
-// Master Person ใช้ driver_key
-//
-// ทุกชื่อจะถูกแปลงกลับไปเป็น key ของ Master Person
-// ============================================================
-
-function buildCanonicalDriverMap() {
-
-  const map =
-    new Map();
-
-
-  masterDrivers.forEach(driver => {
-
-    const canonicalKey =
-      getMasterDriverCanonicalKey(
-        driver
-      );
-
-
-    if (!canonicalKey) {
-      return;
-    }
-
-
-    const keys = [
-
-      normalizeKey(
-        driver.driver_key
-      ),
-
-      normalizeName(
-        driver.driver_name
-      ),
-
-      normalizeName(
-        driver.driver_name_en
-      )
-
-    ];
-
-
-    keys.forEach(key => {
-
-      if (!key) return;
-
-
-      map.set(
-        key,
-        canonicalKey
-      );
-
-    });
-
-  });
-
-
-  return map;
-
-}
-
-
-
-// ============================================================
-// GET MASTER DRIVER CANONICAL KEY
-// ============================================================
-
-function getMasterDriverCanonicalKey(
-  driver
-) {
-
-  if (!driver) {
-    return '';
-  }
-
-
-  if (driver.driver_key) {
-
-    return normalizeKey(
-      driver.driver_key
-    );
-
-  }
-
-
-  if (driver.driver_name) {
-
-    return normalizeName(
-      driver.driver_name
-    );
-
-  }
-
-
-  if (driver.driver_name_en) {
-
-    return normalizeName(
-      driver.driver_name_en
-    );
-
-  }
-
-
-  return '';
-
-}
-
-
-
-// ============================================================
-// FIND MASTER DRIVER
-// ============================================================
-
-function findMasterDriver(
-  value,
-  masterDriverMap
-) {
-
-  const key =
-    normalizeKey(value);
-
-
-  if (!key) {
-    return null;
-  }
-
-
-  return (
-    masterDriverMap.get(key) ||
-    null
+  const params = new URLSearchParams();
+
+  params.set(
+    'select',
+    'id,work_date,driver_name,driver_name_en,status,description,driver_name_master,driver_key,source_sheet'
   );
 
-}
-
-
-
-// ============================================================
-// NORMALIZE PLATE
-// ============================================================
-
-function normalizePlate(value) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return '';
-
-  }
-
-
-  return String(value)
-    .trim()
-    .replace(/\s+/g, '')
-    .toUpperCase();
-
-}
-
-
-
-// ============================================================
-// NORMALIZE NAME
-// ============================================================
-
-function normalizeName(value) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return '';
-
-  }
-
-
-  return String(value)
-    .trim()
-    .replace(/\s+/g, ' ')
-    .toLowerCase();
-
-}
-
-
-
-// ============================================================
-// NORMALIZE KEY
-// ============================================================
-
-function normalizeKey(value) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return '';
-
-  }
-
-
-  return String(value)
-    .trim()
-    .replace(/\s+/g, ' ')
-    .toLowerCase();
-
-}
-
-
-
-// ============================================================
-// GET DRIVER KEY
-// ============================================================
-
-function getDriverKey(driver) {
-
-  if (!driver) {
-    return '';
-  }
-
-
-  if (driver.driver_key) {
-
-    return normalizeKey(
-      driver.driver_key
-    );
-
-  }
-
-
-  if (driver.driver_name_master) {
-
-    return normalizeName(
-      driver.driver_name_master
-    );
-
-  }
-
-
-  if (driver.driver_name) {
-
-    return normalizeName(
-      driver.driver_name
-    );
-
-  }
-
-
-  if (driver.driver_name_en) {
-
-    return normalizeName(
-      driver.driver_name_en
-    );
-
-  }
-
-
-  return '';
-
-}
-
-
-
-// ============================================================
-// GET DRIVER DISPLAY NAME
-// ============================================================
-
-function getDriverDisplayName(
-  driver
-) {
-
-  if (!driver) {
-    return '-';
-  }
-
-
-  return (
-    driver.driver_name_master ||
-    driver.driver_name ||
-    driver.driver_name_en ||
-    '-'
+  params.set(
+    'work_date',
+    `eq.${date}`
   );
 
-}
-
-
-
-// ============================================================
-// FILTER BRANCH
-// ============================================================
-
-function isBranchMatch(branch) {
-
-  if (
-    !currentBranch ||
-    currentBranch === 'ALL'
-  ) {
-
-    return true;
-
-  }
-
-
-  return (
-    normalizeBranch(branch) ===
-    normalizeBranch(currentBranch)
+  params.set(
+    'order',
+    'id.asc'
   );
 
-}
-
-
-
-// ============================================================
-// NORMALIZE BRANCH
-// ============================================================
-
-function normalizeBranch(value) {
-
-  if (!value) {
-    return '';
-  }
-
-
-  return String(value)
-    .trim()
-    .replace(/\s+/g, '');
+  driverShifts =
+    await supabaseFetchAll(
+      'driver_shifts',
+      params.toString()
+    );
 
 }
 
 
-
 // ============================================================
-// RENDER VEHICLE SECTION
+// VEHICLE SECTION
 // ============================================================
 
 function renderVehicleSection() {
 
-  const masterCarMap =
-    buildMasterCarMap();
+  const totalCars =
+    masterCars.length;
 
+  const jobCars =
+    dailyVehicleData.filter(
+      row =>
+        String(row.job_status || '').trim() === 'มีงาน'
+    ).length;
 
-  // --------------------------------------------------------
-  // รถจาก Master Car
-  // --------------------------------------------------------
-
-  const cars =
-    masterCars.filter(car =>
-      isBranchMatch(
-        car.branch
-      )
+  const noJobCars =
+    Math.max(
+      0,
+      totalCars - jobCars
     );
 
-
-  // --------------------------------------------------------
-  // ตารางจัดรถของวันนั้น
-  // --------------------------------------------------------
-
-  const schedules =
-    dailyReport || [];
-
-
-  const scheduleByPlate =
-    new Map();
-
-
-  schedules.forEach(row => {
-
-    const plate =
-      normalizePlate(
-        row.license_plate
-      );
-
-
-    if (!plate) {
-      return;
-    }
-
-
-    // รถที่อยู่ใน Master เท่านั้น
-    if (!masterCarMap.has(plate)) {
-      return;
-    }
-
-
-    if (
-      !scheduleByPlate.has(
-        plate
-      )
-    ) {
-
-      scheduleByPlate.set(
-        plate,
-        []
-      );
-
-    }
-
-
-    scheduleByPlate
-      .get(plate)
-      .push(row);
-
-  });
-
-
-  // --------------------------------------------------------
-  // SUMMARY
-  // --------------------------------------------------------
-
-  let totalCars =
-    cars.length;
-
-  let jobCars = 0;
-
-  let noJobCars = 0;
-
-
-  cars.forEach(car => {
-
-    const plate =
-      normalizePlate(
-        car.license_plate
-      );
-
-
-    const jobs =
-      scheduleByPlate.get(
-        plate
-      ) || [];
-
-
-    if (jobs.length > 0) {
-
-      jobCars++;
-
-    }
-
-    else {
-
-      noJobCars++;
-
-    }
-
-  });
-
-
-  // --------------------------------------------------------
-  // CAR CARDS
-  // --------------------------------------------------------
-
   setText(
-    'totalCars',
+    'vehicleTotal',
     totalCars
   );
 
   setText(
-    'jobCars',
+    'vehicleWorking',
     jobCars
   );
 
   setText(
-    'noJobCars',
+    'vehicleNoJob',
     noJobCars
   );
 
 
-  // --------------------------------------------------------
-  // CAR TABLE
-  // --------------------------------------------------------
-
   const tbody =
     document.getElementById(
-      'reportTableBody'
+      'vehicleTableBody'
     );
 
-
-  if (!tbody) {
-    return;
-  }
-
+  if (!tbody) return;
 
   tbody.innerHTML = '';
 
 
-  cars.forEach(car => {
+  masterCars.forEach(car => {
 
-    const plate =
-      normalizePlate(
-        car.license_plate
-      );
+    const daily =
+      dailyVehicleData.find(row =>
+        normalizePlate(row.license_plate) ===
+        normalizePlate(car.license_plate)
+    );
 
-
-    const jobs =
-      scheduleByPlate.get(
-        plate
-      ) || [];
-
-
-    // ------------------------------------------------------
-    // ไม่มีงาน
-    // ------------------------------------------------------
-
-    if (jobs.length === 0) {
-
-      const tr =
-        document.createElement(
-          'tr'
-        );
+    const schedules =
+      vehicleSchedules.filter(row =>
+        normalizePlate(row.license_plate) ===
+        normalizePlate(car.license_plate)
+    );
 
 
-      tr.innerHTML = `
-
-        <td>
-          ${escapeHtml(
-            car.branch || '-'
-          )}
-        </td>
-
-        <td>
-          ${escapeHtml(
-            car.car_no || '-'
-          )}
-        </td>
-
-        <td>
-          ${escapeHtml(
-            car.license_plate || '-'
-          )}
-        </td>
-
-        <td>
-          ${escapeHtml(
-            car.vehicle_type || '-'
-          )}
-        </td>
-
-        <td>
-          <span class="status-badge no-job">
-            ไม่มีงาน
-          </span>
-        </td>
-
-        <td>-</td>
-
-        <td>-</td>
-
-        <td>-</td>
-
-        <td>-</td>
-
-        <td>-</td>
-
-        <td>-</td>
-
-        <td>0</td>
-
-      `;
+    const drivers = [
+      ...new Set(
+        schedules
+          .map(row =>
+            String(row.driver_name || '').trim()
+          )
+          .filter(Boolean)
+      )
+    ];
 
 
-      tbody.appendChild(
-        tr
-      );
+    const jobStatus =
+      daily?.job_status || 'ไม่มีงาน';
 
 
-      return;
-
-    }
-
-
-    // ------------------------------------------------------
-    // มีงาน
-    // ------------------------------------------------------
-
-    jobs.forEach(job => {
-
-      const tr =
-        document.createElement(
-          'tr'
-        );
+    const tr =
+      document.createElement('tr');
 
 
-      tr.innerHTML = `
+    tr.innerHTML = `
 
-        <td>
-          ${escapeHtml(
-            car.branch || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(car.branch || '-')}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            car.car_no || '-'
-          )}
-        </td>
+      <td>
+        <strong>
+          ${escapeHtml(car.car_no || '-')}
+        </strong>
+      </td>
 
-        <td>
-          ${escapeHtml(
-            car.license_plate || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(car.license_plate || '-')}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            car.vehicle_type || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(car.vehicle_type || '-')}
+      </td>
 
-        <td>
-          <span class="status-badge job">
-            มีงาน
-          </span>
-        </td>
+      <td>
+        <span class="status-badge ${
+          jobStatus === 'มีงาน'
+            ? 'status-green'
+            : 'status-gray'
+        }">
+          ${escapeHtml(jobStatus)}
+        </span>
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.car_status || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(
+          daily?.car_status || '-'
+        )}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.planning || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(
+          daily?.planning || '-'
+        )}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.lts_no || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(
+          daily?.lts_no || '-'
+        )}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.driver_name || '-'
-          )}
-        </td>
+      <td>
+        ${
+          drivers.length
+            ? drivers
+                .map(driver =>
+                  `<span class="driver-chip">
+                    ${escapeHtml(driver)}
+                  </span>`
+                )
+                .join('<br>')
+            : '-'
+        }
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.time_period || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(
+          daily?.time_period || '-'
+        )}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.weight_type || '-'
-          )}
-        </td>
+      <td>
+        ${escapeHtml(
+          daily?.weight_type || '-'
+        )}
+      </td>
 
-        <td>
-          ${escapeHtml(
-            job.schedule_count || 1
-          )}
-        </td>
+      <td>
+        ${daily?.schedule_count || 0}
+      </td>
 
-      `;
+    `;
 
-
-      tbody.appendChild(
-        tr
-      );
-
-    });
+    tbody.appendChild(tr);
 
   });
 
 }
 
 
-
 // ============================================================
-// RENDER DRIVER SECTION
-//
-// พขร.ส่วนนี้ "ไม่ใช้ driver_shifts"
-// ใช้ Master Person + ตารางจัดรถ
+// DRIVER SECTION
 // ============================================================
 
 function renderDriverSection() {
 
-  const masterCarMap =
-    buildMasterCarMap();
-
-
-  const masterDriverMap =
-    buildMasterDriverMap();
-
-
-  const canonicalDriverMap =
-    buildCanonicalDriverMap();
-
-
-  // --------------------------------------------------------
-  // MASTER PERSON
-  // --------------------------------------------------------
-
-  const drivers =
-    masterDrivers.filter(driver =>
-      isBranchMatch(
-        driver.branch
-      )
+  const masterCarPlates =
+    new Set(
+      masterCars
+        .map(car =>
+          normalizePlate(car.license_plate)
+        )
+        .filter(Boolean)
     );
 
 
-  // --------------------------------------------------------
-  // ตารางจัดรถ
-  // --------------------------------------------------------
+  // ----------------------------------------------------------
+  // สร้าง Alias ของ พขร.
+  // เพื่อรองรับชื่อที่เขียนไม่เหมือนกัน
+  // ----------------------------------------------------------
 
-  const schedules =
-    dailyReport || [];
-
-
-  const masterWorkingDrivers =
+  const driverAliasMap =
     new Map();
 
+
+  masterDrivers.forEach(driver => {
+
+    const canonicalKey =
+      normalizeName(
+        driver.driver_key
+      ) ||
+      normalizeName(
+        driver.driver_name
+      ) ||
+      normalizeName(
+        driver.driver_name_en
+      );
+
+    if (!canonicalKey) return;
+
+
+    [
+      driver.driver_key,
+      driver.driver_name,
+      driver.driver_name_en
+    ]
+      .map(normalizeName)
+      .filter(Boolean)
+      .forEach(alias => {
+
+        driverAliasMap.set(
+          alias,
+          canonicalKey
+        );
+
+      });
+
+  });
+
+
+  // ----------------------------------------------------------
+  // COCO / LOCO
+  // ----------------------------------------------------------
+
+  const cocoDrivers =
+    new Set();
 
   const locoDrivers =
-    new Map();
+    new Set();
 
 
-  schedules.forEach(row => {
+  vehicleSchedules.forEach(row => {
 
     const driverName =
-      row.driver_name;
-
-
-    if (!driverName) {
-      return;
-    }
-
-
-    const sourceNameKey =
       normalizeName(
+        row.driver_name
+      );
+
+    if (!driverName) return;
+
+
+    const canonicalDriver =
+      driverAliasMap.get(
         driverName
       );
 
-
-    if (!sourceNameKey) {
-      return;
-    }
-
-
-    // ------------------------------------------------------
-    // หา Canonical Master Driver Key
-    // ------------------------------------------------------
-
-    const canonicalKey =
-      canonicalDriverMap.get(
-        sourceNameKey
-      );
-
-
-    // ------------------------------------------------------
-    // ถ้าไม่เจอใน Master Person
+    // ไม่ใช่ พขร.ใน Master Person
     // ไม่เอามานับ
-    // ------------------------------------------------------
-
-    if (!canonicalKey) {
-      return;
-    }
+    if (!canonicalDriver) return;
 
 
     const plate =
@@ -1467,133 +561,31 @@ function renderDriverSection() {
         row.license_plate
       );
 
-
-    // ------------------------------------------------------
-    // รถใน Master Car = ทำงาน
-    // ------------------------------------------------------
-
-    if (
-      plate &&
-      masterCarMap.has(plate)
-    ) {
-
-      const masterCar =
-        masterCarMap.get(
-          plate
-        );
+    if (!plate) return;
 
 
-      if (
-        !isBranchMatch(
-          masterCar.branch
-        )
-      ) {
-
-        return;
-
-      }
-
-
-      masterWorkingDrivers.set(
-        canonicalKey,
-        {
-          driverName:
-            driverName,
-
-          branch:
-            masterCar.branch,
-
-          carNo:
-            masterCar.car_no,
-
-          licensePlate:
-            masterCar.license_plate,
-
-          vehicleType:
-            masterCar.vehicle_type
-        }
-      );
-
-
-      return;
-
-    }
-
-
-    // ------------------------------------------------------
-    // รถนอก Master Car = LOCO
-    // ------------------------------------------------------
-
-    if (!plate) {
-      return;
-    }
-
-
-    const masterDriver =
-      masterDriverMap.get(
-        sourceNameKey
-      );
-
-
-    if (!masterDriver) {
-      return;
-    }
-
+    // ------------------------------------------
+    // เจอทะเบียนใน Master Car = COCO
+    // ------------------------------------------
 
     if (
-      !isBranchMatch(
-        masterDriver.branch
-      )
+      masterCarPlates.has(plate)
     ) {
 
-      return;
+      cocoDrivers.add(
+        canonicalDriver
+      );
 
     }
 
+    // ------------------------------------------
+    // ไม่เจอทะเบียนใน Master Car = LOCO
+    // ------------------------------------------
 
-    locoDrivers.set(
-      canonicalKey,
-      {
-        driverName:
-          driverName,
+    else {
 
-        branch:
-          masterDriver.branch,
-
-        licensePlate:
-          row.license_plate || '-',
-
-        carNo:
-          row.car_no || '-',
-
-        vehicleType:
-          row.vehicle_type || '-'
-      }
-    );
-
-  });
-
-
-  // --------------------------------------------------------
-  // ALL MASTER DRIVERS
-  // --------------------------------------------------------
-
-  const allMasterDriverKeys =
-    new Set();
-
-
-  drivers.forEach(driver => {
-
-    const key =
-      getMasterDriverCanonicalKey(
-        driver
-      );
-
-
-    if (key) {
-
-      allMasterDriverKeys.add(
-        key
+      locoDrivers.add(
+        canonicalDriver
       );
 
     }
@@ -1601,493 +593,440 @@ function renderDriverSection() {
   });
 
 
-  // --------------------------------------------------------
-  // WORKING
-  // --------------------------------------------------------
+  // ถ้าคนเดียวกันมีทั้ง COCO + LOCO
+  // ให้ถือเป็น COCO ก่อน
+  locoDrivers.forEach(driver => {
 
-  const workingDrivers =
-    new Map();
+    if (
+      cocoDrivers.has(driver)
+    ) {
 
-
-  masterWorkingDrivers.forEach(
-    (value, key) => {
-
-      if (
-        allMasterDriverKeys.has(
-          key
-        )
-      ) {
-
-        workingDrivers.set(
-          key,
-          value
-        );
-
-      }
+      locoDrivers.delete(driver);
 
     }
-  );
 
+  });
 
-  // --------------------------------------------------------
-  // LOCO
-  // --------------------------------------------------------
-
-  const locoDriverCount =
-    [...locoDrivers.keys()]
-      .filter(key =>
-        allMasterDriverKeys.has(
-          key
-        )
-      )
-      .length;
-
-
-  // --------------------------------------------------------
-  // SUMMARY
-  // --------------------------------------------------------
 
   const totalDrivers =
-    allMasterDriverKeys.size;
+    masterDrivers.length;
 
+  const workingDrivers =
+    cocoDrivers.size;
 
-  const workingCount =
-    workingDrivers.size;
+  const locoDriverCount =
+    locoDrivers.size;
 
-
-  const noJobCount =
+  const noJobDrivers =
     Math.max(
       0,
       totalDrivers -
-      workingCount -
+      workingDrivers -
       locoDriverCount
     );
 
 
-  // --------------------------------------------------------
-  // CARDS
-  // --------------------------------------------------------
+  // ----------------------------------------------------------
+  // KPI
+  // ----------------------------------------------------------
 
   setText(
-    'totalDrivers',
+    'driverTotal',
     totalDrivers
   );
 
   setText(
-    'workingDrivers',
-    workingCount
+    'driverWorking',
+    workingDrivers
   );
 
   setText(
-    'locoDrivers',
+    'driverLoco',
     locoDriverCount
   );
 
   setText(
-    'noJobDrivers',
-    noJobCount
+    'driverNoJob',
+    noJobDrivers
   );
 
 
-  // --------------------------------------------------------
-  // DRIVER TABLE
-  // --------------------------------------------------------
-
-  renderDriverTable(
-    drivers,
-    workingDrivers,
-    locoDrivers
-  );
-
-}
-
-
-
-// ============================================================
-// RENDER DRIVER TABLE
-// ============================================================
-
-function renderDriverTable(
-  drivers,
-  workingDrivers,
-  locoDrivers
-) {
+  // ----------------------------------------------------------
+  // TABLE
+  // ----------------------------------------------------------
 
   const tbody =
     document.getElementById(
       'driverTableBody'
     );
 
-
-  if (!tbody) {
-    return;
-  }
-
+  if (!tbody) return;
 
   tbody.innerHTML = '';
 
 
-  drivers.forEach(driver => {
+  masterDrivers
+    .slice()
+    .sort((a, b) =>
+      String(
+        a.driver_name || ''
+      ).localeCompare(
+        String(
+          b.driver_name || ''
+        ),
+        'th'
+      )
+    )
+    .forEach(driver => {
 
-    const key =
-      getMasterDriverCanonicalKey(
-        driver
-      );
-
-
-    const working =
-      workingDrivers.get(
-        key
-      );
-
-
-    const loco =
-      locoDrivers.get(
-        key
-      );
-
-
-    let status =
-      'ไม่มีงาน';
-
-
-    let statusClass =
-      'no-job';
+      const canonicalKey =
+        normalizeName(
+          driver.driver_key
+        ) ||
+        normalizeName(
+          driver.driver_name
+        ) ||
+        normalizeName(
+          driver.driver_name_en
+        );
 
 
-    let carNo =
-      '-';
+      let workType =
+        'ไม่มีงาน';
+
+      let statusClass =
+        'status-gray';
 
 
-    let plate =
-      '-';
+      if (
+        cocoDrivers.has(
+          canonicalKey
+        )
+      ) {
+
+        workType =
+          'ทำงาน';
+
+        statusClass =
+          'status-green';
+
+      } else if (
+        locoDrivers.has(
+          canonicalKey
+        )
+      ) {
+
+        workType =
+          'วิ่งงาน LOCO';
+
+        statusClass =
+          'status-orange';
+
+      }
 
 
-    let vehicleType =
-      '-';
+      // ------------------------------------------
+      // หาเลขรถของ พขร.
+      // ------------------------------------------
+
+      const assignedCars = [
+        ...new Set(
+          vehicleSchedules
+            .filter(row => {
+
+              const scheduleDriver =
+                normalizeName(
+                  row.driver_name
+                );
+
+              const scheduleCanonical =
+                driverAliasMap.get(
+                  scheduleDriver
+                );
+
+              return (
+                scheduleCanonical ===
+                canonicalKey
+              );
+
+            })
+            .map(row =>
+              String(
+                row.license_plate || ''
+              ).trim()
+            )
+            .filter(Boolean)
+        )
+      ];
 
 
-    // ------------------------------------------------------
-    // ทำงาน
-    // ------------------------------------------------------
-
-    if (working) {
-
-      status =
-        'ทำงาน';
-
-      statusClass =
-        'working';
+      const tr =
+        document.createElement('tr');
 
 
-      carNo =
-        working.carNo || '-';
+      tr.innerHTML = `
 
-      plate =
-        working.licensePlate || '-';
-
-      vehicleType =
-        working.vehicleType || '-';
-
-    }
-
-
-    // ------------------------------------------------------
-    // LOCO
-    // ------------------------------------------------------
-
-    else if (loco) {
-
-      status =
-        'วิ่งงาน LOCO';
-
-      statusClass =
-        'loco';
-
-
-      carNo =
-        loco.carNo || '-';
-
-      plate =
-        loco.licensePlate || '-';
-
-      vehicleType =
-        loco.vehicleType || '-';
-
-    }
-
-
-    // ------------------------------------------------------
-    // TABLE ROW
-    // ------------------------------------------------------
-
-    const tr =
-      document.createElement(
-        'tr'
-      );
-
-
-    tr.innerHTML = `
-
-      <td>
-        ${escapeHtml(
-          driver.branch || '-'
-        )}
-      </td>
-
-      <td>
-        ${escapeHtml(
-          driver.driver_name ||
-          driver.driver_name_en ||
-          '-'
-        )}
-      </td>
-
-      <td>
-        <span
-          class="status-badge ${statusClass}"
-        >
+        <td>
           ${escapeHtml(
-            status
+            driver.branch || '-'
           )}
-        </span>
-      </td>
+        </td>
 
-      <td>
-        ${escapeHtml(
-          carNo
-        )}
-      </td>
+        <td>
+          <strong>
+            ${escapeHtml(
+              driver.driver_name || '-'
+            )}
+          </strong>
+        </td>
 
-      <td>
-        ${escapeHtml(
-          plate
-        )}
-      </td>
+        <td>
+          ${escapeHtml(
+            driver.driver_name_en || '-'
+          )}
+        </td>
 
-      <td>
-        ${escapeHtml(
-          vehicleType
-        )}
-      </td>
+        <td>
+          <span class="status-badge ${statusClass}">
+            ${escapeHtml(workType)}
+          </span>
+        </td>
 
-    `;
+        <td>
+          ${
+            assignedCars.length
+              ? assignedCars
+                  .map(car =>
+                    `<span class="car-chip">
+                      ${escapeHtml(car)}
+                    </span>`
+                  )
+                  .join(' ')
+              : '-'
+          }
+        </td>
 
+        <td>
+          ${escapeHtml(
+            driver.position || '-'
+          )}
+        </td>
 
-    tbody.appendChild(
-      tr
-    );
+      `;
 
-  });
+      tbody.appendChild(tr);
+
+    });
 
 }
 
 
-
 // ============================================================
-// RENDER SHIFT SECTION
-//
-// ส่วนนี้แยกจากสถานะ พขร.
-//
-// SOURCE:
-// driver_shifts
-//
-// STATUS ที่แสดง:
-// description
-//
-// ตัวอย่าง:
-// ทำงาน
-// วิ่งงาน
-// ลาพักร้อน
-// ลาป่วย
-// วันหยุดประจำสัปดาห์
-// สแตนบาย
-// เบรค
-// OT
-// ฯลฯ
+// DRIVER SHIFT STATUS SECTION
 // ============================================================
 
-function renderShiftSection() {
+function renderDriverShiftSection() {
+
+  // ----------------------------------------------------------
+  // แสดงทุกสถานะจาก description
+  // ----------------------------------------------------------
+
+  const rows =
+    driverShifts.filter(row =>
+      String(
+        row.driver_name || ''
+      ).trim()
+    );
+
+
+  // ----------------------------------------------------------
+  // ทำ Map พขร. -> สถานะล่าสุด
+  // ----------------------------------------------------------
+
+  const latestStatus =
+    new Map();
+
+
+  rows.forEach(row => {
+
+    const key =
+      normalizeName(
+        row.driver_key
+      ) ||
+      normalizeName(
+        row.driver_name
+      ) ||
+      normalizeName(
+        row.driver_name_en
+      );
+
+    if (!key) return;
+
+    latestStatus.set(
+      key,
+      row
+    );
+
+  });
+
+
+  // ----------------------------------------------------------
+  // นับ Unique พขร.
+  // ----------------------------------------------------------
+
+  let working = 0;
+  let standby = 0;
+  let breakCount = 0;
+  let leave = 0;
+  let off = 0;
+  let other = 0;
+
+
+  latestStatus.forEach(row => {
+
+    const category =
+      getShiftCategory(
+        row.description
+      );
+
+
+    if (category === 'working') {
+      working++;
+
+    } else if (category === 'standby') {
+      standby++;
+
+    } else if (category === 'break') {
+      breakCount++;
+
+    } else if (category === 'leave') {
+      leave++;
+
+    } else if (category === 'off') {
+      off++;
+
+    } else {
+      other++;
+    }
+
+  });
+
+
+  setText(
+    'shiftTotal',
+    latestStatus.size
+  );
+
+  setText(
+    'shiftWorking',
+    working
+  );
+
+  setText(
+    'shiftStandby',
+    standby
+  );
+
+  setText(
+    'shiftBreak',
+    breakCount
+  );
+
+  setText(
+    'shiftLeave',
+    leave
+  );
+
+  setText(
+    'shiftOff',
+    off
+  );
+
+  setText(
+    'shiftOther',
+    other
+  );
+
+
+  // ----------------------------------------------------------
+  // TABLE
+  // ----------------------------------------------------------
 
   const tbody =
     document.getElementById(
       'shiftTableBody'
     );
 
-
-  if (!tbody) {
-    return;
-  }
-
+  if (!tbody) return;
 
   tbody.innerHTML = '';
 
 
-  // --------------------------------------------------------
-  // กรองตามสาขา
-  //
-  // ตอนนี้ driver_shifts ยังไม่มี branch
-  // จึง match ผ่าน Master Person
-  // --------------------------------------------------------
-
-  const masterDriverMap =
-    buildMasterDriverMap();
-
-
-  const rows =
-    (driverShifts || [])
-      .filter(row => {
-
-        if (
-          !currentBranch ||
-          currentBranch === 'ALL'
-        ) {
-
-          return true;
-
-        }
-
-
-        const keys = [
-
-          normalizeKey(
-            row.driver_key
-          ),
-
-          normalizeName(
-            row.driver_name_master
-          ),
-
-          normalizeName(
-            row.driver_name
-          ),
-
-          normalizeName(
-            row.driver_name_en
-          )
-
-        ];
-
-
-        let masterDriver =
-          null;
-
-
-        for (
-          const key of keys
-        ) {
-
-          if (!key) continue;
-
-
-          masterDriver =
-            masterDriverMap.get(
-              key
-            );
-
-
-          if (masterDriver) {
-            break;
-          }
-
-        }
-
-
-        if (!masterDriver) {
-          return false;
-        }
-
-
-        return isBranchMatch(
-          masterDriver.branch
-        );
-
-      });
-
-
-  // --------------------------------------------------------
-  // ไม่มีข้อมูล
-  // --------------------------------------------------------
-
-  if (rows.length === 0) {
-
-    const tr =
-      document.createElement(
-        'tr'
-      );
-
-
-    tr.innerHTML = `
-
-      <td
-        colspan="5"
-        class="loading"
-      >
-        ไม่พบข้อมูลตารางกะของวันนี้
-      </td>
-
-    `;
-
-
-    tbody.appendChild(
-      tr
-    );
-
-
-    return;
-
-  }
-
-
-  // --------------------------------------------------------
-  // Render
-  // --------------------------------------------------------
-
   rows.forEach(row => {
 
-    const tr =
-      document.createElement(
-        'tr'
+    const category =
+      getShiftCategory(
+        row.description
       );
 
 
-    const driverName =
-      row.driver_name_master ||
-      row.driver_name ||
-      row.driver_name_en ||
-      '-';
+    let statusClass =
+      'status-gray';
 
 
-    const status =
-      row.description ||
-      '-';
+    if (
+      category === 'working'
+    ) {
+
+      statusClass =
+        'status-green';
+
+    } else if (
+      category === 'standby'
+    ) {
+
+      statusClass =
+        'status-orange';
+
+    } else if (
+      category === 'leave'
+    ) {
+
+      statusClass =
+        'status-red';
+
+    } else if (
+      category === 'off'
+    ) {
+
+      statusClass =
+        'status-gray';
+
+    }
 
 
-    const englishName =
-      row.driver_name_en ||
-      '-';
-
-
-    const workDate =
-      row.work_date ||
-      currentDate ||
-      '-';
+    const tr =
+      document.createElement('tr');
 
 
     tr.innerHTML = `
 
       <td>
         ${escapeHtml(
-          driverName
+          row.driver_name || '-'
         )}
       </td>
 
       <td>
-        <span
-          class="status-badge shift-status"
-        >
+        ${escapeHtml(
+          row.driver_name_en || '-'
+        )}
+      </td>
+
+      <td>
+        <span class="status-badge ${statusClass}">
           ${escapeHtml(
-            status
+            row.description || '-'
           )}
         </span>
       </td>
@@ -2100,198 +1039,236 @@ function renderShiftSection() {
 
       <td>
         ${escapeHtml(
-          englishName
-        )}
-      </td>
-
-      <td>
-        ${escapeHtml(
-          formatDateThai(
-            workDate
-          )
+          row.source_sheet || '-'
         )}
       </td>
 
     `;
 
-
-    tbody.appendChild(
-      tr
-    );
+    tbody.appendChild(tr);
 
   });
 
 }
 
 
-
 // ============================================================
-// SUPABASE FETCH
+// SHIFT CATEGORY
 // ============================================================
 
-async function supabaseFetchAll(url) {
+function getShiftCategory(description) {
 
-  let results = [];
-
-  let offset = 0;
-
-
-  // ----------------------------------------------------------
-  // สำคัญ
-  //
-  // ป้องกัน key มี space / line break / unicode
-  // ที่ทำให้ browser ส่ง header ไม่ได้
-  // ----------------------------------------------------------
-
-  const cleanKey =
+  const value =
     String(
-      SUPABASE_KEY || ''
+      description || ''
     )
-      .trim();
+      .trim()
+      .toLowerCase();
 
 
-  if (!cleanKey) {
-
-    throw new Error(
-      'ไม่พบ Supabase Publishable Key'
-    );
-
+  if (!value) {
+    return 'other';
   }
 
 
-  // ----------------------------------------------------------
-  // ตรวจสอบ key เบื้องต้น
-  // Header HTTP ต้องเป็น ASCII
-  // ----------------------------------------------------------
-
-  for (
-    let i = 0;
-    i < cleanKey.length;
-    i++
+  // ทำงาน
+  if (
+    [
+      'ทำงาน',
+      'วิ่งงาน',
+      'วิ่งงาน loco',
+      'งานมหาชัย',
+      'ot',
+      'ช่วยงาน',
+      'พขร.ใหม่'
+    ].includes(value)
   ) {
 
-    if (
-      cleanKey.charCodeAt(i) >
-      255
-    ) {
-
-      throw new Error(
-        'Supabase Publishable Key มีอักขระที่ไม่ถูกต้อง กรุณาใส่ Publishable Key ใหม่'
-      );
-
-    }
+    return 'working';
 
   }
 
 
-  while (true) {
+  // Standby
+  if (
+    value === 'สแตนบาย'
+  ) {
 
-    const separator =
-      url.includes('?')
-        ? '&'
-        : '?';
-
-
-    const requestUrl =
-      `${url}` +
-      `${separator}` +
-      `limit=${PAGE_SIZE}` +
-      `&offset=${offset}`;
-
-
-    const response =
-      await fetch(
-        requestUrl,
-        {
-          method: 'GET',
-
-          headers: {
-            'apikey':
-              cleanKey
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-
-      const text =
-        await response.text();
-
-
-      throw new Error(
-        `Supabase ${response.status}: ${text}`
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if (!Array.isArray(data)) {
-      break;
-    }
-
-
-    results.push(
-      ...data
-    );
-
-
-    if (
-      data.length <
-      PAGE_SIZE
-    ) {
-
-      break;
-
-    }
-
-
-    offset +=
-      PAGE_SIZE;
+    return 'standby';
 
   }
 
 
-  return results;
+  // Break
+  if (
+    [
+      'เบรค',
+      'เบรก'
+    ].includes(value)
+  ) {
+
+    return 'break';
+
+  }
+
+
+  // Leave
+  if (
+    [
+      'ลาพักร้อน',
+      'ลาป่วย',
+      'ลากิจ',
+      'ลาหยุดโดยไม่ขอรับเงินเดือน',
+      'ลาหยุดโดยไม่รับเงินเดือน',
+      'ลาออก'
+    ].includes(value)
+  ) {
+
+    return 'leave';
+
+  }
+
+
+  // Off
+  if (
+    [
+      'วันหยุดประจำสัปดาห์',
+      'วันหยุดนักขัตฤกษ์'
+    ].includes(value)
+  ) {
+
+    return 'off';
+
+  }
+
+
+  return 'other';
 
 }
 
 
+// ============================================================
+// NAVIGATION
+// ============================================================
+
+function goToPage(page) {
+
+  try {
+
+    const currentUrl =
+      new URL(
+        window.top.location.href
+      );
+
+    currentUrl.searchParams.set(
+      'page',
+      page
+    );
+
+    window.top.location.href =
+      currentUrl.toString();
+
+  } catch (error) {
+
+    const currentUrl =
+      new URL(
+        window.location.href
+      );
+
+    currentUrl.searchParams.set(
+      'page',
+      page
+    );
+
+    window.location.href =
+      currentUrl.toString();
+
+  }
+
+  return false;
+
+}
+
 
 // ============================================================
-// SET TEXT
+// TOGGLE TABLE
 // ============================================================
 
-function setText(
-  id,
-  value
+function toggleTable(
+  tableWrapperId,
+  buttonId
 ) {
+
+  const wrapper =
+    document.getElementById(
+      tableWrapperId
+    );
+
+  const button =
+    document.getElementById(
+      buttonId
+    );
+
+  if (!wrapper || !button) return;
+
+
+  const hidden =
+    wrapper.classList.toggle(
+      'table-hidden'
+    );
+
+
+  button.textContent =
+    hidden
+      ? 'แสดงตาราง'
+      : 'ซ่อนตาราง';
+
+}
+
+
+// ============================================================
+// REFRESH
+// ============================================================
+
+function refreshReport() {
+
+  loadReport();
+
+}
+
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+
+function updateReportInfo(date) {
 
   const el =
     document.getElementById(
-      id
+      'reportInfo'
     );
 
+  if (!el) return;
 
-  if (!el) {
-    return;
-  }
-
+  const d =
+    new Date(
+      `${date}T00:00:00`
+    );
 
   el.textContent =
-    value ?? 0;
+    `ข้อมูลประจำวันที่ ${
+      d.toLocaleDateString(
+        'th-TH',
+        {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        }
+      )
+    }`;
 
 }
 
-
-
-// ============================================================
-// LOADING
-// ============================================================
 
 function showLoading(show) {
 
@@ -2300,46 +1277,31 @@ function showLoading(show) {
       'loading'
     );
 
-
-  if (!el) {
-    return;
-  }
-
+  if (!el) return;
 
   el.style.display =
-    show
-      ? 'flex'
-      : 'none';
+    show ? 'flex' : 'none';
 
 }
 
 
-
-// ============================================================
-// ERROR
-// ============================================================
-
 function showError(message) {
-
-  console.error(
-    message
-  );
-
 
   const el =
     document.getElementById(
       'errorMessage'
     );
 
-
   if (!el) {
-    return;
-  }
 
+    alert(message);
+
+    return;
+
+  }
 
   el.textContent =
     message;
-
 
   el.style.display =
     'block';
@@ -2347,33 +1309,45 @@ function showError(message) {
 }
 
 
-
-// ============================================================
-// CLEAR ERROR
-// ============================================================
-
-function clearError() {
+function setText(id, value) {
 
   const el =
-    document.getElementById(
-      'errorMessage'
-    );
+    document.getElementById(id);
 
-
-  if (!el) {
-    return;
-  }
-
+  if (!el) return;
 
   el.textContent =
-    '';
-
-
-  el.style.display =
-    'none';
+    value ?? '-';
 
 }
 
+
+// ============================================================
+// NORMALIZE
+// ============================================================
+
+function normalizeName(value) {
+
+  return String(
+    value || ''
+  )
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLowerCase();
+
+}
+
+
+function normalizePlate(value) {
+
+  return String(
+    value || ''
+  )
+    .trim()
+    .replace(/\s+/g, '')
+    .toUpperCase();
+
+}
 
 
 // ============================================================
@@ -2382,67 +1356,30 @@ function clearError() {
 
 function escapeHtml(value) {
 
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return '';
-
-  }
-
-
-  return String(value)
-    .replace(
-      /&/g,
-      '&amp;'
-    )
-    .replace(
-      /</g,
-      '&lt;'
-    )
-    .replace(
-      />/g,
-      '&gt;'
-    )
-    .replace(
-      /"/g,
-      '&quot;'
-    )
-    .replace(
-      /'/g,
-      '&#039;'
-    );
+  return String(
+    value ?? ''
+  )
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 
 }
 
 
-
 // ============================================================
-// DEBUG
+// GLOBAL
 // ============================================================
 
-window.dailyReportDebug = {
+window.loadReport =
+  loadReport;
 
-  getMasterCars:
-    () => masterCars,
+window.refreshReport =
+  refreshReport;
 
-  getMasterDrivers:
-    () => masterDrivers,
+window.goToPage =
+  goToPage;
 
-  getDailyReport:
-    () => dailyReport,
-
-  getDriverShifts:
-    () => driverShifts,
-
-  getCurrentDate:
-    () => currentDate,
-
-  getCurrentBranch:
-    () => currentBranch,
-
-  reload:
-    () => loadReport()
-
-};
+window.toggleTable =
+  toggleTable;
