@@ -5,13 +5,22 @@
 const SUPABASE_URL =
   'https://hhsqijlcebaijtklskag.supabase.co';
 
-// ============================================================
-// IMPORTANT
-// คง Publishable Key เดิมของเธอไว้ตรงนี้
-// ============================================================
-
 const SUPABASE_KEY =
   'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
+
+
+// ============================================================
+// CONFIG
+// ============================================================
+
+const ALLOWED_BRANCHES = [
+  'ระยอง',
+  'ท่าลาน',
+  'บางปะอิน',
+  'หาดใหญ่'
+];
+
+const DEFAULT_BRANCH = 'ทั้งหมด';
 
 
 // ============================================================
@@ -23,6 +32,8 @@ let masterDrivers = [];
 let vehicleSchedules = [];
 let dailyVehicleData = [];
 let driverShifts = [];
+
+let selectedBranch = DEFAULT_BRANCH;
 
 
 // ============================================================
@@ -54,6 +65,7 @@ function setToday() {
 
   if (!el) return;
 
+
   if (!el.value) {
 
     const today =
@@ -72,10 +84,72 @@ function setToday() {
         today.getDate()
       ).padStart(2, '0');
 
+
     el.value =
       `${yyyy}-${mm}-${dd}`;
 
   }
+
+}
+
+
+// ============================================================
+// BRANCH FILTER
+// ============================================================
+
+function getSelectedBranch() {
+
+  const el =
+    document.getElementById(
+      'branchFilter'
+    );
+
+
+  return (
+    el?.value ||
+    DEFAULT_BRANCH
+  );
+
+}
+
+
+// ============================================================
+// VALID BRANCH
+// ============================================================
+
+function isAllowedBranch(
+  branch
+) {
+
+  const value =
+    String(
+      branch || ''
+    ).trim();
+
+
+  return ALLOWED_BRANCHES.includes(
+    value
+  );
+
+}
+
+
+// ============================================================
+// CHECK LINDE OIL
+// ============================================================
+
+function isLindeOil(
+  branch
+) {
+
+  return (
+    String(
+      branch || ''
+    )
+      .trim()
+      .toLowerCase() ===
+    'linde oil'
+  );
 
 }
 
@@ -91,16 +165,23 @@ async function loadReport() {
       'dateFilter'
     )?.value;
 
+
   if (!date) return;
+
+
+  selectedBranch =
+    getSelectedBranch();
+
 
   showLoading(true);
 
   hideError();
 
+
   try {
 
     // ========================================================
-    // MASTER
+    // LOAD MASTER
     // ========================================================
 
     await Promise.all([
@@ -110,7 +191,7 @@ async function loadReport() {
 
 
     // ========================================================
-    // DAILY DATA
+    // LOAD DAILY DATA
     // ========================================================
 
     await Promise.all([
@@ -132,6 +213,9 @@ async function loadReport() {
 
     updateReportInfo(date);
 
+    updateBranchFilter();
+
+
     showLoading(false);
 
   } catch (error) {
@@ -141,7 +225,9 @@ async function loadReport() {
       error
     );
 
+
     showLoading(false);
+
 
     showError(
       error?.message ||
@@ -149,6 +235,375 @@ async function loadReport() {
     );
 
   }
+
+}
+
+
+// ============================================================
+// APPLY FILTERS
+// ============================================================
+
+function applyFilters() {
+
+  selectedBranch =
+    getSelectedBranch();
+
+
+  renderVehicleSection();
+
+  renderDriverSection();
+
+  renderDriverShiftSection();
+
+}
+
+
+// ============================================================
+// UPDATE BRANCH FILTER
+// ============================================================
+
+function updateBranchFilter() {
+
+  const select =
+    document.getElementById(
+      'branchFilter'
+    );
+
+
+  if (!select) return;
+
+
+  const currentValue =
+    selectedBranch;
+
+
+  select.innerHTML = '';
+
+
+  const allOption =
+    document.createElement(
+      'option'
+    );
+
+  allOption.value =
+    DEFAULT_BRANCH;
+
+  allOption.textContent =
+    DEFAULT_BRANCH;
+
+  select.appendChild(
+    allOption
+  );
+
+
+  ALLOWED_BRANCHES.forEach(
+    branch => {
+
+      const option =
+        document.createElement(
+          'option'
+        );
+
+      option.value =
+        branch;
+
+      option.textContent =
+        branch;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if (
+    [
+      DEFAULT_BRANCH,
+      ...ALLOWED_BRANCHES
+    ].includes(
+      currentValue
+    )
+  ) {
+
+    select.value =
+      currentValue;
+
+  } else {
+
+    select.value =
+      DEFAULT_BRANCH;
+
+    selectedBranch =
+      DEFAULT_BRANCH;
+
+  }
+
+}
+
+
+// ============================================================
+// FILTER MASTER CARS
+// ============================================================
+
+function getFilteredMasterCars() {
+
+  const branch =
+    selectedBranch ||
+    getSelectedBranch();
+
+
+  return masterCars.filter(
+    car => {
+
+      const carBranch =
+        String(
+          car.branch || ''
+        ).trim();
+
+
+      // ไม่เอา LINDE Oil
+      if (
+        isLindeOil(
+          carBranch
+        )
+      ) {
+
+        return false;
+
+      }
+
+
+      // ทั้งหมด = เฉพาะ 4 สาขา
+      if (
+        branch === DEFAULT_BRANCH
+      ) {
+
+        return isAllowedBranch(
+          carBranch
+        );
+
+      }
+
+
+      return (
+        carBranch === branch
+      );
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// FILTER MASTER DRIVERS
+// ============================================================
+
+function getFilteredMasterDrivers() {
+
+  const branch =
+    selectedBranch ||
+    getSelectedBranch();
+
+
+  return masterDrivers.filter(
+    driver => {
+
+      const driverBranch =
+        String(
+          driver.branch || ''
+        ).trim();
+
+
+      // ไม่เอา LINDE Oil
+      if (
+        isLindeOil(
+          driverBranch
+        )
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        branch === DEFAULT_BRANCH
+      ) {
+
+        return isAllowedBranch(
+          driverBranch
+        );
+
+      }
+
+
+      return (
+        driverBranch === branch
+      );
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// FILTER DAILY VEHICLE DATA
+// ============================================================
+
+function getFilteredDailyVehicleData() {
+
+  const cars =
+    getFilteredMasterCars();
+
+
+  const allowedPlates =
+    new Set(
+      cars
+        .map(
+          car =>
+            normalizePlate(
+              car.license_plate
+            )
+        )
+        .filter(Boolean)
+    );
+
+
+  return dailyVehicleData.filter(
+    row => {
+
+      const plate =
+        normalizePlate(
+          row.license_plate
+        );
+
+
+      return allowedPlates.has(
+        plate
+      );
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// FILTER VEHICLE SCHEDULES
+// ============================================================
+
+function getFilteredVehicleSchedules() {
+
+  const cars =
+    getFilteredMasterCars();
+
+
+  const allowedPlates =
+    new Set(
+      cars
+        .map(
+          car =>
+            normalizePlate(
+              car.license_plate
+            )
+        )
+        .filter(Boolean)
+    );
+
+
+  return vehicleSchedules.filter(
+    row => {
+
+      const plate =
+        normalizePlate(
+          row.license_plate
+        );
+
+
+      return allowedPlates.has(
+        plate
+      );
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// FILTER DRIVER SHIFTS
+// ============================================================
+
+function getFilteredDriverShifts() {
+
+  const drivers =
+    getFilteredMasterDrivers();
+
+
+  const allowedKeys =
+    new Set();
+
+
+  drivers.forEach(
+    driver => {
+
+      const aliases = [
+
+        driver.driver_key,
+
+        driver.driver_name,
+
+        driver.driver_name_en
+
+      ];
+
+
+      aliases
+        .map(
+          normalizeDriverName
+        )
+        .filter(Boolean)
+        .forEach(
+          key =>
+            allowedKeys.add(key)
+        );
+
+    }
+  );
+
+
+  return driverShifts.filter(
+    row => {
+
+      const aliases = [
+
+        row.driver_key,
+
+        row.driver_name,
+
+        row.driver_name_en,
+
+        row.driver_name_master
+
+      ];
+
+
+      return aliases
+        .map(
+          normalizeDriverName
+        )
+        .filter(Boolean)
+        .some(
+          key =>
+            allowedKeys.has(key)
+        );
+
+    }
+  );
 
 }
 
@@ -164,9 +619,12 @@ async function supabaseFetchAll(
 
   const url =
     `${SUPABASE_URL}/rest/v1/${table}` +
-    (query
-      ? `?${query}`
-      : '');
+    (
+      query
+        ? `?${query}`
+        : ''
+    );
+
 
   const response =
     await fetch(
@@ -175,7 +633,8 @@ async function supabaseFetchAll(
         method: 'GET',
 
         headers: {
-          'apikey': SUPABASE_KEY
+          'apikey':
+            SUPABASE_KEY
         }
       }
     );
@@ -185,6 +644,7 @@ async function supabaseFetchAll(
 
     const text =
       await response.text();
+
 
     throw new Error(
       `${table}: HTTP ${response.status} ${text}`
@@ -207,10 +667,12 @@ async function loadMasterCars() {
   const params =
     new URLSearchParams();
 
+
   params.set(
     'select',
     'id,branch,car_no,license_plate,vehicle_type,target_km'
   );
+
 
   params.set(
     'order',
@@ -236,10 +698,12 @@ async function loadMasterDrivers() {
   const params =
     new URLSearchParams();
 
+
   params.set(
     'select',
     'id,branch,driver_name,driver_name_en,position,resigned_date,driver_key'
   );
+
 
   params.set(
     'order',
@@ -267,15 +731,18 @@ async function loadDailyVehicleData(
   const params =
     new URLSearchParams();
 
+
   params.set(
     'select',
     '*'
   );
 
+
   params.set(
     'work_date',
     `eq.${date}`
   );
+
 
   params.set(
     'order',
@@ -303,15 +770,18 @@ async function loadVehicleSchedules(
   const params =
     new URLSearchParams();
 
+
   params.set(
     'select',
     '*'
   );
 
+
   params.set(
     'work_date',
     `eq.${date}`
   );
+
 
   params.set(
     'order',
@@ -345,15 +815,18 @@ async function loadDriverShifts(
   const params =
     new URLSearchParams();
 
+
   params.set(
     'select',
     'id,work_date,driver_name,driver_name_en,status,description,driver_name_master,driver_key,source_sheet'
   );
 
+
   params.set(
     'work_date',
     `eq.${date}`
   );
+
 
   params.set(
     'order',
@@ -376,23 +849,37 @@ async function loadDriverShifts(
 
 function renderVehicleSection() {
 
+  const filteredCars =
+    getFilteredMasterCars();
+
+
+  const filteredDaily =
+    getFilteredDailyVehicleData();
+
+
+  const filteredSchedules =
+    getFilteredVehicleSchedules();
+
+
   const totalCars =
-    masterCars.length;
+    filteredCars.length;
 
 
   const jobCars =
-    dailyVehicleData.filter(
+    filteredDaily.filter(
       row =>
         String(
           row.job_status || ''
-        ).trim() === 'มีงาน'
+        ).trim() ===
+        'มีงาน'
     ).length;
 
 
   const noJobCars =
     Math.max(
       0,
-      totalCars - jobCars
+      totalCars -
+      jobCars
     );
 
 
@@ -401,10 +888,12 @@ function renderVehicleSection() {
     totalCars
   );
 
+
   setText(
     'vehicleWorking',
     jobCars
   );
+
 
   setText(
     'vehicleNoJob',
@@ -417,13 +906,14 @@ function renderVehicleSection() {
       'vehicleTableBody'
     );
 
+
   if (!tbody) return;
 
 
   tbody.innerHTML = '';
 
 
-  masterCars.forEach(
+  filteredCars.forEach(
     car => {
 
       const carPlate =
@@ -433,25 +923,29 @@ function renderVehicleSection() {
 
 
       const daily =
-        dailyVehicleData.find(
+        filteredDaily.find(
           row =>
             normalizePlate(
               row.license_plate
-            ) === carPlate
+            ) ===
+            carPlate
         );
 
 
       const schedules =
-        vehicleSchedules.filter(
+        filteredSchedules.filter(
           row =>
             normalizePlate(
               row.license_plate
-            ) === carPlate
+            ) ===
+            carPlate
         );
 
 
       const drivers = [
+
         ...new Set(
+
           schedules
             .map(
               row =>
@@ -460,7 +954,9 @@ function renderVehicleSection() {
                 ).trim()
             )
             .filter(Boolean)
+
         )
+
       ];
 
 
@@ -476,12 +972,6 @@ function renderVehicleSection() {
 
 
       tr.innerHTML = `
-
-        <td>
-          ${escapeHtml(
-            car.branch || '-'
-          )}
-        </td>
 
         <td>
           <strong>
@@ -541,6 +1031,7 @@ function renderVehicleSection() {
 
           ${
             drivers.length
+
               ? drivers
                   .map(
                     driver =>
@@ -551,6 +1042,7 @@ function renderVehicleSection() {
                       </span>`
                   )
                   .join('<br>')
+
               : '-'
           }
 
@@ -659,6 +1151,7 @@ function getCanonicalDriverKey(
 ) {
 
   return (
+
     normalizeDriverName(
       driver?.driver_key
     ) ||
@@ -670,6 +1163,7 @@ function getCanonicalDriverKey(
     normalizeDriverName(
       driver?.driver_name_en
     )
+
   );
 
 }
@@ -681,9 +1175,22 @@ function getCanonicalDriverKey(
 
 function renderDriverSection() {
 
+  const filteredDrivers =
+    getFilteredMasterDrivers();
+
+
+  const filteredSchedules =
+    getFilteredVehicleSchedules();
+
+
+  const filteredCars =
+    getFilteredMasterCars();
+
+
   const masterCarPlates =
     new Set(
-      masterCars
+
+      filteredCars
         .map(
           car =>
             normalizePlate(
@@ -691,6 +1198,7 @@ function renderDriverSection() {
             )
         )
         .filter(Boolean)
+
     );
 
 
@@ -707,13 +1215,10 @@ function renderDriverSection() {
 
 
   // ========================================================
-  // สำคัญ:
-  // ใช้ vehicle_schedules.driver_name
-  // และ vehicle_schedules.license_plate
-  // โดยตรง
+  // CLASSIFY DRIVER FROM VEHICLE SCHEDULE
   // ========================================================
 
-  vehicleSchedules.forEach(
+  filteredSchedules.forEach(
     row => {
 
       const rawDriverName =
@@ -739,16 +1244,7 @@ function renderDriverSection() {
         );
 
 
-      // ----------------------------------------------------
-      // ต้องเป็น พขร.ใน Master Person
-      // ----------------------------------------------------
-
       if (!driverKey) {
-
-        console.log(
-          'ไม่พบ พขร.ใน Master Person:',
-          rawDriverName
-        );
 
         return;
 
@@ -764,10 +1260,6 @@ function renderDriverSection() {
       if (!plate) return;
 
 
-      // ----------------------------------------------------
-      // COCO
-      // ----------------------------------------------------
-
       if (
         masterCarPlates.has(
           plate
@@ -778,14 +1270,7 @@ function renderDriverSection() {
           driverKey
         );
 
-      }
-
-
-      // ----------------------------------------------------
-      // LOCO
-      // ----------------------------------------------------
-
-      else {
+      } else {
 
         locoDrivers.add(
           driverKey
@@ -798,21 +1283,20 @@ function renderDriverSection() {
 
 
   // ========================================================
-  // ถ้าคนเดียวกันมี COCO + LOCO
-  // ให้แสดงเป็น "ทำงาน" ก่อน
+  // COCO HAS PRIORITY OVER LOCO
   // ========================================================
 
   locoDrivers.forEach(
-    driver => {
+    driverKey => {
 
       if (
         cocoDrivers.has(
-          driver
+          driverKey
         )
       ) {
 
         locoDrivers.delete(
-          driver
+          driverKey
         );
 
       }
@@ -822,7 +1306,7 @@ function renderDriverSection() {
 
 
   const totalDrivers =
-    masterDrivers.length;
+    filteredDrivers.length;
 
 
   const workingDrivers =
@@ -842,24 +1326,23 @@ function renderDriverSection() {
     );
 
 
-  // ========================================================
-  // KPI
-  // ========================================================
-
   setText(
     'driverTotal',
     totalDrivers
   );
+
 
   setText(
     'driverWorking',
     workingDrivers
   );
 
+
   setText(
     'driverLoco',
     locoDriverCount
   );
+
 
   setText(
     'driverNoJob',
@@ -868,9 +1351,16 @@ function renderDriverSection() {
 
 
   console.log(
+    'Branch:',
+    selectedBranch
+  );
+
+
+  console.log(
     'COCO Drivers:',
     workingDrivers
   );
+
 
   console.log(
     'LOCO Drivers:',
@@ -887,13 +1377,14 @@ function renderDriverSection() {
       'driverTableBody'
     );
 
+
   if (!tbody) return;
 
 
   tbody.innerHTML = '';
 
 
-  masterDrivers
+  filteredDrivers
     .slice()
     .sort(
       (a, b) =>
@@ -952,15 +1443,15 @@ function renderDriverSection() {
         }
 
 
-        // --------------------------------------------------
-        // หาเลขรถ
-        // --------------------------------------------------
+        // ==================================================
+        // ASSIGNED CARS
+        // ==================================================
 
         const assignedCars = [
 
           ...new Set(
 
-            vehicleSchedules
+            filteredSchedules
 
               .filter(
                 row => {
@@ -1002,12 +1493,6 @@ function renderDriverSection() {
 
 
         tr.innerHTML = `
-
-          <td>
-            ${escapeHtml(
-              driver.branch || '-'
-            )}
-          </td>
 
           <td>
 
@@ -1082,16 +1567,11 @@ function renderDriverSection() {
 function renderDriverShiftSection() {
 
   const rows =
-    driverShifts.filter(
-      row =>
-        String(
-          row.driver_name || ''
-        ).trim()
-    );
+    getFilteredDriverShifts();
 
 
   // ========================================================
-  // ล่าสุดต่อ พขร.
+  // LATEST STATUS PER DRIVER
   // ========================================================
 
   const latestStatus =
@@ -1102,6 +1582,7 @@ function renderDriverShiftSection() {
     row => {
 
       const key =
+
         normalizeDriverName(
           row.driver_key
         ) ||
@@ -1128,10 +1609,15 @@ function renderDriverShiftSection() {
 
 
   let working = 0;
+
   let standby = 0;
+
   let breakCount = 0;
+
   let leave = 0;
+
   let off = 0;
+
   let other = 0;
 
 
@@ -1199,30 +1685,36 @@ function renderDriverShiftSection() {
     latestStatus.size
   );
 
+
   setText(
     'shiftWorking',
     working
   );
+
 
   setText(
     'shiftStandby',
     standby
   );
 
+
   setText(
     'shiftBreak',
     breakCount
   );
+
 
   setText(
     'shiftLeave',
     leave
   );
 
+
   setText(
     'shiftOff',
     off
   );
+
 
   setText(
     'shiftOther',
@@ -1239,104 +1731,119 @@ function renderDriverShiftSection() {
       'shiftTableBody'
     );
 
+
   if (!tbody) return;
 
 
   tbody.innerHTML = '';
 
 
-  rows.forEach(
-    row => {
+  Array.from(
+    latestStatus.values()
+  )
+    .sort(
+      (a, b) =>
+        String(
+          a.driver_name || ''
+        ).localeCompare(
+          String(
+            b.driver_name || ''
+          ),
+          'th'
+        )
+    )
+    .forEach(
+      row => {
 
-      const category =
-        getShiftCategory(
-          row.description
-        );
-
-
-      let statusClass =
-        'status-gray';
-
-
-      if (
-        category === 'working'
-      ) {
-
-        statusClass =
-          'status-green';
-
-      }
-
-      else if (
-        category === 'standby'
-      ) {
-
-        statusClass =
-          'status-orange';
-
-      }
-
-      else if (
-        category === 'leave'
-      ) {
-
-        statusClass =
-          'status-red';
-
-      }
+        const category =
+          getShiftCategory(
+            row.description
+          );
 
 
-      const tr =
-        document.createElement(
-          'tr'
-        );
+        let statusClass =
+          'status-gray';
 
 
-      tr.innerHTML = `
+        if (
+          category === 'working'
+        ) {
 
-        <td>
-          ${escapeHtml(
-            row.driver_name || '-'
-          )}
-        </td>
+          statusClass =
+            'status-green';
 
-        <td>
-          ${escapeHtml(
-            row.driver_name_en || '-'
-          )}
-        </td>
+        }
 
-        <td>
+        else if (
+          category === 'standby'
+        ) {
 
-          <span class="status-badge ${statusClass}">
+          statusClass =
+            'status-orange';
+
+        }
+
+        else if (
+          category === 'leave'
+        ) {
+
+          statusClass =
+            'status-red';
+
+        }
+
+
+        const tr =
+          document.createElement(
+            'tr'
+          );
+
+
+        tr.innerHTML = `
+
+          <td>
             ${escapeHtml(
-              row.description || '-'
+              row.driver_name || '-'
             )}
-          </span>
+          </td>
 
-        </td>
+          <td>
+            ${escapeHtml(
+              row.driver_name_en || '-'
+            )}
+          </td>
 
-        <td>
-          ${escapeHtml(
-            row.status || '-'
-          )}
-        </td>
+          <td>
 
-        <td>
-          ${escapeHtml(
-            row.source_sheet || '-'
-          )}
-        </td>
+            <span class="status-badge ${statusClass}">
+              ${escapeHtml(
+                row.description || '-'
+              )}
+            </span>
 
-      `;
+          </td>
+
+          <td>
+            ${escapeHtml(
+              row.status || '-'
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              row.source_sheet || '-'
+            )}
+          </td>
+
+        `;
 
 
-      tbody.appendChild(
-        tr
-      );
+        tbody.appendChild(
+          tr
+        );
 
-    }
-  );
+      }
+    );
 
 }
 
@@ -1364,6 +1871,10 @@ function getShiftCategory(
   }
 
 
+  // ========================================================
+  // WORKING
+  // ========================================================
+
   if (
     [
       'ทำงาน',
@@ -1381,6 +1892,10 @@ function getShiftCategory(
   }
 
 
+  // ========================================================
+  // STANDBY
+  // ========================================================
+
   if (
     value === 'สแตนบาย'
   ) {
@@ -1389,6 +1904,10 @@ function getShiftCategory(
 
   }
 
+
+  // ========================================================
+  // BREAK
+  // ========================================================
 
   if (
     [
@@ -1401,6 +1920,10 @@ function getShiftCategory(
 
   }
 
+
+  // ========================================================
+  // LEAVE
+  // ========================================================
 
   if (
     [
@@ -1417,6 +1940,10 @@ function getShiftCategory(
 
   }
 
+
+  // ========================================================
+  // OFF
+  // ========================================================
 
   if (
     [
@@ -1452,10 +1979,17 @@ function normalizeDriverName(
       .toLowerCase();
 
 
+  if (!name) {
+
+    return '';
+
+  }
+
+
   // ========================================================
-  // ถ้ามีหลายชื่อ เช่น
+  // MULTIPLE DRIVER
   // นาย A + นาย B
-  // เอาคนแรก
+  // ใช้ชื่อคนแรก
   // ========================================================
 
   if (
@@ -1471,7 +2005,7 @@ function normalizeDriverName(
 
 
   // ========================================================
-  // ลบคำนำหน้า
+  // REMOVE TITLE
   // ========================================================
 
   name =
@@ -1482,7 +2016,7 @@ function normalizeDriverName(
 
 
   // ========================================================
-  // ลบจุด / comma ที่ติดชื่อ
+  // REMOVE PUNCTUATION
   // ========================================================
 
   name =
@@ -1580,6 +2114,7 @@ function toggleTable(
     document.getElementById(
       tableWrapperId
     );
+
 
   const button =
     document.getElementById(
@@ -1717,11 +2252,16 @@ function showError(
   el.textContent =
     message;
 
+
   el.style.display =
     'block';
 
 }
 
+
+// ============================================================
+// HIDE ERROR
+// ============================================================
 
 function hideError() {
 
@@ -1734,7 +2274,9 @@ function hideError() {
   if (!el) return;
 
 
-  el.textContent = '';
+  el.textContent =
+    '';
+
 
   el.style.display =
     'none';
@@ -1810,6 +2352,9 @@ window.loadReport =
 
 window.refreshReport =
   refreshReport;
+
+window.applyFilters =
+  applyFilters;
 
 window.goToPage =
   goToPage;
