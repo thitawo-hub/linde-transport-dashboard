@@ -342,6 +342,8 @@ function updateBranchFilter() {
 
 // ============================================================
 // FILTER MASTER CARS
+//
+// 🚛 สถานะรถใช้ Master Car เท่านั้น
 // ============================================================
 
 function getFilteredMasterCars() {
@@ -467,7 +469,6 @@ function getFilteredDailyVehicleData() {
         ).trim();
 
 
-      // ไม่เอา LINDE Oil
       if (
         isLindeOil(
           rowBranch
@@ -502,11 +503,8 @@ function getFilteredDailyVehicleData() {
 
 // ============================================================
 // FILTER VEHICLE SCHEDULES
-// IMPORTANT:
-// ใช้ branch เป็นตัวกรอง
 //
-// ไม่ใช้ Master Car เป็นตัวกรอง
-// เพราะ LOCO อาจไม่มีทะเบียนอยู่ใน Master Car
+// 👨‍✈️ การจัดงาน พขร. ใช้ schedule ได้
 // ============================================================
 
 function getFilteredVehicleSchedules() {
@@ -525,7 +523,6 @@ function getFilteredVehicleSchedules() {
         ).trim();
 
 
-      // ไม่เอา LINDE Oil
       if (
         isLindeOil(
           rowBranch
@@ -868,80 +865,67 @@ async function loadDriverShifts(
 
 
 // ============================================================
-// GET LATEST VEHICLE SCHEDULE
-//
-// ใช้สำหรับ "สถานะรถ" เท่านั้น
-//
-// หลักการ:
-// 1. เอาเฉพาะ schedule ที่มีทะเบียนตรงกัน
-// 2. ถ้ามีหลายรายการในวันเดียวกัน
-//    เลือกรายการล่าสุดที่มีข้อมูล
-// 3. car_status จาก schedule เป็นข้อมูลหลัก
-//
-// IMPORTANT:
-// ไม่กระทบการจัดงาน พขร.
+// GET DAILY VEHICLE DATA BY PLATE
 // ============================================================
 
-function getLatestVehicleSchedule(
-  schedules
+function getDailyVehicleByPlate(
+  dailyRows,
+  plate
 ) {
 
-  if (
-    !Array.isArray(
-      schedules
-    ) ||
-    !schedules.length
-  ) {
-
-    return null;
-
-  }
-
-
-  const sorted =
-    schedules
-      .slice()
-      .sort(
-        (a, b) => {
-
-          const aId =
-            Number(
-              a?.id || 0
-            );
-
-          const bId =
-            Number(
-              b?.id || 0
-            );
-
-          return bId - aId;
-
-        }
-      );
-
-
-  // ----------------------------------------------------------
-  // ถ้ามีรายการล่าสุดที่มี car_status
-  // ให้ใช้รายการนั้น
-  // ----------------------------------------------------------
-
-  const withStatus =
-    sorted.find(
-      row =>
-        String(
-          row?.car_status || ''
-        ).trim() !== ''
+  const normalized =
+    normalizePlate(
+      plate
     );
 
 
-  if (withStatus) {
-
-    return withStatus;
-
+  if (!normalized) {
+    return null;
   }
 
 
-  return sorted[0] || null;
+  return (
+    dailyRows.find(
+      row =>
+        normalizePlate(
+          row.license_plate
+        ) === normalized
+    ) ||
+    null
+  );
+
+}
+
+
+// ============================================================
+// GET VEHICLE SCHEDULES BY PLATE
+//
+// ใช้เฉพาะสำหรับรายละเอียดสถานะของรถที่อยู่ใน Master Car
+// ไม่ได้ใช้เพิ่มจำนวนรถ
+// ============================================================
+
+function getSchedulesByPlate(
+  scheduleRows,
+  plate
+) {
+
+  const normalized =
+    normalizePlate(
+      plate
+    );
+
+
+  if (!normalized) {
+    return [];
+  }
+
+
+  return scheduleRows.filter(
+    row =>
+      normalizePlate(
+        row.license_plate
+      ) === normalized
+  );
 
 }
 
@@ -949,21 +933,18 @@ function getLatestVehicleSchedule(
 // ============================================================
 // GET VEHICLE STATUS
 //
-// สถานะรถต้องมาจาก "car_status"
-// ไม่ใช่จาก hasSchedule
+// 🚛 สำคัญมาก
 //
-// Priority:
-// 1. v_daily_report.car_status
-// 2. vehicle_schedules.car_status
-// 3. -
+// รายการรถ = Master Car เท่านั้น
 //
-// แต่สำหรับ LOCO ที่ไม่มี v_daily_report
-// จะใช้ vehicle_schedules โดยตรง
+// แต่สถานะของรถใน Master Car
+// สามารถอ่านจาก v_daily_report ก่อน
+// และ fallback ไป vehicle_schedules
 // ============================================================
 
 function getVehicleStatus(
   daily,
-  schedule
+  schedules
 ) {
 
   const dailyStatus =
@@ -979,15 +960,47 @@ function getVehicleStatus(
   }
 
 
-  const scheduleStatus =
-    String(
-      schedule?.car_status || ''
-    ).trim();
+  if (
+    Array.isArray(
+      schedules
+    ) &&
+    schedules.length
+  ) {
+
+    // --------------------------------------------------------
+    // เลือกรายการล่าสุดที่มีสถานะ
+    // --------------------------------------------------------
+
+    const sorted =
+      schedules
+        .slice()
+        .sort(
+          (a, b) =>
+            Number(
+              b?.id || 0
+            ) -
+            Number(
+              a?.id || 0
+            )
+        );
 
 
-  if (scheduleStatus) {
+    const schedule =
+      sorted.find(
+        row =>
+          String(
+            row?.car_status || ''
+          ).trim() !== ''
+      );
 
-    return scheduleStatus;
+
+    if (schedule) {
+
+      return String(
+        schedule.car_status
+      ).trim();
+
+    }
 
   }
 
@@ -1000,12 +1013,8 @@ function getVehicleStatus(
 // ============================================================
 // GET VEHICLE JOB STATUS
 //
-// แยกออกจาก "สถานะรถ"
-//
-// ไม่ใช้แค่:
-// schedules.length > 0
-//
-// เพราะ schedule มีไว้บอกการจัดรถด้วย
+// ใช้สำหรับ column "มีงาน / ไม่มีงาน"
+// ไม่ใช่สถานะรถ
 // ============================================================
 
 function getVehicleJobStatus(
@@ -1019,7 +1028,6 @@ function getVehicleJobStatus(
     ).trim();
 
 
-  // ถ้า View ระบุชัดเจน ให้ใช้ค่าจาก View ก่อน
   if (
     dailyJobStatus === 'มีงาน'
   ) {
@@ -1037,11 +1045,6 @@ function getVehicleJobStatus(
 
   }
 
-
-  // ----------------------------------------------------------
-  // ถ้าไม่มี daily job status
-  // ให้ดูจาก schedule ที่มีข้อมูลการวางแผน/งาน
-  // ----------------------------------------------------------
 
   if (
     !Array.isArray(
@@ -1076,7 +1079,6 @@ function getVehicleJobStatus(
         ).trim();
 
 
-      // รถออกแล้ว = มีการจัดงาน/รถกำลังทำงาน
       if (
         carStatus === 'รถออกแล้ว'
       ) {
@@ -1086,7 +1088,6 @@ function getVehicleJobStatus(
       }
 
 
-      // ถ้ามี LTS หรือ planning
       if (
         ltsNo ||
         planning
@@ -1107,6 +1108,10 @@ function getVehicleJobStatus(
 
 // ============================================================
 // VEHICLE SECTION
+//
+// 🚛 รายการรถ = Master Car เท่านั้น
+//
+// ห้ามเพิ่มรถจาก vehicle_schedules
 // ============================================================
 
 function renderVehicleSection() {
@@ -1124,19 +1129,17 @@ function renderVehicleSection() {
 
 
   // ========================================================
-  // BUILD VEHICLE MASTER
+  // KPI
   //
-  // COCO = จาก Master Car
-  // LOCO = จาก Vehicle Schedule ที่ไม่มีใน Master Car
+  // totalCars = Master Car เท่านั้น
   // ========================================================
 
-  const vehicleMap =
-    new Map();
+  const totalCars =
+    filteredCars.length;
 
 
-  // ========================================================
-  // 1. ADD MASTER CAR
-  // ========================================================
+  let jobCars = 0;
+
 
   filteredCars.forEach(
     car => {
@@ -1150,101 +1153,17 @@ function renderVehicleSection() {
       if (!plate) return;
 
 
-      vehicleMap.set(
-        plate,
-        {
-          source: 'COCO',
-          car: car,
-          plate: plate
-        }
-      );
-
-    }
-  );
-
-
-  // ========================================================
-  // 2. ADD LOCO FROM VEHICLE SCHEDULE
-  //
-  // ถ้าทะเบียนไม่มีใน Master Car
-  // ให้ถือเป็น LOCO
-  // ========================================================
-
-  filteredSchedules.forEach(
-    schedule => {
-
-      const plate =
-        normalizePlate(
-          schedule.license_plate
-        );
-
-
-      if (!plate) return;
-
-
-      if (
-        vehicleMap.has(
-          plate
-        )
-      ) {
-
-        return;
-
-      }
-
-
-      vehicleMap.set(
-        plate,
-        {
-          source: 'LOCO',
-          car: null,
-          plate: plate
-        }
-      );
-
-    }
-  );
-
-
-  const vehicles =
-    Array.from(
-      vehicleMap.values()
-    );
-
-
-  // ========================================================
-  // KPI
-  // ========================================================
-
-  const totalCars =
-    vehicles.length;
-
-
-  let jobCars = 0;
-
-
-  vehicles.forEach(
-    vehicle => {
-
-      const plate =
-        vehicle.plate;
-
-
       const daily =
-        filteredDaily.find(
-          row =>
-            normalizePlate(
-              row.license_plate
-            ) === plate
+        getDailyVehicleByPlate(
+          filteredDaily,
+          plate
         );
 
 
       const schedules =
-        filteredSchedules.filter(
-          row =>
-            normalizePlate(
-              row.license_plate
-            ) === plate
+        getSchedulesByPlate(
+          filteredSchedules,
+          plate
         );
 
 
@@ -1307,64 +1226,49 @@ function renderVehicleSection() {
   tbody.innerHTML = '';
 
 
-  vehicles
+  filteredCars
+    .slice()
     .sort(
-      (a, b) => {
-
-        const aCar =
-          a.car?.car_no ||
-          a.plate ||
-          '';
-
-        const bCar =
-          b.car?.car_no ||
-          b.plate ||
-          '';
-
-        return String(
-          aCar
+      (a, b) =>
+        String(
+          a.car_no || ''
         ).localeCompare(
           String(
-            bCar
+            b.car_no || ''
           ),
           'th'
-        );
-
-      }
+        )
     )
     .forEach(
-      vehicle => {
+      car => {
 
         const plate =
-          vehicle.plate;
+          normalizePlate(
+            car.license_plate
+          );
 
 
-        const car =
-          vehicle.car;
+        if (!plate) return;
 
 
         const daily =
-          filteredDaily.find(
-            row =>
-              normalizePlate(
-                row.license_plate
-              ) === plate
+          getDailyVehicleByPlate(
+            filteredDaily,
+            plate
           );
 
 
         const schedules =
-          filteredSchedules.filter(
-            row =>
-              normalizePlate(
-                row.license_plate
-              ) === plate
+          getSchedulesByPlate(
+            filteredSchedules,
+            plate
           );
 
 
         // ==================================================
-        // DRIVER
+        // DRIVERS
         //
-        // ไม่เปลี่ยน logic การจัดงาน พขร.
+        // ไม่เปลี่ยน logic ส่วนนี้
         // ==================================================
 
         const drivers = [
@@ -1409,88 +1313,45 @@ function renderVehicleSection() {
 
 
         // ==================================================
-        // VEHICLE TYPE
-        // ==================================================
-
-        const vehicleType =
-          car?.vehicle_type ||
-          (
-            vehicle.source === 'LOCO'
-              ? 'LOCO'
-              : '-'
-          );
-
-
-        // ==================================================
-        // CAR NO
-        // ==================================================
-
-        const carNo =
-          car?.car_no ||
-          '-';
-
-
-        // ==================================================
-        // SELECT STATUS SCHEDULE
+        // 🚛 VEHICLE STATUS
         //
-        // สำคัญ:
-        // ห้ามใช้ schedules[0]
-        //
-        // ใช้รายการล่าสุดที่มี car_status
-        // ========================================================
-
-        const statusSchedule =
-          getLatestVehicleSchedule(
-            schedules
-          );
-
-
-        // ==================================================
-        // STATUS
-        //
-        // แก้ตรงนี้เป็นหลัก
+        // ใช้เฉพาะรถที่อยู่ Master Car
         // ==================================================
 
         const carStatus =
           getVehicleStatus(
             daily,
-            statusSchedule
+            schedules
           );
 
 
         // ==================================================
-        // OTHER SCHEDULE DATA
-        //
-        // ใช้ statusSchedule เป็นหลัก
+        // OTHER DATA
         // ==================================================
 
         const planning =
           daily?.planning ||
-          statusSchedule?.planning ||
+          schedules[0]?.planning ||
           '-';
 
 
         const ltsNo =
           daily?.lts_no ||
-          statusSchedule?.lts_no ||
+          schedules[0]?.lts_no ||
           '-';
 
 
         const timePeriod =
           daily?.time_period ||
-          statusSchedule?.time_period ||
+          schedules[0]?.time_period ||
           '-';
 
 
         const weightType =
           daily?.weight_type ||
-          statusSchedule?.weight_type ||
+          schedules[0]?.weight_type ||
           '-';
 
-
-        // ==================================================
-        // SCHEDULE COUNT
-        // ==================================================
 
         const scheduleCount =
           Number(
@@ -1515,7 +1376,7 @@ function renderVehicleSection() {
           <td>
             <strong>
               ${escapeHtml(
-                carNo
+                car.car_no || '-'
               )}
             </strong>
           </td>
@@ -1528,7 +1389,7 @@ function renderVehicleSection() {
 
           <td>
             ${escapeHtml(
-              vehicleType
+              car.vehicle_type || '-'
             )}
           </td>
 
@@ -1705,8 +1566,8 @@ function getCanonicalDriverKey(
 // ============================================================
 // DRIVER SECTION
 //
-// IMPORTANT:
-// ส่วนนี้คง logic เดิม
+// 👨‍✈️ คง logic เดิม
+// ใช้ vehicle_schedules เพื่อจัดประเภท COCO / LOCO
 // ============================================================
 
 function renderDriverSection() {
@@ -2106,10 +1967,6 @@ function renderDriverShiftSection() {
     getFilteredDriverShifts();
 
 
-  // ========================================================
-  // LATEST STATUS PER DRIVER
-  // ========================================================
-
   const latestStatus =
     new Map();
 
@@ -2258,10 +2115,6 @@ function renderDriverShiftSection() {
   );
 
 
-  // ========================================================
-  // SHIFT TABLE
-  // ========================================================
-
   const tbody =
     document.getElementById(
       'shiftTableBody'
@@ -2407,10 +2260,6 @@ function getShiftCategory(
   }
 
 
-  // ========================================================
-  // WORKING
-  // ========================================================
-
   if (
     [
       'ทำงาน',
@@ -2428,10 +2277,6 @@ function getShiftCategory(
   }
 
 
-  // ========================================================
-  // STANDBY
-  // ========================================================
-
   if (
     value === 'สแตนบาย'
   ) {
@@ -2440,10 +2285,6 @@ function getShiftCategory(
 
   }
 
-
-  // ========================================================
-  // BREAK
-  // ========================================================
 
   if (
     [
@@ -2456,10 +2297,6 @@ function getShiftCategory(
 
   }
 
-
-  // ========================================================
-  // LEAVE
-  // ========================================================
 
   if (
     [
@@ -2476,10 +2313,6 @@ function getShiftCategory(
 
   }
 
-
-  // ========================================================
-  // OFF
-  // ========================================================
 
   if (
     [
@@ -2522,12 +2355,6 @@ function normalizeDriverName(
   }
 
 
-  // ========================================================
-  // MULTIPLE DRIVER
-  // นาย A + นาย B
-  // ใช้ชื่อคนแรก
-  // ========================================================
-
   if (
     name.includes('+')
   ) {
@@ -2540,20 +2367,12 @@ function normalizeDriverName(
   }
 
 
-  // ========================================================
-  // REMOVE TITLE
-  // ========================================================
-
   name =
     name.replace(
       /^(นาย|นาง|นางสาว|mr\.|mrs\.|ms\.|miss)\s*/i,
       ''
     );
 
-
-  // ========================================================
-  // REMOVE PUNCTUATION
-  // ========================================================
 
   name =
     name
