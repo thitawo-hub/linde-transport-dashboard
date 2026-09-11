@@ -84,7 +84,6 @@ function setToday() {
         today.getDate()
       ).padStart(2, '0');
 
-
     el.value =
       `${yyyy}-${mm}-${dd}`;
 
@@ -103,7 +102,6 @@ function getSelectedBranch() {
     document.getElementById(
       'branchFilter'
     );
-
 
   return (
     el?.value ||
@@ -125,7 +123,6 @@ function isAllowedBranch(
     String(
       branch || ''
     ).trim();
-
 
   return ALLOWED_BRANCHES.includes(
     value
@@ -165,7 +162,6 @@ async function loadReport() {
       'dateFilter'
     )?.value;
 
-
   if (!date) return;
 
 
@@ -202,6 +198,13 @@ async function loadReport() {
 
 
     // ========================================================
+    // BRANCH FILTER
+    // ========================================================
+
+    updateBranchFilter();
+
+
+    // ========================================================
     // RENDER
     // ========================================================
 
@@ -213,8 +216,6 @@ async function loadReport() {
 
     updateReportInfo(date);
 
-    updateBranchFilter();
-
 
     showLoading(false);
 
@@ -225,9 +226,7 @@ async function loadReport() {
       error
     );
 
-
     showLoading(false);
-
 
     showError(
       error?.message ||
@@ -248,7 +247,6 @@ function applyFilters() {
   selectedBranch =
     getSelectedBranch();
 
-
   renderVehicleSection();
 
   renderDriverSection();
@@ -268,7 +266,6 @@ function updateBranchFilter() {
     document.getElementById(
       'branchFilter'
     );
-
 
   if (!select) return;
 
@@ -456,34 +453,45 @@ function getFilteredMasterDrivers() {
 
 function getFilteredDailyVehicleData() {
 
-  const cars =
-    getFilteredMasterCars();
-
-
-  const allowedPlates =
-    new Set(
-      cars
-        .map(
-          car =>
-            normalizePlate(
-              car.license_plate
-            )
-        )
-        .filter(Boolean)
-    );
+  const branch =
+    selectedBranch ||
+    getSelectedBranch();
 
 
   return dailyVehicleData.filter(
     row => {
 
-      const plate =
-        normalizePlate(
-          row.license_plate
+      const rowBranch =
+        String(
+          row.branch || ''
+        ).trim();
+
+
+      // ไม่เอา LINDE Oil
+      if (
+        isLindeOil(
+          rowBranch
+        )
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        branch === DEFAULT_BRANCH
+      ) {
+
+        return isAllowedBranch(
+          rowBranch
         );
 
+      }
 
-      return allowedPlates.has(
-        plate
+
+      return (
+        rowBranch === branch
       );
 
     }
@@ -494,38 +502,54 @@ function getFilteredDailyVehicleData() {
 
 // ============================================================
 // FILTER VEHICLE SCHEDULES
+// IMPORTANT:
+// ใช้ branch เป็นตัวกรอง
+// ไม่ใช้ Master Car เป็นตัวกรอง
+//
+// เพราะ LOCO อาจไม่มีทะเบียนอยู่ใน Master Car
 // ============================================================
 
 function getFilteredVehicleSchedules() {
 
-  const cars =
-    getFilteredMasterCars();
-
-
-  const allowedPlates =
-    new Set(
-      cars
-        .map(
-          car =>
-            normalizePlate(
-              car.license_plate
-            )
-        )
-        .filter(Boolean)
-    );
+  const branch =
+    selectedBranch ||
+    getSelectedBranch();
 
 
   return vehicleSchedules.filter(
     row => {
 
-      const plate =
-        normalizePlate(
-          row.license_plate
+      const rowBranch =
+        String(
+          row.branch || ''
+        ).trim();
+
+
+      // ไม่เอา LINDE Oil
+      if (
+        isLindeOil(
+          rowBranch
+        )
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        branch === DEFAULT_BRANCH
+      ) {
+
+        return isAllowedBranch(
+          rowBranch
         );
 
+      }
 
-      return allowedPlates.has(
-        plate
+
+      return (
+        rowBranch === branch
       );
 
     }
@@ -861,18 +885,163 @@ function renderVehicleSection() {
     getFilteredVehicleSchedules();
 
 
+  // ========================================================
+  // BUILD VEHICLE MASTER
+  //
+  // COCO = จาก Master Car
+  // LOCO = จาก Vehicle Schedule ที่ไม่มีใน Master Car
+  // ========================================================
+
+  const vehicleMap =
+    new Map();
+
+
+  // ========================================================
+  // 1. ADD MASTER CAR
+  // ========================================================
+
+  filteredCars.forEach(
+    car => {
+
+      const plate =
+        normalizePlate(
+          car.license_plate
+        );
+
+
+      if (!plate) return;
+
+
+      vehicleMap.set(
+        plate,
+        {
+          source: 'COCO',
+          car: car,
+          plate: plate
+        }
+      );
+
+    }
+  );
+
+
+  // ========================================================
+  // 2. ADD LOCO FROM VEHICLE SCHEDULE
+  //
+  // ถ้าทะเบียนไม่มีใน Master Car
+  // ให้ถือเป็น LOCO
+  // ========================================================
+
+  filteredSchedules.forEach(
+    schedule => {
+
+      const plate =
+        normalizePlate(
+          schedule.license_plate
+        );
+
+
+      if (!plate) return;
+
+
+      if (
+        vehicleMap.has(
+          plate
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      vehicleMap.set(
+        plate,
+        {
+          source: 'LOCO',
+          car: null,
+          plate: plate
+        }
+      );
+
+    }
+  );
+
+
+  const vehicles =
+    Array.from(
+      vehicleMap.values()
+    );
+
+
+  // ========================================================
+  // KPI
+  // ========================================================
+
   const totalCars =
-    filteredCars.length;
+    vehicles.length;
 
 
-  const jobCars =
-    filteredDaily.filter(
-      row =>
+  let jobCars = 0;
+
+
+  vehicles.forEach(
+    vehicle => {
+
+      const plate =
+        vehicle.plate;
+
+
+      const daily =
+        filteredDaily.find(
+          row =>
+            normalizePlate(
+              row.license_plate
+            ) === plate
+        );
+
+
+      const schedules =
+        filteredSchedules.filter(
+          row =>
+            normalizePlate(
+              row.license_plate
+            ) === plate
+        );
+
+
+      const hasSchedule =
+        schedules.length > 0;
+
+
+      const hasDailyJob =
         String(
-          row.job_status || ''
+          daily?.job_status || ''
         ).trim() ===
-        'มีงาน'
-    ).length;
+        'มีงาน';
+
+
+      // ====================================================
+      // มีงาน ถ้า:
+      //
+      // 1. v_daily_report ระบุว่ามีงาน
+      // หรือ
+      // 2. มีรายการใน vehicle_schedules
+      //
+      // รองรับ LOCO ที่ยังไม่มี trips
+      // ====================================================
+
+      if (
+        hasDailyJob ||
+        hasSchedule
+      ) {
+
+        jobCars++;
+
+      }
+
+    }
+  );
 
 
   const noJobCars =
@@ -901,6 +1070,10 @@ function renderVehicleSection() {
   );
 
 
+  // ========================================================
+  // TABLE
+  // ========================================================
+
   const tbody =
     document.getElementById(
       'vehicleTableBody'
@@ -913,166 +1086,289 @@ function renderVehicleSection() {
   tbody.innerHTML = '';
 
 
-  filteredCars.forEach(
-    car => {
+  vehicles
+    .sort(
+      (a, b) => {
 
-      const carPlate =
-        normalizePlate(
-          car.license_plate
+        const aCar =
+          a.car?.car_no ||
+          a.plate ||
+          '';
+
+        const bCar =
+          b.car?.car_no ||
+          b.plate ||
+          '';
+
+        return String(
+          aCar
+        ).localeCompare(
+          String(
+            bCar
+          ),
+          'th'
         );
 
+      }
+    )
+    .forEach(
+      vehicle => {
 
-      const daily =
-        filteredDaily.find(
-          row =>
-            normalizePlate(
-              row.license_plate
-            ) ===
-            carPlate
-        );
+        const plate =
+          vehicle.plate;
 
 
-      const schedules =
-        filteredSchedules.filter(
-          row =>
-            normalizePlate(
-              row.license_plate
-            ) ===
-            carPlate
-        );
+        const car =
+          vehicle.car;
 
 
-      const drivers = [
-
-        ...new Set(
-
-          schedules
-            .map(
-              row =>
-                String(
-                  row.driver_name || ''
-                ).trim()
-            )
-            .filter(Boolean)
-
-        )
-
-      ];
+        const daily =
+          filteredDaily.find(
+            row =>
+              normalizePlate(
+                row.license_plate
+              ) === plate
+          );
 
 
-      const jobStatus =
-        daily?.job_status ||
-        'ไม่มีงาน';
+        const schedules =
+          filteredSchedules.filter(
+            row =>
+              normalizePlate(
+                row.license_plate
+              ) === plate
+          );
 
 
-      const tr =
-        document.createElement(
-          'tr'
-        );
+        // ==================================================
+        // DRIVERS
+        // ==================================================
+
+        const drivers = [
+
+          ...new Set(
+
+            schedules
+              .map(
+                row =>
+                  String(
+                    row.driver_name || ''
+                  ).trim()
+              )
+              .filter(Boolean)
+
+          )
+
+        ];
 
 
-      tr.innerHTML = `
+        // ==================================================
+        // JOB STATUS
+        // ==================================================
 
-        <td>
-          <strong>
-            ${escapeHtml(
-              car.car_no || '-'
-            )}
-          </strong>
-        </td>
+        const hasSchedule =
+          schedules.length > 0;
 
-        <td>
-          ${escapeHtml(
-            car.license_plate || '-'
-          )}
-        </td>
 
-        <td>
-          ${escapeHtml(
-            car.vehicle_type || '-'
-          )}
-        </td>
+        const hasDailyJob =
+          String(
+            daily?.job_status || ''
+          ).trim() ===
+          'มีงาน';
 
-        <td>
 
-          <span class="status-badge ${
-            jobStatus === 'มีงาน'
-              ? 'status-green'
-              : 'status-gray'
-          }">
+        const hasJob =
+          hasDailyJob ||
+          hasSchedule;
 
-            ${escapeHtml(
-              jobStatus
-            )}
 
-          </span>
+        const jobStatus =
+          hasJob
+            ? 'มีงาน'
+            : 'ไม่มีงาน';
 
-        </td>
 
-        <td>
-          ${escapeHtml(
-            daily?.car_status || '-'
-          )}
-        </td>
+        const jobStatusClass =
+          hasJob
+            ? 'status-green'
+            : 'status-gray';
 
-        <td>
-          ${escapeHtml(
-            daily?.planning || '-'
-          )}
-        </td>
 
-        <td>
-          ${escapeHtml(
-            daily?.lts_no || '-'
-          )}
-        </td>
+        // ==================================================
+        // VEHICLE TYPE
+        // ==================================================
 
-        <td>
-
-          ${
-            drivers.length
-
-              ? drivers
-                  .map(
-                    driver =>
-                      `<span class="driver-chip">
-                        ${escapeHtml(
-                          driver
-                        )}
-                      </span>`
-                  )
-                  .join('<br>')
-
+        const vehicleType =
+          car?.vehicle_type ||
+          (
+            vehicle.source === 'LOCO'
+              ? 'LOCO'
               : '-'
-          }
-
-        </td>
-
-        <td>
-          ${escapeHtml(
-            daily?.time_period || '-'
-          )}
-        </td>
-
-        <td>
-          ${escapeHtml(
-            daily?.weight_type || '-'
-          )}
-        </td>
-
-        <td>
-          ${daily?.schedule_count || 0}
-        </td>
-
-      `;
+          );
 
 
-      tbody.appendChild(
-        tr
-      );
+        // ==================================================
+        // CAR NO
+        // ==================================================
 
-    }
-  );
+        const carNo =
+          car?.car_no ||
+          '-';
+
+
+        // ==================================================
+        // STATUS / PLANNING / LTS
+        //
+        // ถ้า v_daily_report ไม่มี
+        // ใช้ vehicle_schedules แทน
+        // ==================================================
+
+        const schedule =
+          schedules[0];
+
+
+        const carStatus =
+          daily?.car_status ||
+          schedule?.car_status ||
+          '-';
+
+
+        const planning =
+          daily?.planning ||
+          schedule?.planning ||
+          '-';
+
+
+        const ltsNo =
+          daily?.lts_no ||
+          schedule?.lts_no ||
+          '-';
+
+
+        const timePeriod =
+          daily?.time_period ||
+          schedule?.time_period ||
+          '-';
+
+
+        const weightType =
+          daily?.weight_type ||
+          schedule?.weight_type ||
+          '-';
+
+
+        const scheduleCount =
+          daily?.schedule_count ||
+          schedules.length ||
+          0;
+
+
+        // ==================================================
+        // ROW
+        // ==================================================
+
+        const tr =
+          document.createElement(
+            'tr'
+          );
+
+
+        tr.innerHTML = `
+
+          <td>
+            <strong>
+              ${escapeHtml(
+                carNo
+              )}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHtml(
+              plate
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              vehicleType
+            )}
+          </td>
+
+          <td>
+
+            <span class="status-badge ${jobStatusClass}">
+              ${escapeHtml(
+                jobStatus
+              )}
+            </span>
+
+          </td>
+
+          <td>
+            ${escapeHtml(
+              carStatus
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              planning
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              ltsNo
+            )}
+          </td>
+
+          <td>
+
+            ${
+              drivers.length
+
+                ? drivers
+                    .map(
+                      driver =>
+                        `<span class="driver-chip">
+                          ${escapeHtml(
+                            driver
+                          )}
+                        </span>`
+                    )
+                    .join('<br>')
+
+                : '-'
+            }
+
+          </td>
+
+          <td>
+            ${escapeHtml(
+              timePeriod
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              weightType
+            )}
+          </td>
+
+          <td>
+            ${scheduleCount}
+          </td>
+
+        `;
+
+
+        tbody.appendChild(
+          tr
+        );
+
+      }
+    );
 
 }
 
@@ -1179,6 +1475,9 @@ function renderDriverSection() {
     getFilteredMasterDrivers();
 
 
+  // IMPORTANT:
+  // ใช้ vehicle_schedules ที่กรองด้วยสาขาโดยตรง
+  // ไม่กรองด้วย Master Car
   const filteredSchedules =
     getFilteredVehicleSchedules();
 
