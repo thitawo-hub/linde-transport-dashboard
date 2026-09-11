@@ -28,6 +28,7 @@
       box-sizing: border-box;
     }
 
+
     body {
 
       margin: 0;
@@ -146,7 +147,8 @@
 
       margin: auto;
 
-      padding: 24px 28px 50px;
+      padding:
+        24px 28px 50px;
 
     }
 
@@ -231,7 +233,8 @@
 
       color: #ffffff;
 
-      border-color: #1f3a5f;
+      border-color:
+        #1f3a5f;
 
     }
 
@@ -249,13 +252,14 @@
 
       border-radius: 12px;
 
-      padding: 16px 18px;
+      padding:
+        16px 18px;
 
       display: flex;
 
-      align-items: center;
+      align-items: flex-end;
 
-      gap: 12px;
+      gap: 18px;
 
       margin-bottom: 24px;
 
@@ -282,7 +286,8 @@
     }
 
 
-    input[type="date"] {
+    input[type="date"],
+    select {
 
       border:
         1px solid #d0d5dd;
@@ -295,6 +300,29 @@
       font-family: inherit;
 
       font-size: 14px;
+
+      background: #ffffff;
+
+      color: #172033;
+
+      min-width: 170px;
+
+      cursor: pointer;
+
+    }
+
+
+    input[type="date"]:focus,
+    select:focus {
+
+      outline: none;
+
+      border-color:
+        #1f3a5f;
+
+      box-shadow:
+        0 0 0 3px
+        rgba(31,58,95,.08);
 
     }
 
@@ -395,7 +423,8 @@
 
       border-radius: 12px;
 
-      padding: 17px 18px;
+      padding:
+        17px 18px;
 
       min-height: 100px;
 
@@ -481,9 +510,6 @@
       border-radius: 12px;
 
       overflow-x: auto;
-
-      transition:
-        max-height .25s ease;
 
     }
 
@@ -712,12 +738,14 @@
 
       }
 
+
       .page {
 
         padding:
           18px 15px 40px;
 
       }
+
 
       .page-header {
 
@@ -726,6 +754,24 @@
         align-items: flex-start;
 
       }
+
+
+      .filter-bar {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+      }
+
+
+      input[type="date"],
+      select {
+
+        width: 100%;
+
+      }
+
 
       .cards,
       .cards.driver-cards,
@@ -749,6 +795,7 @@
           1fr;
 
       }
+
 
       .nav {
 
@@ -836,9 +883,11 @@
             รายงานประจำวัน
           </h1>
 
+
           <div class="page-subtitle">
             Daily Transport Operations Report
           </div>
+
 
           <div id="reportInfo">
             -
@@ -875,62 +924,70 @@
 
 
       <!-- =================================================
-           DATE
+           FILTER
            ================================================== -->
 
       <div class="filter-bar">
 
-  <div class="filter-group">
 
-    <div class="filter-label">
-      วันที่
-    </div>
+        <!-- DATE -->
 
-    <input
-      type="date"
-      id="dateFilter"
-      onchange="loadReport()"
-    >
+        <div class="filter-group">
 
-  </div>
+          <div class="filter-label">
+            วันที่
+          </div>
 
 
-  <div class="filter-group">
+          <input
+            type="date"
+            id="dateFilter"
+            onchange="loadReport()"
+          >
 
-    <div class="filter-label">
-      สาขา
-    </div>
+        </div>
 
-    <select
-      id="branchFilter"
-      onchange="applyFilters()"
-    >
 
-      <option value="ทั้งหมด">
-        ทั้งหมด
-      </option>
+        <!-- BRANCH -->
 
-      <option value="ระยอง">
-        ระยอง
-      </option>
+        <div class="filter-group">
 
-      <option value="ท่าลาน">
-        ท่าลาน
-      </option>
+          <div class="filter-label">
+            สาขา
+          </div>
 
-      <option value="บางปะอิน">
-        บางปะอิน
-      </option>
 
-      <option value="หาดใหญ่">
-        หาดใหญ่
-      </option>
+          <select
+            id="branchFilter"
+            onchange="applyFilters()"
+          >
 
-    </select>
+            <option value="ทั้งหมด">
+              ทั้งหมด
+            </option>
 
-  </div>
+            <option value="ระยอง">
+              ระยอง
+            </option>
 
-</div>
+            <option value="ท่าลาน">
+              ท่าลาน
+            </option>
+
+            <option value="บางปะอิน">
+              บางปะอิน
+            </option>
+
+            <option value="หาดใหญ่">
+              หาดใหญ่
+            </option>
+
+          </select>
+
+        </div>
+
+
+      </div>
 
 
       <!-- =================================================
@@ -939,6 +996,7 @@
 
       <section class="section">
 
+
         <div class="section-header">
 
           <div>
@@ -946,6 +1004,7 @@
             <div class="section-title">
               🚛 สถานะรถ
             </div>
+
 
             <div class="section-subtitle">
               ข้อมูลจาก Master Car และตารางจัดรถ
@@ -978,11 +1037,13 @@
 
         <div class="cards">
 
+
           <div class="card">
 
             <div class="card-label">
               รถทั้งหมด
             </div>
+
 
             <div
               class="card-value"
@@ -990,6 +1051,7 @@
             >
               -
             </div>
+
 
             <div class="card-note">
               จาก Master Car
@@ -1004,12 +1066,14 @@
               มีงาน
             </div>
 
+
             <div
               class="card-value"
               id="vehicleWorking"
             >
               -
             </div>
+
 
             <div class="card-note">
               มีการจัดงาน
@@ -1024,6 +1088,7 @@
               ไม่มีงาน
             </div>
 
+
             <div
               class="card-value"
               id="vehicleNoJob"
@@ -1031,11 +1096,13 @@
               -
             </div>
 
+
             <div class="card-note">
               ไม่มีการจัดงาน
             </div>
 
           </div>
+
 
         </div>
 
@@ -1053,7 +1120,6 @@
 
               <tr>
 
-                <th>สาขา</th>
                 <th>เบอร์รถ</th>
                 <th>ทะเบียน</th>
                 <th>ประเภทรถ</th>
@@ -1069,6 +1135,7 @@
               </tr>
 
             </thead>
+
 
             <tbody
               id="vehicleTableBody"
@@ -1087,6 +1154,7 @@
 
       <section class="section">
 
+
         <div class="section-header">
 
           <div>
@@ -1094,6 +1162,7 @@
             <div class="section-title">
               👨‍✈️ การจัดงาน พขร.
             </div>
+
 
             <div class="section-subtitle">
               พขร.จาก Master Person เทียบกับรถที่จัดงาน
@@ -1126,11 +1195,13 @@
 
         <div class="cards driver-cards">
 
+
           <div class="card">
 
             <div class="card-label">
               พขร.ทั้งหมด
             </div>
+
 
             <div
               class="card-value"
@@ -1138,6 +1209,7 @@
             >
               -
             </div>
+
 
             <div class="card-note">
               จาก Master Person
@@ -1152,12 +1224,14 @@
               🟢 ทำงาน
             </div>
 
+
             <div
               class="card-value"
               id="driverWorking"
             >
               -
             </div>
+
 
             <div class="card-note">
               จัดรถ COCO
@@ -1172,12 +1246,14 @@
               🟠 วิ่งงาน LOCO
             </div>
 
+
             <div
               class="card-value"
               id="driverLoco"
             >
               -
             </div>
+
 
             <div class="card-note">
               ทะเบียนไม่อยู่ใน Master Car
@@ -1192,6 +1268,7 @@
               ⚪ ไม่มีงาน
             </div>
 
+
             <div
               class="card-value"
               id="driverNoJob"
@@ -1199,11 +1276,13 @@
               -
             </div>
 
+
             <div class="card-note">
               ไม่มีการจัดรถ
             </div>
 
           </div>
+
 
         </div>
 
@@ -1221,7 +1300,6 @@
 
               <tr>
 
-                <th>สาขา</th>
                 <th>พขร.</th>
                 <th>ชื่อ EN</th>
                 <th>สถานะงาน</th>
@@ -1231,6 +1309,7 @@
               </tr>
 
             </thead>
+
 
             <tbody
               id="driverTableBody"
@@ -1249,6 +1328,7 @@
 
       <section class="section">
 
+
         <div class="section-header">
 
           <div>
@@ -1256,6 +1336,7 @@
             <div class="section-title">
               👨‍✈️ สถานะ พขร.
             </div>
+
 
             <div class="section-subtitle">
               สถานะการทำงานจากตารางกะ
@@ -1295,6 +1376,7 @@
               พขร.ในตารางกะ
             </div>
 
+
             <div
               class="card-value"
               id="shiftTotal"
@@ -1310,6 +1392,7 @@
             <div class="card-label">
               🟢 ทำงาน
             </div>
+
 
             <div
               class="card-value"
@@ -1327,6 +1410,7 @@
               🟠 สแตนบาย
             </div>
 
+
             <div
               class="card-value"
               id="shiftStandby"
@@ -1342,6 +1426,7 @@
             <div class="card-label">
               เบรค
             </div>
+
 
             <div
               class="card-value"
@@ -1359,6 +1444,7 @@
               🔴 ลางาน
             </div>
 
+
             <div
               class="card-value"
               id="shiftLeave"
@@ -1375,6 +1461,7 @@
               ⚪ วันหยุด
             </div>
 
+
             <div
               class="card-value"
               id="shiftOff"
@@ -1390,6 +1477,7 @@
             <div class="card-label">
               อื่นๆ
             </div>
+
 
             <div
               class="card-value"
@@ -1427,6 +1515,7 @@
 
             </thead>
 
+
             <tbody
               id="shiftTableBody"
             ></tbody>
@@ -1442,7 +1531,14 @@
 
   </main>
 
-<script src="daily-report.js"></script>
+
+  <!-- =====================================================
+       JAVASCRIPT
+       ====================================================== -->
+
+  <script src="daily-report.js"></script>
+
+
 </body>
 
 </html>
