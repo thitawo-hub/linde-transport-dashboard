@@ -20,7 +20,7 @@
 const SUPABASE_URL = 'https://hhsqijlcebaijtklskag.supabase.co';
 
 // Publishable key
-const SUPABASE_KEY = 'ใส่_PUBLISHABLE_KEY_เดิมของเธอที่นี่';
+const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 
 // ==================== CONFIG ====================
