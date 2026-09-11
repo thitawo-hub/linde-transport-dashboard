@@ -40,6 +40,7 @@
       z-index: 20;
     }
 
+
     .topbar-inner {
       max-width: 1500px;
       margin: auto;
@@ -117,6 +118,8 @@
 
       font-size: 13px;
       font-weight: 500;
+
+      transition: .15s ease;
     }
 
 
@@ -129,6 +132,32 @@
       background: #edf7f1;
       color: #16734a;
       font-weight: 600;
+    }
+
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      text-decoration: none;
+
+      color: #16734a;
+      background: #edf7f1;
+
+      padding: 8px 13px;
+      border-radius: 8px;
+
+      font-size: 13px;
+      font-weight: 600;
+
+      transition: .15s ease;
+    }
+
+
+    .back-link:hover {
+      background: #dff0e7;
+      transform: translateX(-2px);
     }
 
 
@@ -146,6 +175,8 @@
       font-weight: 500;
 
       color: #37434a;
+
+      transition: .15s ease;
     }
 
 
@@ -307,6 +338,13 @@
       gap: 12px;
 
       margin-bottom: 18px;
+    }
+
+
+    .driver-cards {
+
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
     }
 
 
@@ -519,7 +557,7 @@
        STATUS
     ===================================================== */
 
-    .status {
+    .status-badge {
 
       display: inline-flex;
 
@@ -528,7 +566,7 @@
       gap: 5px;
 
       padding:
-        4px 8px;
+        4px 9px;
 
       border-radius: 999px;
 
@@ -538,29 +576,25 @@
     }
 
 
-    .status-job {
+    .status-badge.job,
+    .status-badge.working {
 
       background: #eaf7ef;
       color: #167548;
     }
 
 
-    .status-no-job {
+    .status-badge.no-job {
 
       background: #f1f3f4;
       color: #737d84;
     }
 
 
-    .driver-status {
+    .status-badge.loco {
 
-      display: inline-flex;
-
-      align-items: center;
-
-      gap: 5px;
-
-      font-weight: 600;
+      background: #fff3df;
+      color: #b66a08;
     }
 
 
@@ -594,8 +628,42 @@
 
 
     /* =====================================================
+       ERROR
+    ===================================================== */
+
+    #errorMessage {
+
+      display: none;
+
+      margin-bottom: 18px;
+
+      padding: 12px 15px;
+
+      border-radius: 10px;
+
+      background: #fff0f0;
+
+      border: 1px solid #f2cccc;
+
+      color: #b43e3e;
+
+      font-size: 12px;
+    }
+
+
+    /* =====================================================
        RESPONSIVE
     ===================================================== */
+
+    @media (max-width: 1100px) {
+
+      .driver-cards {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
 
     @media (max-width: 950px) {
 
@@ -604,17 +672,26 @@
         flex-direction: column;
       }
 
+
       .filter-bar {
         align-items: stretch;
         flex-direction: column;
       }
+
 
       .filter-item input,
       .filter-item select {
         width: 100%;
       }
 
+
       .cards {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+
+      .driver-cards {
         grid-template-columns:
           repeat(2, minmax(0, 1fr));
       }
@@ -629,10 +706,12 @@
           14px 10px 30px;
       }
 
+
       .topbar-inner {
         padding:
           12px 10px;
       }
+
 
       .cards {
         grid-template-columns:
@@ -641,17 +720,33 @@
         gap: 8px;
       }
 
+
+      .driver-cards {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+
       .card {
         padding: 13px;
         min-height: 95px;
       }
 
+
       .card-value {
         font-size: 24px;
       }
 
+
       .topbar-actions {
         width: 100%;
+      }
+
+
+      .topbar-actions .navlink,
+      .topbar-actions .back-link,
+      .topbar-actions .btn {
+        font-size: 12px;
       }
 
     }
@@ -671,6 +766,9 @@
 <div class="topbar">
 
   <div class="topbar-inner">
+
+
+    <!-- BRAND -->
 
     <div class="brand">
 
@@ -700,21 +798,30 @@
     </div>
 
 
+    <!-- ACTIONS -->
+
     <div class="topbar-actions">
 
+
+      <!-- กลับหน้าภาพรวม -->
+
       <a
-        class="navlink"
+        class="back-link"
         href="?page=overview"
         target="_top"
       >
-        🌿 ภาพรวม
+        ← ภาพรวม
       </a>
 
+
+      <!-- CURRENT PAGE -->
 
       <span class="navlink active">
         🗓️ รายงานประจำวัน
       </span>
 
+
+      <!-- MILEAGE -->
 
       <a
         class="navlink"
@@ -725,9 +832,12 @@
       </a>
 
 
+      <!-- REFRESH -->
+
       <button
         class="btn"
-        onclick="loadDailyReport()"
+        type="button"
+        onclick="loadReport()"
       >
         ⟳ รีเฟรชข้อมูล
       </button>
@@ -747,11 +857,18 @@
 <div class="wrap">
 
 
+  <!-- ERROR -->
+
+  <div id="errorMessage"></div>
+
+
+
   <!-- ======================================================
        FILTER
   ======================================================= -->
 
   <div class="filter-bar">
+
 
     <div class="filter-item">
 
@@ -818,9 +935,15 @@
   </div>
 
 
-  <!-- CAR CARDS -->
+
+  <!-- ======================================================
+       CAR CARDS
+  ======================================================= -->
 
   <div class="cards">
+
+
+    <!-- TOTAL CARS -->
 
     <div class="card blue">
 
@@ -842,10 +965,12 @@
     </div>
 
 
+    <!-- JOB CARS -->
+
     <div class="card green">
 
       <div class="card-label">
-        มีงาน
+        รถมีงาน
       </div>
 
       <div
@@ -856,16 +981,18 @@
       </div>
 
       <div class="card-note">
-        มีการจัดงาน
+        มีการจัดงานวันนี้
       </div>
 
     </div>
 
 
+    <!-- NO JOB CARS -->
+
     <div class="card gray">
 
       <div class="card-label">
-        ไม่มีงาน
+        รถไม่มีงาน
       </div>
 
       <div
@@ -876,7 +1003,7 @@
       </div>
 
       <div class="card-note">
-        ไม่มีการจัดงาน
+        ไม่มีการจัดงานวันนี้
       </div>
 
     </div>
@@ -885,7 +1012,9 @@
 
 
 
-  <!-- CAR TABLE -->
+  <!-- ======================================================
+       CAR TABLE
+  ======================================================= -->
 
   <div class="section">
 
@@ -910,62 +1039,25 @@
 
           <tr>
 
-            <th>
-              สาขา
-            </th>
-
-            <th>
-              เบอร์รถ
-            </th>
-
-            <th>
-              ทะเบียน
-            </th>
-
-            <th>
-              ประเภทรถ
-            </th>
-
-            <th>
-              งาน
-            </th>
-
-            <th>
-              สถานะรถ
-            </th>
-
-            <th>
-              วางแผน
-            </th>
-
-            <th>
-              LTS
-            </th>
-
-            <th>
-              พขร.
-            </th>
-
-            <th>
-              ช่วงเวลา
-            </th>
-
-            <th>
-              หนัก/เบา
-            </th>
-
-            <th>
-              จำนวนรายการ
-            </th>
+            <th>สาขา</th>
+            <th>เบอร์รถ</th>
+            <th>ทะเบียน</th>
+            <th>ประเภทรถ</th>
+            <th>งาน</th>
+            <th>สถานะรถ</th>
+            <th>วางแผน</th>
+            <th>LTS</th>
+            <th>พขร.</th>
+            <th>ช่วงเวลา</th>
+            <th>หนัก/เบา</th>
+            <th>จำนวนรายการ</th>
 
           </tr>
 
         </thead>
 
 
-        <tbody
-          id="reportTableBody"
-        >
+        <tbody id="reportTableBody">
 
           <tr>
 
@@ -1007,7 +1099,7 @@
         </h2>
 
         <p>
-          สถานะการทำงานจากตารางกะ
+          สรุปจาก Master Person และตารางจัดรถ
         </p>
 
       </div>
@@ -1018,11 +1110,14 @@
 
 
 
-  <!-- DRIVER CARDS -->
+  <!-- ======================================================
+       DRIVER CARDS
+  ======================================================= -->
 
-  <div class="cards">
+  <div class="cards driver-cards">
 
-    <!-- TOTAL -->
+
+    <!-- TOTAL DRIVERS -->
 
     <div class="card blue">
 
@@ -1038,7 +1133,7 @@
       </div>
 
       <div class="card-note">
-        พขร.ในวันที่เลือก
+        จาก Master Person
       </div>
 
     </div>
@@ -1049,7 +1144,7 @@
     <div class="card green">
 
       <div class="card-label">
-        ทำงาน / วิ่งงาน
+        พขร.ทำงาน
       </div>
 
       <div
@@ -1060,117 +1155,51 @@
       </div>
 
       <div class="card-note">
-        ทำงาน · วิ่งงาน · OT
+        จัดรถที่อยู่ใน Master Car
       </div>
 
     </div>
 
 
-    <!-- STANDBY -->
+    <!-- LOCO -->
 
     <div class="card orange">
 
       <div class="card-label">
-        สแตนบาย
+        พขร.วิ่งงาน LOCO
       </div>
 
       <div
         class="card-value"
-        id="standbyDrivers"
+        id="locoDrivers"
       >
         -
       </div>
 
       <div class="card-note">
-        รอรับงาน
+        ขับรถที่ไม่อยู่ใน Master Car
       </div>
 
     </div>
 
 
-    <!-- BREAK -->
-
-    <div class="card red">
-
-      <div class="card-label">
-        เบรค
-      </div>
-
-      <div
-        class="card-value"
-        id="breakDrivers"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        เบรคงาน
-      </div>
-
-    </div>
-
-
-    <!-- OFF -->
-
-    <div class="card yellow">
-
-      <div class="card-label">
-        วันหยุด
-      </div>
-
-      <div
-        class="card-value"
-        id="offDrivers"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        วันหยุดประจำสัปดาห์ / นักขัตฤกษ์
-      </div>
-
-    </div>
-
-
-    <!-- LEAVE -->
-
-    <div class="card blue">
-
-      <div class="card-label">
-        ลางาน
-      </div>
-
-      <div
-        class="card-value"
-        id="leaveDrivers"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        ลากิจ · ลาป่วย · ลาพักร้อน
-      </div>
-
-    </div>
-
-
-    <!-- OTHER -->
+    <!-- NO JOB -->
 
     <div class="card gray">
 
       <div class="card-label">
-        อื่น ๆ
+        พขร.ไม่มีงาน
       </div>
 
       <div
         class="card-value"
-        id="otherDrivers"
+        id="noJobDrivers"
       >
         -
       </div>
 
       <div class="card-note">
-        เช่น อบรม
+        Master − ทำงาน − LOCO
       </div>
 
     </div>
@@ -1179,7 +1208,9 @@
 
 
 
-  <!-- DRIVER TABLE -->
+  <!-- ======================================================
+       DRIVER TABLE
+  ======================================================= -->
 
   <div class="section">
 
@@ -1190,7 +1221,7 @@
       </h3>
 
       <span>
-        สถานะจาก ตารางกะ
+        Master Person + ตารางจัดรถ
       </span>
 
     </div>
@@ -1199,12 +1230,16 @@
     <div class="table-wrap">
 
       <table
-        style="min-width:700px"
+        style="min-width:760px"
       >
 
         <thead>
 
           <tr>
+
+            <th>
+              สาขา
+            </th>
 
             <th>
               พขร.
@@ -1222,19 +1257,21 @@
               ทะเบียน
             </th>
 
+            <th>
+              ประเภทรถ
+            </th>
+
           </tr>
 
         </thead>
 
 
-        <tbody
-          id="driverTableBody"
-        >
+        <tbody id="driverTableBody">
 
           <tr>
 
             <td
-              colspan="4"
+              colspan="6"
               class="loading"
             >
               กำลังโหลดข้อมูล...
@@ -1251,9 +1288,37 @@
   </div>
 
 
+
 </div>
 
 
+
+<!-- ========================================================
+     LOADING
+========================================================= -->
+
+<div
+  id="loading"
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(255,255,255,.65);
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    color:#68747c;
+  "
+>
+  กำลังโหลดข้อมูล...
+</div>
+
+
+
+<!-- ========================================================
+     JS
+========================================================= -->
 
 <script src="daily-report.js"></script>
 
