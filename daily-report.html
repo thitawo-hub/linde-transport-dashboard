@@ -1,394 +1,815 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>LINDE TRANSPORT - รายงานประจำวัน</title>
+  <title>LINDE TRANSPORT · Daily Report</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
 
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f5f7fa;
-      color: #1f2937;
-    }
 
-    .page {
-      padding: 24px;
-    }
-
-    .page-header {
-      margin-bottom: 20px;
-    }
-
-    .page-title {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-
-    .page-subtitle {
-      margin-top: 5px;
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    .filter-card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.05);
-      display: flex;
-      align-items: end;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .filter-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .filter-group label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #4b5563;
-    }
-
-    .filter-group input,
-    .filter-group select {
-      height: 40px;
-      min-width: 190px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 0 12px;
-      background: #fff;
-      font-size: 14px;
+    * {
       box-sizing: border-box;
     }
 
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(8, minmax(120px, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
+    body {
+      margin: 0;
+      background: #f5f7f8;
+      color: #172026;
+      font-family:
+        "IBM Plex Sans Thai",
+        sans-serif;
     }
 
-    .summary-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.05);
-      border-left: 4px solid #d1d5db;
+
+    /* =====================================================
+       TOP BAR
+    ===================================================== */
+
+    .topbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e9ec;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
 
-    .summary-card.card-total {
-      border-left-color: #374151;
-    }
+    .topbar-inner {
+      max-width: 1500px;
+      margin: auto;
+      padding: 14px 24px;
 
-    .summary-card.card-job {
-      border-left-color: #16a34a;
-    }
-
-    .summary-card.card-no-job {
-      border-left-color: #9ca3af;
-    }
-
-    .summary-card.card-work {
-      border-left-color: #2563eb;
-    }
-
-    .summary-card.card-off {
-      border-left-color: #eab308;
-    }
-
-    .summary-card.card-leave {
-      border-left-color: #6366f1;
-    }
-
-    .summary-card.card-standby {
-      border-left-color: #f97316;
-    }
-
-    .summary-card.card-unknown {
-      border-left-color: #9ca3af;
-    }
-
-    .summary-label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 7px;
-      white-space: nowrap;
-    }
-
-    .summary-value {
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .table-card {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.05);
-      overflow: hidden;
-    }
-
-    .table-header {
-      padding: 18px 20px;
-      border-bottom: 1px solid #e5e7eb;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+
+      gap: 20px;
     }
 
-    .table-title {
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #edf7f1;
+      border-radius: 12px;
+
+      font-size: 22px;
+    }
+
+
+    .eyebrow {
+      font-size: 11px;
+      color: #78838c;
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+
+
+    h1 {
+      margin: 0;
+
+      font-size: 20px;
+      line-height: 1.3;
+
+      font-weight: 700;
+    }
+
+
+    .sub {
+      font-size: 12px;
+      color: #89939b;
+      margin-top: 2px;
+    }
+
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+
+    .navlink {
+      text-decoration: none;
+      color: #58636b;
+
+      padding: 8px 12px;
+      border-radius: 8px;
+
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+
+    .navlink:hover {
+      background: #f1f4f5;
+    }
+
+
+    .navlink.active {
+      background: #edf7f1;
+      color: #16734a;
+      font-weight: 600;
+    }
+
+
+    .btn {
+      border: 1px solid #dce2e5;
+      background: #ffffff;
+
+      padding: 8px 13px;
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+
+      color: #37434a;
+    }
+
+
+    .btn:hover {
+      background: #f5f7f8;
+    }
+
+
+    /* =====================================================
+       PAGE
+    ===================================================== */
+
+    .wrap {
+      max-width: 1500px;
+      margin: auto;
+
+      padding:
+        22px 24px 40px;
+    }
+
+
+    /* =====================================================
+       FILTER
+    ===================================================== */
+
+    .filter-bar {
+
+      background: #ffffff;
+
+      border: 1px solid #e4e8eb;
+      border-radius: 14px;
+
+      padding: 16px 18px;
+
+      display: flex;
+      align-items: end;
+
+      gap: 14px;
+
+      margin-bottom: 26px;
+    }
+
+
+    .filter-item {
+      display: flex;
+      flex-direction: column;
+
+      gap: 5px;
+    }
+
+
+    .filter-item label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6f7a82;
+    }
+
+
+    .filter-item input,
+    .filter-item select {
+
+      height: 38px;
+
+      border: 1px solid #dce2e5;
+      border-radius: 8px;
+
+      padding: 0 11px;
+
+      font-family: inherit;
+      font-size: 13px;
+
+      background: #ffffff;
+      color: #202a30;
+    }
+
+
+    .filter-item input:focus,
+    .filter-item select:focus {
+
+      outline: none;
+
+      border-color: #8dbfa5;
+
+      box-shadow:
+        0 0 0 3px
+        rgba(42, 125, 84, .08);
+    }
+
+
+    /* =====================================================
+       SECTION HEADER
+    ===================================================== */
+
+    .section-title {
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin:
+        24px 0 12px;
+    }
+
+
+    .section-title-left {
+
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+
+    .section-icon {
+
+      width: 34px;
+      height: 34px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 9px;
+
+      background: #edf7f1;
+
+      font-size: 18px;
+    }
+
+
+    .section-title h2 {
+
+      margin: 0;
+
       font-size: 17px;
       font-weight: 700;
     }
 
-    .table-wrapper {
+
+    .section-title p {
+
+      margin: 1px 0 0;
+
+      font-size: 11px;
+      color: #8a949b;
+    }
+
+
+    /* =====================================================
+       CARDS
+    ===================================================== */
+
+    .cards {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+      gap: 12px;
+
+      margin-bottom: 18px;
+    }
+
+
+    .card {
+
+      background: #ffffff;
+
+      border: 1px solid #e4e8eb;
+
+      border-radius: 13px;
+
+      padding: 16px 17px;
+
+      min-height: 105px;
+
+      position: relative;
+      overflow: hidden;
+    }
+
+
+    .card-label {
+
+      color: #76818a;
+
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+
+    .card-value {
+
+      margin-top: 6px;
+
+      font-size: 28px;
+      line-height: 1;
+
+      font-weight: 700;
+    }
+
+
+    .card-note {
+
+      margin-top: 7px;
+
+      font-size: 11px;
+
+      color: #9aa3a9;
+    }
+
+
+    .card::after {
+
+      content: "";
+
+      position: absolute;
+
+      right: -20px;
+      bottom: -25px;
+
+      width: 70px;
+      height: 70px;
+
+      border-radius: 50%;
+
+      background: #f2f5f4;
+    }
+
+
+    .card.green .card-value {
+      color: #16804e;
+    }
+
+
+    .card.orange .card-value {
+      color: #c97a16;
+    }
+
+
+    .card.red .card-value {
+      color: #c74b4b;
+    }
+
+
+    .card.blue .card-value {
+      color: #3c72b8;
+    }
+
+
+    .card.yellow .card-value {
+      color: #ad8614;
+    }
+
+
+    .card.gray .card-value {
+      color: #66727a;
+    }
+
+
+    /* =====================================================
+       TABLE SECTION
+    ===================================================== */
+
+    .section {
+
+      background: #ffffff;
+
+      border: 1px solid #e4e8eb;
+
+      border-radius: 14px;
+
+      overflow: hidden;
+
+      margin-bottom: 24px;
+    }
+
+
+    .section-head {
+
+      padding: 15px 18px;
+
+      border-bottom: 1px solid #edf0f2;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+
+    .section-head h3 {
+
+      margin: 0;
+
+      font-size: 15px;
+
+      font-weight: 600;
+    }
+
+
+    .section-head span {
+
+      font-size: 11px;
+
+      color: #8b959c;
+    }
+
+
+    .table-wrap {
+
       overflow-x: auto;
     }
 
+
     table {
+
       width: 100%;
+
       border-collapse: collapse;
-      min-width: 1350px;
+
+      min-width: 1100px;
     }
 
-    thead th {
-      background: #f9fafb;
-      color: #4b5563;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 12px 10px;
+
+    th {
+
+      background: #f8faf9;
+
+      color: #68747c;
+
+      font-size: 11px;
+
+      font-weight: 600;
+
       text-align: left;
-      border-bottom: 1px solid #e5e7eb;
+
+      padding: 11px 13px;
+
+      white-space: nowrap;
+
+      border-bottom:
+        1px solid #e6eaec;
+    }
+
+
+    td {
+
+      padding: 11px 13px;
+
+      font-size: 12px;
+
+      border-bottom:
+        1px solid #f0f2f3;
+
+      vertical-align: middle;
+
       white-space: nowrap;
     }
 
-    tbody td {
-      padding: 12px 10px;
-      border-bottom: 1px solid #f0f1f3;
-      font-size: 13px;
-      vertical-align: middle;
-    }
 
     tbody tr:hover {
-      background: #fafafa;
+      background: #fafcfb;
     }
+
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+
+    /* =====================================================
+       STATUS
+    ===================================================== */
 
     .status {
+
       display: inline-flex;
+
       align-items: center;
-      gap: 4px;
-      padding: 4px 9px;
+
+      gap: 5px;
+
+      padding:
+        4px 8px;
+
       border-radius: 999px;
-      font-size: 12px;
+
+      font-size: 11px;
+
       font-weight: 600;
-      white-space: nowrap;
     }
+
 
     .status-job {
-      background: #dcfce7;
-      color: #166534;
+
+      background: #eaf7ef;
+      color: #167548;
     }
+
 
     .status-no-job {
-      background: #f3f4f6;
-      color: #6b7280;
+
+      background: #f1f3f4;
+      color: #737d84;
     }
+
 
     .driver-status {
+
       display: inline-flex;
+
       align-items: center;
-      gap: 4px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      font-size: 12px;
+
+      gap: 5px;
+
       font-weight: 600;
-      white-space: nowrap;
     }
 
-    .driver-work {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
 
-    .driver-off {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .driver-leave {
-      background: #e0e7ff;
-      color: #4338ca;
-    }
-
-    .driver-standby {
-      background: #ffedd5;
-      color: #c2410c;
-    }
-
-    .driver-unknown {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px !important;
-      color: #6b7280;
-    }
+    /* =====================================================
+       INFO
+    ===================================================== */
 
     .report-info {
-      font-size: 13px;
-      color: #6b7280;
+
+      color: #89939a;
+
+      font-size: 12px;
+
+      margin:
+        8px 0 16px;
     }
 
-    @media (max-width: 1200px) {
-      .summary-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
+
+    /* =====================================================
+       LOADING
+    ===================================================== */
+
+    .loading {
+
+      text-align: center;
+
+      color: #89939a;
+
+      padding: 28px !important;
     }
 
-    @media (max-width: 700px) {
-      .page {
-        padding: 12px;
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 950px) {
+
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
-      .summary-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .filter-card {
+      .filter-bar {
         align-items: stretch;
+        flex-direction: column;
       }
 
-      .filter-group input,
-      .filter-group select {
+      .filter-item input,
+      .filter-item select {
         width: 100%;
       }
+
+      .cards {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
     }
+
+
+    @media (max-width: 600px) {
+
+      .wrap {
+        padding:
+          14px 10px 30px;
+      }
+
+      .topbar-inner {
+        padding:
+          12px 10px;
+      }
+
+      .cards {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+
+        gap: 8px;
+      }
+
+      .card {
+        padding: 13px;
+        min-height: 95px;
+      }
+
+      .card-value {
+        font-size: 24px;
+      }
+
+      .topbar-actions {
+        width: 100%;
+      }
+
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
-  <div class="page">
 
-    <div class="page-header">
-      <h1 class="page-title">LINDE TRANSPORT</h1>
-      <div class="page-subtitle">
-        รายงานประจำวัน — สถานะรถและ พขร.
-      </div>
-    </div>
+<!-- ========================================================
+     TOP BAR
+========================================================= -->
 
-    <!-- FILTER -->
-    <div class="filter-card">
+<div class="topbar">
 
-      <div class="filter-group">
-        <label for="reportDate">วันที่</label>
-        <input type="date" id="reportDate">
+  <div class="topbar-inner">
+
+    <div class="brand">
+
+      <div class="brand-icon">
+        🗓️
       </div>
 
-      <div class="filter-group">
-        <label for="branchFilter">สาขา</label>
-        <select id="branchFilter">
-          <option value="">ทุกสาขา</option>
-        </select>
-      </div>
+      <div>
 
-    </div>
+        <div class="eyebrow">
+          LINDE TRANSPORT
+        </div>
 
-    <!-- SUMMARY -->
-    <div class="summary-grid">
+        <h1>
+          รายงานประจำวัน
+        </h1>
 
-      <div class="summary-card card-total">
-        <div class="summary-label">🚛 รถทั้งหมด</div>
-        <div class="summary-value" id="totalCars">-</div>
-      </div>
+        <div
+          class="sub"
+          id="reportInfo"
+        >
+          —
+        </div>
 
-      <div class="summary-card card-job">
-        <div class="summary-label">🟢 รถมีงาน</div>
-        <div class="summary-value" id="jobCars">-</div>
-      </div>
-
-      <div class="summary-card card-no-job">
-        <div class="summary-label">⚪ รถไม่มีงาน</div>
-        <div class="summary-value" id="noJobCars">-</div>
-      </div>
-
-      <div class="summary-card card-work">
-        <div class="summary-label">👨‍✈️ พขร.ทำงาน</div>
-        <div class="summary-value" id="workingDrivers">-</div>
-      </div>
-
-      <div class="summary-card card-off">
-        <div class="summary-label">🟡 วันหยุด</div>
-        <div class="summary-value" id="offDrivers">-</div>
-      </div>
-
-      <div class="summary-card card-leave">
-        <div class="summary-label">🔵 ลางาน</div>
-        <div class="summary-value" id="leaveDrivers">-</div>
-      </div>
-
-      <div class="summary-card card-standby">
-        <div class="summary-label">🟠 สแตนบาย</div>
-        <div class="summary-value" id="standbyDrivers">-</div>
-      </div>
-
-      <div class="summary-card card-unknown">
-        <div class="summary-label">⚪ ไม่ระบุ</div>
-        <div class="summary-value" id="unknownDrivers">-</div>
       </div>
 
     </div>
 
-    <!-- TABLE -->
-    <div class="table-card">
 
-      <div class="table-header">
-        <div class="table-title">รายละเอียดรถและ พขร. ประจำวัน</div>
-        <div class="report-info" id="reportInfo"></div>
+    <div class="topbar-actions">
+
+      <a
+        class="navlink"
+        href="?page=overview"
+        target="_top"
+      >
+        🌿 ภาพรวม
+      </a>
+
+
+      <span class="navlink active">
+        🗓️ รายงานประจำวัน
+      </span>
+
+
+      <a
+        class="navlink"
+        href="?page=mileage"
+        target="_top"
+      >
+        📈 KPI ระยะทาง
+      </a>
+
+
+      <button
+        class="btn"
+        onclick="loadDailyReport()"
+      >
+        ⟳ รีเฟรชข้อมูล
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ========================================================
+     MAIN
+========================================================= -->
+
+<div class="wrap">
+
+
+  <!-- ======================================================
+       FILTER
+  ======================================================= -->
+
+  <div class="filter-bar">
+
+    <div class="filter-item">
+
+      <label>
+        วันที่
+      </label>
+
+      <input
+        type="date"
+        id="reportDate"
+      >
+
+    </div>
+
+
+    <div class="filter-item">
+
+      <label>
+        สาขา
+      </label>
+
+      <select
+        id="branchFilter"
+      >
+
+        <option value="">
+          ทั้งหมด
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ======================================================
+       SECTION 1 : รถ
+  ======================================================= -->
+
+  <div class="section-title">
+
+    <div class="section-title-left">
+
+      <div class="section-icon">
+        🚛
       </div>
 
-      <div class="table-wrapper">
+      <div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>สาขา</th>
-              <th>เบอร์รถ</th>
-              <th>ทะเบียน</th>
-              <th>ประเภทรถ</th>
-              <th>สถานะรถ</th>
-              <th>สถานะรถจากระบบ</th>
-              <th>ประเภทงาน</th>
-              <th>LTS</th>
-              <th>พขร.</th>
-              <th>สถานะ พขร.</th>
-              <th>ช่วงเวลา</th>
-              <th>หนัก / เบา</th>
-            </tr>
-          </thead>
+        <h2>
+          สถานะรถ
+        </h2>
 
-          <tbody id="reportTableBody">
-            <tr>
-              <td colspan="12" class="loading">
-                กำลังโหลดข้อมูล...
-              </td>
-            </tr>
-          </tbody>
-
-        </table>
+        <p>
+          ข้อมูลรถและการจัดรถประจำวัน
+        </p>
 
       </div>
 
@@ -396,7 +817,447 @@
 
   </div>
 
-  <script src="daily-report.js"></script>
+
+  <!-- CAR CARDS -->
+
+  <div class="cards">
+
+    <div class="card blue">
+
+      <div class="card-label">
+        รถทั้งหมด
+      </div>
+
+      <div
+        class="card-value"
+        id="totalCars"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        จาก Master Car
+      </div>
+
+    </div>
+
+
+    <div class="card green">
+
+      <div class="card-label">
+        มีงาน
+      </div>
+
+      <div
+        class="card-value"
+        id="jobCars"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        มีการจัดงาน
+      </div>
+
+    </div>
+
+
+    <div class="card gray">
+
+      <div class="card-label">
+        ไม่มีงาน
+      </div>
+
+      <div
+        class="card-value"
+        id="noJobCars"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        ไม่มีการจัดงาน
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- CAR TABLE -->
+
+  <div class="section">
+
+    <div class="section-head">
+
+      <h3>
+        รายละเอียดรถ
+      </h3>
+
+      <span>
+        Master Car + ตารางจัดรถ
+      </span>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              สาขา
+            </th>
+
+            <th>
+              เบอร์รถ
+            </th>
+
+            <th>
+              ทะเบียน
+            </th>
+
+            <th>
+              ประเภทรถ
+            </th>
+
+            <th>
+              งาน
+            </th>
+
+            <th>
+              สถานะรถ
+            </th>
+
+            <th>
+              วางแผน
+            </th>
+
+            <th>
+              LTS
+            </th>
+
+            <th>
+              พขร.
+            </th>
+
+            <th>
+              ช่วงเวลา
+            </th>
+
+            <th>
+              หนัก/เบา
+            </th>
+
+            <th>
+              จำนวนรายการ
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="reportTableBody"
+        >
+
+          <tr>
+
+            <td
+              colspan="12"
+              class="loading"
+            >
+              กำลังโหลดข้อมูล...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ======================================================
+       SECTION 2 : DRIVER
+  ======================================================= -->
+
+  <div class="section-title">
+
+    <div class="section-title-left">
+
+      <div class="section-icon">
+        👨‍✈️
+      </div>
+
+      <div>
+
+        <h2>
+          สถานะ พขร.
+        </h2>
+
+        <p>
+          สถานะการทำงานจากตารางกะ
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- DRIVER CARDS -->
+
+  <div class="cards">
+
+    <!-- TOTAL -->
+
+    <div class="card blue">
+
+      <div class="card-label">
+        พขร.ทั้งหมด
+      </div>
+
+      <div
+        class="card-value"
+        id="totalDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        พขร.ในวันที่เลือก
+      </div>
+
+    </div>
+
+
+    <!-- WORKING -->
+
+    <div class="card green">
+
+      <div class="card-label">
+        ทำงาน / วิ่งงาน
+      </div>
+
+      <div
+        class="card-value"
+        id="workingDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        ทำงาน · วิ่งงาน · OT
+      </div>
+
+    </div>
+
+
+    <!-- STANDBY -->
+
+    <div class="card orange">
+
+      <div class="card-label">
+        สแตนบาย
+      </div>
+
+      <div
+        class="card-value"
+        id="standbyDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        รอรับงาน
+      </div>
+
+    </div>
+
+
+    <!-- BREAK -->
+
+    <div class="card red">
+
+      <div class="card-label">
+        เบรค
+      </div>
+
+      <div
+        class="card-value"
+        id="breakDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        เบรคงาน
+      </div>
+
+    </div>
+
+
+    <!-- OFF -->
+
+    <div class="card yellow">
+
+      <div class="card-label">
+        วันหยุด
+      </div>
+
+      <div
+        class="card-value"
+        id="offDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        วันหยุดประจำสัปดาห์ / นักขัตฤกษ์
+      </div>
+
+    </div>
+
+
+    <!-- LEAVE -->
+
+    <div class="card blue">
+
+      <div class="card-label">
+        ลางาน
+      </div>
+
+      <div
+        class="card-value"
+        id="leaveDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        ลากิจ · ลาป่วย · ลาพักร้อน
+      </div>
+
+    </div>
+
+
+    <!-- OTHER -->
+
+    <div class="card gray">
+
+      <div class="card-label">
+        อื่น ๆ
+      </div>
+
+      <div
+        class="card-value"
+        id="otherDrivers"
+      >
+        -
+      </div>
+
+      <div class="card-note">
+        เช่น อบรม
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- DRIVER TABLE -->
+
+  <div class="section">
+
+    <div class="section-head">
+
+      <h3>
+        รายละเอียด พขร.
+      </h3>
+
+      <span>
+        สถานะจาก ตารางกะ
+      </span>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table
+        style="min-width:700px"
+      >
+
+        <thead>
+
+          <tr>
+
+            <th>
+              พขร.
+            </th>
+
+            <th>
+              สถานะ
+            </th>
+
+            <th>
+              เบอร์รถ
+            </th>
+
+            <th>
+              ทะเบียน
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="driverTableBody"
+        >
+
+          <tr>
+
+            <td
+              colspan="4"
+              class="loading"
+            >
+              กำลังโหลดข้อมูล...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+<script src="daily-report.js"></script>
+
 
 </body>
+
 </html>
