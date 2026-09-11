@@ -504,8 +504,8 @@ function getFilteredDailyVehicleData() {
 // FILTER VEHICLE SCHEDULES
 // IMPORTANT:
 // ใช้ branch เป็นตัวกรอง
-// ไม่ใช้ Master Car เป็นตัวกรอง
 //
+// ไม่ใช้ Master Car เป็นตัวกรอง
 // เพราะ LOCO อาจไม่มีทะเบียนอยู่ใน Master Car
 // ============================================================
 
@@ -868,6 +868,244 @@ async function loadDriverShifts(
 
 
 // ============================================================
+// GET LATEST VEHICLE SCHEDULE
+//
+// ใช้สำหรับ "สถานะรถ" เท่านั้น
+//
+// หลักการ:
+// 1. เอาเฉพาะ schedule ที่มีทะเบียนตรงกัน
+// 2. ถ้ามีหลายรายการในวันเดียวกัน
+//    เลือกรายการล่าสุดที่มีข้อมูล
+// 3. car_status จาก schedule เป็นข้อมูลหลัก
+//
+// IMPORTANT:
+// ไม่กระทบการจัดงาน พขร.
+// ============================================================
+
+function getLatestVehicleSchedule(
+  schedules
+) {
+
+  if (
+    !Array.isArray(
+      schedules
+    ) ||
+    !schedules.length
+  ) {
+
+    return null;
+
+  }
+
+
+  const sorted =
+    schedules
+      .slice()
+      .sort(
+        (a, b) => {
+
+          const aId =
+            Number(
+              a?.id || 0
+            );
+
+          const bId =
+            Number(
+              b?.id || 0
+            );
+
+          return bId - aId;
+
+        }
+      );
+
+
+  // ----------------------------------------------------------
+  // ถ้ามีรายการล่าสุดที่มี car_status
+  // ให้ใช้รายการนั้น
+  // ----------------------------------------------------------
+
+  const withStatus =
+    sorted.find(
+      row =>
+        String(
+          row?.car_status || ''
+        ).trim() !== ''
+    );
+
+
+  if (withStatus) {
+
+    return withStatus;
+
+  }
+
+
+  return sorted[0] || null;
+
+}
+
+
+// ============================================================
+// GET VEHICLE STATUS
+//
+// สถานะรถต้องมาจาก "car_status"
+// ไม่ใช่จาก hasSchedule
+//
+// Priority:
+// 1. v_daily_report.car_status
+// 2. vehicle_schedules.car_status
+// 3. -
+//
+// แต่สำหรับ LOCO ที่ไม่มี v_daily_report
+// จะใช้ vehicle_schedules โดยตรง
+// ============================================================
+
+function getVehicleStatus(
+  daily,
+  schedule
+) {
+
+  const dailyStatus =
+    String(
+      daily?.car_status || ''
+    ).trim();
+
+
+  if (dailyStatus) {
+
+    return dailyStatus;
+
+  }
+
+
+  const scheduleStatus =
+    String(
+      schedule?.car_status || ''
+    ).trim();
+
+
+  if (scheduleStatus) {
+
+    return scheduleStatus;
+
+  }
+
+
+  return '-';
+
+}
+
+
+// ============================================================
+// GET VEHICLE JOB STATUS
+//
+// แยกออกจาก "สถานะรถ"
+//
+// ไม่ใช้แค่:
+// schedules.length > 0
+//
+// เพราะ schedule มีไว้บอกการจัดรถด้วย
+// ============================================================
+
+function getVehicleJobStatus(
+  daily,
+  schedules
+) {
+
+  const dailyJobStatus =
+    String(
+      daily?.job_status || ''
+    ).trim();
+
+
+  // ถ้า View ระบุชัดเจน ให้ใช้ค่าจาก View ก่อน
+  if (
+    dailyJobStatus === 'มีงาน'
+  ) {
+
+    return true;
+
+  }
+
+
+  if (
+    dailyJobStatus === 'ไม่มีงาน'
+  ) {
+
+    return false;
+
+  }
+
+
+  // ----------------------------------------------------------
+  // ถ้าไม่มี daily job status
+  // ให้ดูจาก schedule ที่มีข้อมูลการวางแผน/งาน
+  // ----------------------------------------------------------
+
+  if (
+    !Array.isArray(
+      schedules
+    ) ||
+    !schedules.length
+  ) {
+
+    return false;
+
+  }
+
+
+  return schedules.some(
+    row => {
+
+      const carStatus =
+        String(
+          row?.car_status || ''
+        ).trim();
+
+
+      const planning =
+        String(
+          row?.planning || ''
+        ).trim();
+
+
+      const ltsNo =
+        String(
+          row?.lts_no || ''
+        ).trim();
+
+
+      // รถออกแล้ว = มีการจัดงาน/รถกำลังทำงาน
+      if (
+        carStatus === 'รถออกแล้ว'
+      ) {
+
+        return true;
+
+      }
+
+
+      // ถ้ามี LTS หรือ planning
+      if (
+        ltsNo ||
+        planning
+      ) {
+
+        return true;
+
+      }
+
+
+      return false;
+
+    }
+  );
+
+}
+
+
+// ============================================================
 // VEHICLE SECTION
 // ============================================================
 
@@ -1010,31 +1248,14 @@ function renderVehicleSection() {
         );
 
 
-      const hasSchedule =
-        schedules.length > 0;
+      const hasJob =
+        getVehicleJobStatus(
+          daily,
+          schedules
+        );
 
 
-      const hasDailyJob =
-        String(
-          daily?.job_status || ''
-        ).trim() ===
-        'มีงาน';
-
-
-      // ====================================================
-      // มีงาน ถ้า:
-      //
-      // 1. v_daily_report ระบุว่ามีงาน
-      // หรือ
-      // 2. มีรายการใน vehicle_schedules
-      //
-      // รองรับ LOCO ที่ยังไม่มี trips
-      // ====================================================
-
-      if (
-        hasDailyJob ||
-        hasSchedule
-      ) {
+      if (hasJob) {
 
         jobCars++;
 
@@ -1141,7 +1362,9 @@ function renderVehicleSection() {
 
 
         // ==================================================
-        // DRIVERS
+        // DRIVER
+        //
+        // ไม่เปลี่ยน logic การจัดงาน พขร.
         // ==================================================
 
         const drivers = [
@@ -1166,20 +1389,11 @@ function renderVehicleSection() {
         // JOB STATUS
         // ==================================================
 
-        const hasSchedule =
-          schedules.length > 0;
-
-
-        const hasDailyJob =
-          String(
-            daily?.job_status || ''
-          ).trim() ===
-          'มีงาน';
-
-
         const hasJob =
-          hasDailyJob ||
-          hasSchedule;
+          getVehicleJobStatus(
+            daily,
+            schedules
+          );
 
 
         const jobStatus =
@@ -1217,48 +1431,71 @@ function renderVehicleSection() {
 
 
         // ==================================================
-        // STATUS / PLANNING / LTS
+        // SELECT STATUS SCHEDULE
         //
-        // ถ้า v_daily_report ไม่มี
-        // ใช้ vehicle_schedules แทน
+        // สำคัญ:
+        // ห้ามใช้ schedules[0]
+        //
+        // ใช้รายการล่าสุดที่มี car_status
+        // ========================================================
+
+        const statusSchedule =
+          getLatestVehicleSchedule(
+            schedules
+          );
+
+
+        // ==================================================
+        // STATUS
+        //
+        // แก้ตรงนี้เป็นหลัก
         // ==================================================
 
-        const schedule =
-          schedules[0];
-
-
         const carStatus =
-          daily?.car_status ||
-          schedule?.car_status ||
-          '-';
+          getVehicleStatus(
+            daily,
+            statusSchedule
+          );
 
+
+        // ==================================================
+        // OTHER SCHEDULE DATA
+        //
+        // ใช้ statusSchedule เป็นหลัก
+        // ==================================================
 
         const planning =
           daily?.planning ||
-          schedule?.planning ||
+          statusSchedule?.planning ||
           '-';
 
 
         const ltsNo =
           daily?.lts_no ||
-          schedule?.lts_no ||
+          statusSchedule?.lts_no ||
           '-';
 
 
         const timePeriod =
           daily?.time_period ||
-          schedule?.time_period ||
+          statusSchedule?.time_period ||
           '-';
 
 
         const weightType =
           daily?.weight_type ||
-          schedule?.weight_type ||
+          statusSchedule?.weight_type ||
           '-';
 
 
+        // ==================================================
+        // SCHEDULE COUNT
+        // ==================================================
+
         const scheduleCount =
-          daily?.schedule_count ||
+          Number(
+            daily?.schedule_count
+          ) ||
           schedules.length ||
           0;
 
@@ -1467,6 +1704,9 @@ function getCanonicalDriverKey(
 
 // ============================================================
 // DRIVER SECTION
+//
+// IMPORTANT:
+// ส่วนนี้คง logic เดิม
 // ============================================================
 
 function renderDriverSection() {
@@ -1475,9 +1715,6 @@ function renderDriverSection() {
     getFilteredMasterDrivers();
 
 
-  // IMPORTANT:
-  // ใช้ vehicle_schedules ที่กรองด้วยสาขาโดยตรง
-  // ไม่กรองด้วย Master Car
   const filteredSchedules =
     getFilteredVehicleSchedules();
 
