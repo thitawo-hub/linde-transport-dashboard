@@ -682,6 +682,40 @@ img {
   margin-bottom: 14px;
 }
 
+/* ---------- .kpi-grid.cols-5 ----------
+   สำหรับแถวที่ต้องการ 5 การ์ดในบรรทัดเดียว (เช่น Distance
+   Performance & Forecast) — ตัวเลขแคบกว่าปกติ จึงลดขนาด
+   card-value ลงเล็กน้อยเพื่อไม่ให้ตัวเลขหลักหมื่น/แสนตัดบรรทัด */
+
+.kpi-grid.cols-5 {
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+}
+
+.kpi-grid.cols-5 .card-value {
+
+  font-size: 21px;
+}
+
+@media (max-width: 1300px) {
+
+  .kpi-grid.cols-5 {
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+
+  .kpi-grid.cols-5 {
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
 .kpi,
 .kpi-card {
 
