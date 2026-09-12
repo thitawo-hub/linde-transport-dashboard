@@ -64,42 +64,6 @@ function getTargetKm(car) {
   return getDefaultTargetForType(car.vehicle_type);
 }
 
-// เติมรถ "หลอน" (ยังไม่มีข้อมูลทริปจริงใน Supabase) ให้ครบตามจำนวนใน FLEET_COUNTS
-// เพื่อให้ตารางรายละเอียด/สรุปแสดงรถครบทุกคัน แม้ Supabase จะยังไม่มีข้อมูลของคันนั้น
-function ensureFleetCoverage(cars) {
-  const merged = [...cars];
-
-  FLEET_COUNTS.forEach(entry => {
-    if (!entry.vehicleType) return; // ไม่รู้ breakdown รายคัน ข้ามไป
-
-    const matchCount = merged.filter(
-      car =>
-        normalizeText(car.branch) === normalizeText(entry.branch) &&
-        normalizeText(normalizeVehicleType(car.vehicle_type)) === normalizeText(entry.vehicleType)
-    ).length;
-
-    const missing = entry.count - matchCount;
-    if (missing <= 0) return;
-
-    const defaultTarget = getDefaultTargetForType(entry.vehicleType);
-
-    for (let i = 1; i <= missing; i++) {
-      merged.push({
-        car_no: `${entry.vehicleType}-${matchCount + i}`,
-        license_plate: '-',
-        branch: entry.branch,
-        vehicle_type: entry.vehicleType,
-        target_km: defaultTarget,
-        total_km: 0,
-        forecast_km: 0,
-        _virtual: true
-      });
-    }
-  });
-
-  return merged;
-}
-
 // ============================================================
 // SUPABASE FETCH
 // ============================================================
@@ -162,7 +126,7 @@ async function loadKpiDistance() {
     ]);
 
     summaryData = summary?.[0] || null;
-    carData = ensureFleetCoverage(cars || []);
+    carData = cars || [];
 
     console.log('KPI Distance Summary:', summaryData);
     console.log('KPI Distance Cars:', carData.length);
