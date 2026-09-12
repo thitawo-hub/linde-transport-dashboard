@@ -1,4 +1,3 @@
-```javascript
 // ============================================================
 // LINDE TRANSPORT
 // KPI DISTANCE
@@ -1530,4 +1529,3 @@ function renderRankingList(
           <li class="ranking-item">
 
             <div class="ranking-number">
-```
