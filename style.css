@@ -2744,3 +2744,52 @@ tbody td {
 .kpi-card.danger .card-status {
   color: var(--danger);
 }
+
+/* ============================================================
+   ADD-ON: แก้ปัญหาข้อมูลในแต่ละหน้า "ล่น" ไม่มีระยะหายใจ
+   ------------------------------------------------------------
+   สาเหตุ: .section-heading, .kpi-grid, .forecast, .table-wrapper,
+   .performance-status ฯลฯ เป็น direct child ของ .section ตรงๆ
+   โดยไม่มี .section-body ห่ออยู่ (ในเว็บจริงไม่ได้ใช้ .section-body
+   เลย) ทำให้เนื้อหาชิดขอบซ้าย/ขวา/บน ของ section ไม่มี gutter
+
+   วิธีแก้: ให้ .section เป็นตัว "จ่าย" padding ซ้าย-ขวา-ล่างแทน
+   แล้วให้ .section-heading ใช้ negative margin ดึงตัวเองกลับไป
+   เต็มขอบเหมือนเดิม (full-bleed header, padded body) — ไม่ต้อง
+   แก้ HTML หรือ JS แม้แต่บรรทัดเดียว ใช้ได้กับทุกหน้าที่มี .section
+   ============================================================ */
+
+.section {
+  padding: 0 16px 16px;
+}
+
+.section-heading {
+  margin: 0 -16px;
+}
+
+.section-heading + * {
+  margin-top: 16px;
+}
+
+/* ---------- page-title กับ filter bar ชิดกันเกินไป ---------- */
+
+.page-title {
+  margin-bottom: 14px;
+}
+
+/* ---------- responsive: ให้ padding เท่ากับ .section-heading ที่ปรับไว้ตาม breakpoint เดิม ---------- */
+
+@media (max-width: 700px) {
+
+  .section {
+    padding: 0 10px 10px;
+  }
+
+  .section-heading {
+    margin: 0 -10px;
+  }
+
+  .section-heading + * {
+    margin-top: 10px;
+  }
+}
