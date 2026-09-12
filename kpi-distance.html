@@ -1,1067 +1,535 @@
 <!DOCTYPE html>
+
 <html lang="th">
 
 <head>
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
+>
 
   <title>KPI ระยะทาง | LINDE TRANSPORT</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    rel="stylesheet"
-    href="style.css"
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
   >
 
-  <style>
-
-    /* =====================================================
-       KPI DISTANCE
-    ===================================================== */
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 32px;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .brand {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: .3px;
-    }
-
-    .nav {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .nav a,
-    .nav button {
-      border: 0;
-      background: transparent;
-      padding: 9px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: #6b7280;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .nav a:hover,
-    .nav button:hover {
-      background: #f3f4f6;
-      color: #111827;
-    }
-
-    .nav a.active,
-    .nav button.active {
-      background: #111827;
-      color: #ffffff;
-    }
-
-
-    /* =====================================================
-       PAGE HEADER
-    ===================================================== */
-
-    .page-header {
-      margin-bottom: 22px;
-    }
-
-    .page-header h1 {
-      margin: 0;
-      font-size: 26px;
-      font-weight: 800;
-    }
-
-    .page-header p {
-      margin: 6px 0 0;
-      color: #6b7280;
-      font-size: 13px;
-    }
-
-
-    /* =====================================================
-       CYCLE INFO
-    ===================================================== */
-
-    .cycle-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      padding: 16px 18px;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-    }
-
-    .cycle-info-label {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 4px;
-    }
-
-    .cycle-info-value {
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .cycle-info-meta {
-      display: flex;
-      gap: 22px;
-      flex-wrap: wrap;
-    }
-
-    .cycle-meta-item {
-      min-width: 100px;
-    }
-
-    .cycle-meta-item span {
-      display: block;
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 3px;
-    }
-
-    .cycle-meta-item strong {
-      font-size: 15px;
-    }
-
-
-    /* =====================================================
-       KPI CARDS
-    ===================================================== */
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .kpi-card {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 20px;
-      min-height: 120px;
-    }
-
-    .kpi-card-label {
-      font-size: 13px;
-      color: #6b7280;
-      margin-bottom: 8px;
-    }
-
-    .kpi-card-value {
-      font-size: 30px;
-      font-weight: 800;
-      line-height: 1.15;
-    }
-
-    .kpi-card-note {
-      margin-top: 7px;
-      font-size: 11px;
-      color: #9ca3af;
-    }
-
-    .kpi-card-breakdown {
-      margin-top: 6px;
-      font-size: 11px;
-      color: #6b7280;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-    .kpi-card.actual {
-      border-left: 4px solid #111827;
-    }
-
-    .kpi-card.target {
-      border-left: 4px solid #2563eb;
-    }
-
-    .kpi-card.warning {
-      border-left: 4px solid #f59e0b;
-    }
-
-    .kpi-card.danger {
-      border-left: 4px solid #dc2626;
-    }
-
-
-    /* =====================================================
-       ACHIEVEMENT
-    ===================================================== */
-
-    .achievement-box {
-      display: grid;
-      grid-template-columns: 1fr 260px;
-      gap: 20px;
-      align-items: center;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 22px 24px;
-      margin-bottom: 20px;
-    }
-
-    .achievement-main-label {
-      font-size: 12px;
-      color: #6b7280;
-      font-weight: 600;
-    }
-
-    .achievement-main-value {
-      margin-top: 5px;
-      font-size: 36px;
-      font-weight: 800;
-    }
-
-    .achievement-main-note {
-      margin-top: 5px;
-      color: #6b7280;
-      font-size: 13px;
-    }
-
-    .achievement-side {
-      padding-left: 22px;
-      border-left: 1px solid #e5e7eb;
-    }
-
-    .achievement-side-item {
-      margin-bottom: 12px;
-    }
-
-    .achievement-side-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .achievement-side-item span {
-      display: block;
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 3px;
-    }
-
-    .achievement-side-item strong {
-      font-size: 20px;
-    }
-
-
-    /* =====================================================
-       ALERT SECTION
-    ===================================================== */
-
-    .alert-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .alert-box {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #ffffff;
-    }
-
-    .alert-box-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .alert-box-header h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    .alert-box-header p {
-      margin: 5px 0 0;
-      color: #6b7280;
-      font-size: 12px;
-    }
-
-    .alert-danger .alert-box-header {
-      border-left: 4px solid #dc2626;
-    }
-
-    .alert-warning .alert-box-header {
-      border-left: 4px solid #f59e0b;
-    }
-
-    .alert-list {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    .alert-item {
-      display: grid;
-      grid-template-columns: 75px 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 16px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-
-    .alert-item:last-child {
-      border-bottom: 0;
-    }
-
-    .alert-car {
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .alert-plate {
-      color: #6b7280;
-      font-size: 12px;
-    }
-
-    .alert-type {
-      color: #9ca3af;
-      font-size: 11px;
-      margin-top: 2px;
-    }
-
-    .alert-km {
-      text-align: right;
-      font-weight: 700;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-    .alert-percent {
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .empty-alert {
-      padding: 25px;
-      text-align: center;
-      color: #9ca3af;
-      font-size: 13px;
-    }
-
-
-    /* =====================================================
-       RANKING
-    ===================================================== */
-
-    .ranking-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .ranking-box {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .ranking-header {
-      padding: 16px 18px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .ranking-header h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    .ranking-header p {
-      margin: 5px 0 0;
-      color: #6b7280;
-      font-size: 12px;
-    }
-
-    .ranking-list {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .ranking-item {
-      display: grid;
-      grid-template-columns: 34px 1fr auto;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-
-    .ranking-item:last-child {
-      border-bottom: 0;
-    }
-
-    .ranking-number {
-      font-weight: 800;
-      color: #9ca3af;
-    }
-
-    .ranking-car {
-      font-weight: 700;
-    }
-
-    .ranking-car small {
-      display: block;
-      color: #9ca3af;
-      font-size: 11px;
-      font-weight: 400;
-      margin-top: 2px;
-    }
-
-    .ranking-value {
-      text-align: right;
-      font-weight: 800;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-
-    /* =====================================================
-       TABLE
-    ===================================================== */
-
-    .distance-table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-    }
-
-    .distance-table {
-      width: 100%;
-      min-width: 1250px;
-      border-collapse: collapse;
-    }
-
-    .distance-table th {
-      padding: 13px 14px;
-      text-align: left;
-      background: #f8fafc;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 12px;
-      color: #374151;
-      white-space: nowrap;
-    }
-
-    .distance-table td {
-      padding: 13px 14px;
-      border-bottom: 1px solid #f1f5f9;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .distance-table tbody tr:hover {
-      background: #f8fafc;
-    }
-
-    .distance-table td.num {
-      text-align: right;
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 600;
-    }
-
-    .distance-table td:first-child {
-      font-weight: 800;
-    }
-
-    .vehicle-type-cell {
-      font-weight: 700;
-    }
-
-    .distance-status {
-      display: inline-flex;
-      align-items: center;
-      padding: 5px 9px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .distance-status.normal {
-      background: #f3f4f6;
-      color: #4b5563;
-    }
-
-    .distance-status.near {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .distance-status.forecast {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .distance-status.over {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
-    .distance-status.no-target {
-      background: #f3f4f6;
-      color: #9ca3af;
-    }
-
-
-    /* =====================================================
-       FILTER
-    ===================================================== */
-
-    .kpi-filter {
-      margin-bottom: 20px;
-    }
-
-    .filter-cycle-text {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: 7px;
-    }
-
-
-    /* =====================================================
-       SECTION
-    ===================================================== */
-
-    .section {
-      margin-top: 24px;
-    }
-
-    .section h2 {
-      margin-bottom: 6px;
-    }
-
-    .section-subtitle {
-      margin: 0 0 14px;
-      color: #6b7280;
-      font-size: 12px;
-    }
-
-
-    /* =====================================================
-       EMPTY STATE
-    ===================================================== */
-
-    .empty-state {
-      padding: 30px !important;
-      text-align: center;
-      color: #9ca3af;
-    }
-
-
-    /* =====================================================
-       STATUS FOOTER
-    ===================================================== */
-
-    .page-status {
-      margin-top: 16px;
-      color: #9ca3af;
-      font-size: 12px;
-    }
-
-
-    /* =====================================================
-       RESPONSIVE
-    ===================================================== */
-
-    @media (max-width: 1000px) {
-
-      .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .alert-grid,
-      .ranking-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .achievement-box {
-        grid-template-columns: 1fr;
-      }
-
-      .achievement-side {
-        padding-left: 0;
-        padding-top: 15px;
-        border-left: 0;
-        border-top: 1px solid #e5e7eb;
-      }
-
-    }
-
-
-    @media (max-width: 600px) {
-
-      .topbar {
-        padding: 14px 16px;
-      }
-
-      .container {
-        padding: 16px;
-      }
-
-      .kpi-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .cycle-info {
-        align-items: flex-start;
-      }
-
-      .cycle-info-meta {
-        gap: 12px;
-      }
-
-    }
-
-  </style>
-
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-
   <!-- =====================================================
-       TOP NAV
-  ====================================================== -->
+       HEADER
+       ===================================================== -->
 
-  <div class="topbar">
+  <header>
 
-    <div class="brand">
-      LINDE TRANSPORT
+<div class="header-content">
+
+  <div class="header-brand">
+
+    <div class="brand-mark">
+      LT
     </div>
 
-    <div class="nav">
+    <div class="brand-text">
 
-      <a
-        href="index.html"
-      >
-        ภาพรวม
-      </a>
+      <h1 class="brand-title">
+        LINDE TRANSPORT
+      </h1>
 
-      <a
-        href="kpi-distance.html"
-        class="active"
-      >
-        KPI ระยะทาง
-      </a>
-
-      <a
-        href="daily-report.html"
-      >
-        Daily Report
-      </a>
+      <p class="brand-subtitle">
+        Transport Performance &amp; Operational Monitoring
+      </p>
 
     </div>
 
   </div>
 
 
+  <!-- NAVIGATION -->
+
+  <nav class="page-nav">
+
+    <a href="index.html">
+      📊 ภาพรวม
+    </a>
+
+    <a href="daily-report.html">
+      📅 รายงานประจำวัน
+    </a>
+
+    <a
+      href="kpi-distance.html"
+      class="active"
+    >
+      📍 KPI ระยะทาง
+    </a>
+
+  </nav>
+
+</div>
+
+  </header>
+
   <!-- =====================================================
        MAIN
-  ====================================================== -->
+       ===================================================== -->
 
   <main class="container">
 
+<!-- PAGE TITLE -->
 
-    <!-- ===================================================
-         PAGE HEADER
-    ==================================================== -->
+<div class="page-title">
 
-    <div class="page-header">
+  <h1>
+    📍 KPI ระยะทาง
+  </h1>
 
-      <h1>
-        📍 KPI ระยะทาง
-      </h1>
+  <p>
+    ติดตาม KM รถ COCO เทียบเป้าหมาย และช่วยตัดสินใจจัดรถ
+  </p>
 
-      <p>
-        ติดตาม KM รถ COCO เทียบเป้าหมาย และช่วยตัดสินใจจัดรถ
+</div>
+
+
+<!-- ===================================================
+     FILTER
+     =================================================== -->
+
+<section class="filters">
+
+  <div class="filter-group">
+
+    <label for="branchFilter">
+      สาขา
+    </label>
+
+    <select id="branchFilter">
+
+      <option value="">
+        ทุกสาขา
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <div class="filter-group">
+
+    <label>
+      รอบการทำงาน
+    </label>
+
+    <div
+      id="cycleText"
+      class="filter-cycle-text"
+    >
+      กำลังโหลด...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     CYCLE INFORMATION
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        🗓️ รอบการทำงาน
+      </h2>
+
+      <p class="section-subtitle">
+        รอบ KPI ปัจจุบัน 26–25
       </p>
 
     </div>
 
+  </div>
 
-    <!-- ===================================================
-         FILTER
-    ==================================================== -->
 
-    <div class="filters kpi-filter">
+  <div class="cycle-info">
 
-      <div>
+    <div>
 
-        <label for="branchFilter">
-          สาขา
-        </label>
-
-        <select id="branchFilter">
-
-          <option value="">
-            ทุกสาขา
-          </option>
-
-        </select>
-
+      <div class="cycle-info-label">
+        รอบปัจจุบัน
       </div>
 
-
-      <div>
-
-        <label>
-          รอบการทำงาน
-        </label>
-
-        <div
-          id="cycleText"
-          class="filter-cycle-text"
-        >
-          กำลังโหลด...
-        </div>
-
+      <div
+        id="cycleValue"
+        class="cycle-info-value"
+      >
+        -
       </div>
 
     </div>
 
 
-    <!-- ===================================================
-         CYCLE
-    ==================================================== -->
+    <div class="cycle-info-meta">
 
-    <div class="cycle-info">
+      <div class="cycle-meta-item">
 
-      <div>
+        <span>
+          ผ่านมาแล้ว
+        </span>
 
-        <div class="cycle-info-label">
-          รอบปัจจุบัน
-        </div>
-
-        <div
-          id="cycleValue"
-          class="cycle-info-value"
-        >
+        <strong id="elapsedDays">
           -
-        </div>
+        </strong>
 
       </div>
 
 
-      <div class="cycle-info-meta">
+      <div class="cycle-meta-item">
 
-        <div class="cycle-meta-item">
+        <span>
+          เหลือ
+        </span>
 
-          <span>
-            ผ่านมาแล้ว
-          </span>
+        <strong id="remainingDays">
+          -
+        </strong>
 
-          <strong id="elapsedDays">
-            -
-          </strong>
-
-        </div>
+      </div>
 
 
-        <div class="cycle-meta-item">
+      <div class="cycle-meta-item">
 
-          <span>
-            เหลือ
-          </span>
+        <span>
+          ข้อมูลล่าสุด
+        </span>
 
-          <strong id="remainingDays">
-            -
-          </strong>
-
-        </div>
-
-
-        <div class="cycle-meta-item">
-
-          <span>
-            ข้อมูลล่าสุด
-          </span>
-
-          <strong id="latestDate">
-            -
-          </strong>
-
-        </div>
+        <strong id="latestDate">
+          -
+        </strong>
 
       </div>
 
     </div>
 
+  </div>
 
-    <!-- ===================================================
-         MAIN KPI
-    ==================================================== -->
-
-    <div class="kpi-grid">
+</section>
 
 
-      <div class="kpi-card actual">
+<!-- ===================================================
+     MAIN KPI
+     =================================================== -->
 
-        <div class="kpi-card-label">
-          🚛 รถ COCO
-        </div>
+<section class="section">
 
-        <div
-          id="totalCars"
-          class="kpi-card-value"
-        >
-          -
-        </div>
+  <div class="section-heading">
 
-        <div class="kpi-card-note">
-          จาก Master Car
-        </div>
+    <div>
 
-        <div
-          id="totalCarsBreakdown"
-          class="kpi-card-breakdown"
-        ></div>
+      <h2>
+        📊 KPI ระยะทาง
+      </h2>
 
+      <p class="section-subtitle">
+        ผลการวิ่งของรถ COCO ในรอบปัจจุบัน
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="kpi-grid">
+
+
+    <!-- TOTAL CARS -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        🚛 รถ COCO
       </div>
 
-
-      <div class="kpi-card actual">
-
-        <div class="kpi-card-label">
-          📍 KM สะสม
-        </div>
-
-        <div
-          id="totalKm"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div class="kpi-card-note">
-          ในรอบปัจจุบัน
-        </div>
-
+      <div
+        id="totalCars"
+        class="card-value"
+      >
+        -
       </div>
 
-
-      <div class="kpi-card target">
-
-        <div class="kpi-card-label">
-          🎯 KM เป้าหมาย
-        </div>
-
-        <div
-          id="totalTargetKm"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div class="kpi-card-note">
-          รถที่มี Target
-        </div>
-
-      </div>
-
-
-      <div class="kpi-card target">
-
-        <div class="kpi-card-label">
-          📊 Achievement
-        </div>
-
-        <div
-          id="achievement"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div
-          id="achievementStatus"
-          class="kpi-card-note"
-        >
-          -
-        </div>
-
+      <div class="card-status">
+        จาก Master Car
       </div>
 
     </div>
 
 
-    <!-- ===================================================
-         ADDITIONAL KPI
-    ==================================================== -->
+    <!-- TOTAL KM -->
 
-    <div class="kpi-grid">
+    <div class="kpi-card">
 
-
-      <div class="kpi-card">
-
-        <div class="kpi-card-label">
-          🚗 รถที่มี KM
-        </div>
-
-        <div
-          id="runningCars"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div class="kpi-card-note">
-          รถที่มี KM สะสมมากกว่า 0
-        </div>
-
+      <div class="card-title">
+        📍 KM สะสม
       </div>
 
-
-      <div class="kpi-card">
-
-        <div class="kpi-card-label">
-          📏 KM / รถ
-        </div>
-
-        <div
-          id="avgKmCar"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div class="kpi-card-note">
-          ค่าเฉลี่ยรถที่มี Target
-        </div>
-
+      <div
+        id="totalKm"
+        class="card-value"
+      >
+        -
       </div>
 
-
-      <div class="kpi-card warning">
-
-        <div class="kpi-card-label">
-          ⚠️ ใกล้เป้า
-        </div>
-
-        <div
-          id="nearTargetCars"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div class="kpi-card-note">
-          KM ≥ 90% ของ Target
-        </div>
-
-      </div>
-
-
-      <div class="kpi-card danger">
-
-        <div class="kpi-card-label">
-          🚨 Forecast เกินเป้า
-        </div>
-
-        <div
-          id="forecastOverCars"
-          class="kpi-card-value"
-        >
-          -
-        </div>
-
-        <div class="kpi-card-note">
-          คาดว่าจะเกิน Target
-        </div>
-
+      <div class="card-status">
+        ในรอบปัจจุบัน
       </div>
 
     </div>
 
 
-    <!-- ===================================================
-         ACHIEVEMENT
-    ==================================================== -->
+    <!-- TARGET -->
 
-    <section class="section">
+    <div class="kpi-card">
+
+      <div class="card-title">
+        🎯 KM เป้าหมาย
+      </div>
+
+      <div
+        id="totalTargetKm"
+        class="card-value"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        รถที่มี Target
+      </div>
+
+    </div>
+
+
+    <!-- ACHIEVEMENT -->
+
+    <div class="kpi-card primary">
+
+      <div class="card-title">
+        📊 Achievement
+      </div>
+
+      <div
+        id="achievement"
+        class="card-value"
+      >
+        -
+      </div>
+
+      <div
+        id="achievementStatus"
+        class="card-status"
+      >
+        -
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ADDITIONAL KPI -->
+
+  <div class="kpi-grid">
+
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        🚗 รถที่มี KM
+      </div>
+
+      <div
+        id="runningCars"
+        class="card-value"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        รถที่มี KM สะสมมากกว่า 0
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        📏 KM / รถ
+      </div>
+
+      <div
+        id="avgKmCar"
+        class="card-value"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        ค่าเฉลี่ยรถที่มี Target
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card warning">
+
+      <div class="card-title">
+        ⚠️ ใกล้เป้า
+      </div>
+
+      <div
+        id="nearTargetCars"
+        class="card-value"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        KM ≥ 90% ของ Target
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card danger">
+
+      <div class="card-title">
+        🚨 Forecast เกินเป้า
+      </div>
+
+      <div
+        id="forecastOverCars"
+        class="card-value"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        คาดว่าจะเกิน Target
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     ACHIEVEMENT
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
 
       <h2>
         📊 ภาพรวมการทำ KM
       </h2>
 
-      <div class="achievement-box">
+      <p class="section-subtitle">
+        เปรียบเทียบผลจริงกับเป้าหมาย
+      </p>
 
-        <div>
+    </div>
 
-          <div class="achievement-main-label">
-            Achievement ปัจจุบัน
-          </div>
-
-          <div
-            id="achievementMain"
-            class="achievement-main-value"
-          >
-            -
-          </div>
-
-          <div class="achievement-main-note">
-            เทียบ KM สะสมกับ Target ของรถ COCO
-          </div>
-
-        </div>
+  </div>
 
 
-        <div class="achievement-side">
+  <div class="achievement-box">
 
-          <div class="achievement-side-item">
+    <div>
 
-            <span>
-              KM คาดการณ์สิ้นรอบ
-            </span>
+      <div class="achievement-main-label">
+        Achievement ปัจจุบัน
+      </div>
 
-            <strong id="forecastKm">
-              -
-            </strong>
+      <div
+        id="achievementMain"
+        class="achievement-main-value"
+      >
+        -
+      </div>
 
-          </div>
+      <div class="achievement-main-note">
+        เทียบ KM สะสมกับ Target ของรถ COCO
+      </div>
+
+    </div>
 
 
-          <div class="achievement-side-item">
+    <div class="achievement-side">
 
-            <span>
-              Forecast Achievement
-            </span>
+      <div class="achievement-side-item">
 
-            <strong id="forecastAchievement">
-              -
-            </strong>
+        <span>
+          KM คาดการณ์สิ้นรอบ
+        </span>
 
-          </div>
-
-        </div>
+        <strong id="forecastKm">
+          -
+        </strong>
 
       </div>
 
-    </section>
+
+      <div class="achievement-side-item">
+
+        <span>
+          Forecast Achievement
+        </span>
+
+        <strong id="forecastAchievement">
+          -
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 
-    <!-- ===================================================
-         ALERT
-    ==================================================== -->
+<!-- ===================================================
+     ALERT
+     =================================================== -->
 
-    <section class="section">
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
 
       <h2>
         🚨 รถที่ต้องระวัง
@@ -1071,77 +539,89 @@
         ใช้ประกอบการตัดสินใจจัดงาน โดยเฉพาะรถที่มีแนวโน้ม KM สูงเกินเป้า
       </p>
 
+    </div>
 
-      <div class="alert-grid">
-
-
-        <div class="alert-box alert-danger">
-
-          <div class="alert-box-header">
-
-            <h3>
-              🚨 Forecast เกินเป้า
-            </h3>
-
-            <p>
-              รถที่คาดว่าจะวิ่งเกิน Target เมื่อจบรอบ
-            </p>
-
-          </div>
+  </div>
 
 
-          <ul
-            id="forecastOverList"
-            class="alert-list"
-          >
-
-            <li class="empty-alert">
-              กำลังโหลด...
-            </li>
-
-          </ul>
-
-        </div>
+  <div class="alert-grid">
 
 
-        <div class="alert-box alert-warning">
+    <!-- FORECAST OVER -->
 
-          <div class="alert-box-header">
+    <div class="alert-box alert-danger">
 
-            <h3>
-              ⚠️ ใกล้ถึงเป้า
-            </h3>
+      <div class="alert-box-header">
 
-            <p>
-              รถที่มี KM สะสมตั้งแต่ 90% ของ Target
-            </p>
+        <h3>
+          🚨 Forecast เกินเป้า
+        </h3>
 
-          </div>
-
-
-          <ul
-            id="nearTargetList"
-            class="alert-list"
-          >
-
-            <li class="empty-alert">
-              กำลังโหลด...
-            </li>
-
-          </ul>
-
-        </div>
+        <p>
+          รถที่คาดว่าจะวิ่งเกิน Target เมื่อจบรอบ
+        </p>
 
       </div>
 
-    </section>
+
+      <ul
+        id="forecastOverList"
+        class="alert-list"
+      >
+
+        <li class="empty-alert">
+          กำลังโหลด...
+        </li>
+
+      </ul>
+
+    </div>
 
 
-    <!-- ===================================================
-         RANKING
-    ==================================================== -->
+    <!-- NEAR TARGET -->
 
-    <section class="section">
+    <div class="alert-box alert-warning">
+
+      <div class="alert-box-header">
+
+        <h3>
+          ⚠️ ใกล้ถึงเป้า
+        </h3>
+
+        <p>
+          รถที่มี KM สะสมตั้งแต่ 90% ของ Target
+        </p>
+
+      </div>
+
+
+      <ul
+        id="nearTargetList"
+        class="alert-list"
+      >
+
+        <li class="empty-alert">
+          กำลังโหลด...
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     RANKING
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
 
       <h2>
         📋 Ranking รถ
@@ -1151,77 +631,121 @@
         ใช้ดูรถที่มี KM สูงและต่ำเพื่อช่วยประกอบการจัดงาน
       </p>
 
+    </div>
 
-      <div class="ranking-grid">
-
-
-        <div class="ranking-box">
-
-          <div class="ranking-header">
-
-            <h3>
-              🔺 KM สูงสุด
-            </h3>
-
-            <p>
-              รถที่มี KM สะสมสูงที่สุด
-            </p>
-
-          </div>
+  </div>
 
 
-          <ul
-            id="highestKmList"
-            class="ranking-list"
-          >
-
-            <li class="empty-alert">
-              กำลังโหลด...
-            </li>
-
-          </ul>
-
-        </div>
+  <div class="ranking-grid">
 
 
-        <div class="ranking-box">
+    <!-- HIGHEST -->
 
-          <div class="ranking-header">
+    <div class="ranking-box">
 
-            <h3>
-              🔻 KM ต่ำสุด
-            </h3>
+      <div class="ranking-header">
 
-            <p>
-              รถที่มี KM สะสมต่ำกว่าเพื่อน
-            </p>
+        <h3>
+          🔺 KM สูงสุด
+        </h3>
 
-          </div>
-
-
-          <ul
-            id="lowestKmList"
-            class="ranking-list"
-          >
-
-            <li class="empty-alert">
-              กำลังโหลด...
-            </li>
-
-          </ul>
-
-        </div>
+        <p>
+          รถที่มี KM สะสมสูงที่สุด
+        </p>
 
       </div>
 
-    </section>
+
+      <ul
+        id="highestKmList"
+        class="ranking-list"
+      >
+
+        <li class="empty-alert">
+          กำลังโหลด...
+        </li>
+
+      </ul>
+
+    </div>
 
 
-    <!-- ===================================================
-         CAR TABLE
-    ==================================================== -->
+    <!-- LOWEST -->
 
-    <section class="section">
+    <div class="ranking-box">
+
+      <div class="ranking-header">
+
+        <h3>
+          🔻 KM ต่ำสุด
+        </h3>
+
+        <p>
+          รถที่มี KM สะสมต่ำกว่าเพื่อน
+        </p>
+
+      </div>
+
+
+      <ul
+        id="lowestKmList"
+        class="ranking-list"
+      >
+
+        <li class="empty-alert">
+          กำลังโหลด...
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     DAILY CHART
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        📈 KM รายวัน
+      </h2>
+
+      <p class="section-subtitle">
+        แสดง KM ของรถ COCO ตลอดรอบ 26–25
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="chart-wrapper">
+
+    <canvas id="distanceDailyChart"></canvas>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     CAR TABLE
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
 
       <h2>
         🚛 รายละเอียดรถ COCO
@@ -1231,107 +755,102 @@
         เรียงตาม KM สูงสุด เพื่อช่วยติดตามรถที่ใช้งานหนัก
       </p>
 
-
-      <div class="distance-table-wrapper">
-
-        <table class="distance-table">
-
-          <thead>
-
-            <tr>
-
-              <th>
-                เบอร์รถ
-              </th>
-
-              <th>
-                ทะเบียน
-              </th>
-
-              <th>
-                สาขา
-              </th>
-
-              <th>
-                ประเภทรถ
-              </th>
-
-              <th>
-                KM สะสม
-              </th>
-
-              <th>
-                Target
-              </th>
-
-              <th>
-                Achievement
-              </th>
-
-              <th>
-                KM คงเหลือ
-              </th>
-
-              <th>
-                Forecast KM
-              </th>
-
-              <th>
-                Forecast
-              </th>
-
-              <th>
-                สถานะ
-              </th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody id="carTableBody">
-
-            <tr>
-
-              <td
-                colspan="11"
-                class="empty-state"
-              >
-                กำลังโหลดข้อมูล...
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         PAGE STATUS
-    ==================================================== -->
-
-    <div
-      id="pageStatus"
-      class="page-status"
-    >
-      กำลังโหลดข้อมูล...
     </div>
 
+  </div>
+
+
+  <div class="table-wrapper">
+
+    <table class="data-table">
+
+      <thead>
+
+        <tr>
+
+          <th>
+            เบอร์รถ
+          </th>
+
+          <th>
+            ทะเบียน
+          </th>
+
+          <th>
+            สาขา
+          </th>
+
+          <th>
+            KM สะสม
+          </th>
+
+          <th>
+            Target
+          </th>
+
+          <th>
+            Achievement
+          </th>
+
+          <th>
+            Forecast KM
+          </th>
+
+          <th>
+            Forecast
+          </th>
+
+          <th>
+            สถานะ
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="carTableBody">
+
+        <tr>
+
+          <td
+            colspan="9"
+            class="empty-state"
+          >
+            กำลังโหลดข้อมูล...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     PAGE STATUS
+     =================================================== -->
+
+<div
+  id="pageStatus"
+  class="page-status"
+>
+  กำลังโหลดข้อมูล...
+</div>
 
   </main>
 
-
   <!-- =====================================================
-       SCRIPTS
-  ====================================================== -->
+       SCRIPT
+       ===================================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script src="kpi-distance.js"></script>
-
 
 </body>
 
