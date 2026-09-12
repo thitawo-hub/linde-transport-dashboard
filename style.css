@@ -1,33 +1,10 @@
 /* ============================================================
-   LINDE TRANSPORT DASHBOARD
-   PROFESSIONAL CORPORATE DESIGN SYSTEM — REFINED EDITION
-   ------------------------------------------------------------
-   UI ONLY
-   - ไม่แตะ SQL
-   - ไม่แตะ JS
-   - ไม่ตัดข้อมูล
-   - ไม่ลบ / ไม่เปลี่ยนชื่อ class ใดๆ จากไฟล์เดิม
-   - รองรับทุกหน้าใน Dashboard
-
-   แนวทางการปรับ:
-   งานขนส่ง/โลจิสติกส์ที่คนอ่านค่าตัวเลขทุกวัน (mature, data-first
-   audience) ต้องการความ "นิ่ง เชื่อถือได้ อ่านง่าย" มากกว่าความ
-   หวือหวา จึงปรับโทนสีให้ลึกและสุขุมขึ้น เพิ่มความคมชัดของตัวเลข
-   (tabular numerals), ปรับเงาให้นุ่มขึ้นเป็นชั้นๆ แบบเอกสารพิมพ์
-   ธุรกิจ, และเพิ่ม hierarchy ของหัวข้อให้ชัดเจนขึ้นโดยไม่แตะ
-   โครงสร้าง layout / ขนาดที่กระทบกับกราฟหรือความสูงของตาราง
-   ============================================================ */
-
-
-/* ============================================================
    01. DESIGN TOKENS
    ============================================================ */
 
 :root {
 
   /* ---------- Brand ---------- */
-  /* โทนเขียวป่าลึกขึ้น สื่อถึงความมั่นคง/ความน่าเชื่อถือ
-     ของงานขนส่งอุตสาหกรรม แทนเขียวสดที่ดูเป็นแอปทั่วไป */
   --brand-950: #052018;
   --brand-900: #0a3527;
   --brand-800: #0e4835;
@@ -39,7 +16,6 @@
   --brand-50:  #f0f8f3;
 
   /* ---------- Text ---------- */
-  /* ชาร์โคลอมโทนอุ่นขึ้นเล็กน้อย อ่านสบายตากว่าสีดำล้วน */
   --text-950: #14201b;
   --text-900: #1c2b24;
   --text-800: #2b3a33;
@@ -49,18 +25,17 @@
   --text-400: #93a19a;
 
   /* ---------- Surface ---------- */
-  --bg:       #f2f5f3;
+  /* พื้นหลังโทนครีมอมเขียวอ่อนๆ แบบภาพตัวอย่าง แทนเทาเรียบ */
+  --bg:       #f4f7f2;
   --surface:  #ffffff;
-  --surface-2:#f7faf8;
-  --surface-3:#eef3f0;
+  --surface-2:#f8faf6;
+  --surface-3:#eef4ee;
 
   /* ---------- Border ---------- */
-  --border:   #dde5e0;
-  --border-2: #e8eeeb;
+  --border:   #e2e9e0;
+  --border-2: #edf2ea;
 
   /* ---------- Status ---------- */
-  /* สีสถานะดัน saturation ลงเล็กน้อยให้ดูเป็นมืออาชีพ
-     ไม่ฉูดฉาดเมื่ออยู่รวมกันเป็นจำนวนมากในตาราง */
   --success:       #1a7a52;
   --success-bg:    #e6f5ec;
 
@@ -76,27 +51,40 @@
   --neutral:       #626d67;
   --neutral-bg:    #eef1ef;
 
+  /* ---------- Pill palette (จำกัดแค่เฉดเขียว 3 ระดับ) ----------
+     ใช้กับ KPI แบบ pill สีทึบ ให้ความรู้สึกสดใสแบบภาพตัวอย่าง
+     แต่ไม่แตกสีออกไปนอกโทนเขียวของแบรนด์ */
+  --pill-1-bg: linear-gradient(135deg, var(--brand-800), var(--brand-900));
+  --pill-1-fg: #ffffff;
+  --pill-1-sub: rgba(255, 255, 255, 0.72);
+
+  --pill-2-bg: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+  --pill-2-fg: #ffffff;
+  --pill-2-sub: rgba(255, 255, 255, 0.72);
+
+  --pill-3-bg: var(--brand-100);
+  --pill-3-fg: var(--brand-900);
+  --pill-3-sub: rgba(14, 72, 53, 0.62);
+
   /* ---------- Shadow ---------- */
-  /* เงาแบบ 2 ชั้น (ambient + contact) ให้ความลึกแบบเอกสาร
-     รายงานธุรกิจ นุ่มกว่าเงาเดี่ยวแบบการ์ด SaaS ทั่วไป */
+  /* เงานุ่ม ฟุ้งกว้าง แบบการ์ดลอยตัวในภาพตัวอย่าง */
   --shadow-xs:
-    0 1px 2px rgba(10, 20, 16, 0.05);
+    0 1px 2px rgba(20, 45, 34, 0.04);
 
   --shadow-sm:
-    0 1px 2px rgba(10, 20, 16, 0.04),
-    0 4px 10px rgba(10, 20, 16, 0.05);
+    0 1px 2px rgba(20, 45, 34, 0.03),
+    0 10px 24px rgba(20, 45, 34, 0.06);
 
   --shadow-md:
-    0 2px 4px rgba(10, 20, 16, 0.04),
-    0 10px 24px rgba(10, 20, 16, 0.07);
+    0 4px 10px rgba(20, 45, 34, 0.05),
+    0 18px 44px rgba(20, 45, 34, 0.09);
 
   /* ---------- Radius ---------- */
-  /* ลดความมนลงเล็กน้อยจากต้นฉบับ ให้ความรู้สึก "เครื่องมือทำงาน"
-     มากกว่า "แอปทั่วไป" ซึ่งเข้ากับผู้ใช้งานที่คุ้นกับซอฟต์แวร์
-     องค์กร/ERP */
-  --radius-sm: 6px;
-  --radius-md: 9px;
-  --radius-lg: 12px;
+  /* โค้งมนขึ้นชัดเจนตามภาพตัวอย่าง ให้ความรู้สึกนุ่มนวล เป็นมิตร
+     มากกว่าเครื่องมือ ERP แบบเหลี่ยม */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
 
   /* ---------- Spacing ---------- */
   --space-1: 4px;
@@ -213,8 +201,6 @@ img {
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* เส้นเน้นแบรนด์บางๆ ด้านล่างสุดของ header ให้ความรู้สึก
-   เป็นระบบงานที่มี identity ชัดเจน โดยไม่แตะโครงสร้างเดิม */
 .header::after {
   content: "";
   display: block;
@@ -366,10 +352,10 @@ img {
 
   min-height: 36px;
 
-  padding: 0 13px;
+  padding: 0 14px;
 
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
 
   background: transparent;
 
@@ -396,10 +382,12 @@ img {
 .page-nav a.active,
 .navlink.active {
 
-  background: var(--brand-50);
-  color: var(--brand-800);
+  background: var(--brand-800);
+  color: #ffffff;
 }
 
+/* pill แบบ tab จึงไม่ต้องมีขีดเส้นใต้ซ้ำซ้อน — ปิดเส้นใต้เดิม
+   ของ active state (ยังคง rule ไว้ แค่ปรับให้โปร่งใส) */
 .nav button.active::after,
 .page-nav a.active::after,
 .navlink.active::after {
@@ -414,7 +402,7 @@ img {
 
   height: 2px;
 
-  background: var(--brand-600);
+  background: transparent;
 
   border-radius: 2px;
 }
@@ -434,8 +422,8 @@ img {
 
   margin: 0 auto;
 
-  padding-top: 16px;
-  padding-bottom: 20px;
+  padding-top: 18px;
+  padding-bottom: 22px;
 }
 
 
@@ -504,13 +492,13 @@ img {
 
   margin-bottom: 14px;
 
-  padding: 12px 13px;
+  padding: 12px 14px;
 
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .filters > div,
@@ -543,12 +531,12 @@ img {
 
   height: 34px;
 
-  padding: 0 10px;
+  padding: 0 12px;
 
-  background: #ffffff;
+  background: var(--surface-2);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
 
   color: var(--text-800);
 
@@ -583,12 +571,12 @@ img {
 
   min-height: 34px;
 
-  padding: 0 10px;
+  padding: 0 12px;
 
   background: var(--surface-3);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
 
   color: var(--text-700);
 
@@ -609,7 +597,7 @@ img {
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
 
-  gap: 10px;
+  gap: 12px;
 
   margin-bottom: 14px;
 }
@@ -621,24 +609,24 @@ img {
 
   min-width: 0;
 
-  padding: 14px 15px;
+  padding: 15px 16px;
 
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 
   overflow: hidden;
 
-  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .kpi:hover,
 .kpi-card:hover {
 
-  border-color: var(--border);
   box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .kpi::before,
@@ -697,6 +685,108 @@ img {
   font-size: 10.5px;
 }
 
+/* ---------- Comvi-style solid pill variant ----------
+   ไล่เฉด "เขียว" 3 ระดับซ้ำเป็นรอบ (เข้ม → กลาง → มินต์อ่อน)
+   ให้ความรู้สึกสดใสมีชีวิตชีวาแบบภาพตัวอย่าง แต่ไม่หลุดจากโทน
+   เขียวของแบรนด์ และจำนวนสีรวมยังจำกัดอยู่แค่ 3 เฉด */
+
+.kpi-grid .kpi:nth-child(3n+1),
+.kpi-grid .kpi-card:nth-child(3n+1),
+.cards .kpi:nth-child(3n+1),
+.cards .kpi-card:nth-child(3n+1) {
+  background: var(--pill-1-bg);
+  border-color: transparent;
+}
+
+.kpi-grid .kpi:nth-child(3n+2),
+.kpi-grid .kpi-card:nth-child(3n+2),
+.cards .kpi:nth-child(3n+2),
+.cards .kpi-card:nth-child(3n+2) {
+  background: var(--pill-2-bg);
+  border-color: transparent;
+}
+
+.kpi-grid .kpi:nth-child(3n+3),
+.kpi-grid .kpi-card:nth-child(3n+3),
+.cards .kpi:nth-child(3n+3),
+.cards .kpi-card:nth-child(3n+3) {
+  background: var(--pill-3-bg);
+  border-color: transparent;
+}
+
+.kpi-grid .kpi:nth-child(3n+1)::before,
+.kpi-grid .kpi-card:nth-child(3n+1)::before,
+.kpi-grid .kpi:nth-child(3n+2)::before,
+.kpi-grid .kpi-card:nth-child(3n+2)::before,
+.cards .kpi:nth-child(3n+1)::before,
+.cards .kpi-card:nth-child(3n+1)::before,
+.cards .kpi:nth-child(3n+2)::before,
+.cards .kpi-card:nth-child(3n+2)::before {
+  display: none;
+}
+
+.kpi-grid .kpi:nth-child(3n+3)::before,
+.kpi-grid .kpi-card:nth-child(3n+3)::before,
+.cards .kpi:nth-child(3n+3)::before,
+.cards .kpi-card:nth-child(3n+3)::before {
+  background: var(--brand-500);
+  opacity: 0.6;
+}
+
+.kpi-grid .kpi:nth-child(3n+1) .kpi-title,
+.kpi-grid .kpi-card:nth-child(3n+1) .kpi-label,
+.kpi-grid .kpi:nth-child(3n+2) .kpi-title,
+.kpi-grid .kpi-card:nth-child(3n+2) .kpi-label,
+.cards .kpi:nth-child(3n+1) .kpi-title,
+.cards .kpi-card:nth-child(3n+1) .kpi-label,
+.cards .kpi:nth-child(3n+2) .kpi-title,
+.cards .kpi-card:nth-child(3n+2) .kpi-label {
+  color: var(--pill-1-sub);
+}
+
+.kpi-grid .kpi:nth-child(3n+1) .kpi-value,
+.kpi-grid .kpi-card:nth-child(3n+1) .kpi-value,
+.kpi-grid .kpi:nth-child(3n+2) .kpi-value,
+.kpi-grid .kpi-card:nth-child(3n+2) .kpi-value,
+.cards .kpi:nth-child(3n+1) .kpi-value,
+.cards .kpi-card:nth-child(3n+1) .kpi-value,
+.cards .kpi:nth-child(3n+2) .kpi-value,
+.cards .kpi-card:nth-child(3n+2) .kpi-value {
+  color: var(--pill-1-fg);
+}
+
+.kpi-grid .kpi:nth-child(3n+1) .kpi-sub,
+.kpi-grid .kpi-card:nth-child(3n+1) .kpi-sub,
+.kpi-grid .kpi:nth-child(3n+2) .kpi-sub,
+.kpi-grid .kpi-card:nth-child(3n+2) .kpi-sub,
+.cards .kpi:nth-child(3n+1) .kpi-sub,
+.cards .kpi-card:nth-child(3n+1) .kpi-sub,
+.cards .kpi:nth-child(3n+2) .kpi-sub,
+.cards .kpi-card:nth-child(3n+2) .kpi-sub {
+  color: var(--pill-1-sub);
+}
+
+.kpi-grid .kpi:nth-child(3n+3) .kpi-title,
+.kpi-grid .kpi-card:nth-child(3n+3) .kpi-label,
+.cards .kpi:nth-child(3n+3) .kpi-title,
+.cards .kpi-card:nth-child(3n+3) .kpi-label {
+  color: var(--pill-3-sub);
+}
+
+.kpi-grid .kpi:nth-child(3n+3) .kpi-value,
+.kpi-grid .kpi-card:nth-child(3n+3) .kpi-value,
+.cards .kpi:nth-child(3n+3) .kpi-value,
+.cards .kpi-card:nth-child(3n+3) .kpi-value {
+  color: var(--pill-3-fg);
+}
+
+.kpi-grid .kpi:nth-child(3n+3) .kpi-sub,
+.kpi-grid .kpi-card:nth-child(3n+3) .kpi-sub,
+.cards .kpi:nth-child(3n+3) .kpi-sub,
+.cards .kpi-card:nth-child(3n+3) .kpi-sub {
+  color: var(--pill-3-sub);
+}
+
 
 /* ============================================================
    10. GENERIC SECTIONS
@@ -710,7 +800,7 @@ img {
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 
   overflow: hidden;
@@ -723,7 +813,7 @@ img {
 
 .section-heading {
 
-  min-height: 44px;
+  min-height: 46px;
 
   display: flex;
   align-items: center;
@@ -731,7 +821,7 @@ img {
 
   gap: 12px;
 
-  padding: 10px 14px;
+  padding: 12px 16px;
 
   background: var(--surface);
 
@@ -745,7 +835,7 @@ img {
 
   color: var(--text-900);
 
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
 
   letter-spacing: -0.005em;
@@ -762,7 +852,7 @@ img {
 
 .section-body {
 
-  padding: 13px;
+  padding: 15px;
 }
 
 
@@ -843,7 +933,7 @@ img {
 
   height: 215px;
 
-  padding: 10px 12px;
+  padding: 12px 14px;
 
   background: var(--surface);
 }
@@ -878,9 +968,9 @@ img {
   grid-template-columns:
     repeat(3, minmax(0, 1fr));
 
-  gap: 6px;
+  gap: 8px;
 
-  padding: 9px 12px;
+  padding: 10px 14px;
 
   border-bottom: 1px solid var(--border-2);
 
@@ -891,7 +981,7 @@ img {
 
   min-width: 0;
 
-  padding: 8px 9px;
+  padding: 9px 10px;
 
   background: #ffffff;
 
@@ -943,7 +1033,7 @@ img {
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 
   overflow: hidden;
@@ -951,7 +1041,7 @@ img {
 
 .forecast-main {
 
-  padding: 14px 16px;
+  padding: 16px 18px;
 }
 
 .forecast-title {
@@ -985,9 +1075,9 @@ img {
 
 .forecast-side {
 
-  padding: 14px 16px;
+  padding: 16px 18px;
 
-  background: var(--surface-2);
+  background: var(--brand-50);
 
   border-left: 1px solid var(--border);
 }
@@ -1028,12 +1118,12 @@ img {
 
   margin-bottom: 14px;
 
-  padding: 10px 14px;
+  padding: 12px 16px;
 
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xs);
 }
 
@@ -1070,7 +1160,7 @@ img {
 
   min-height: 22px;
 
-  padding: 2px 9px;
+  padding: 2px 10px;
 
   border-radius: 999px;
 
@@ -1169,7 +1259,7 @@ img {
 
   min-width: 0;
 
-  padding: 12px 13px;
+  padding: 13px 14px;
 
   background: var(--surface);
 
@@ -1528,7 +1618,7 @@ tbody td {
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 
   overflow: hidden;
@@ -1546,20 +1636,24 @@ tbody td {
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
 
-  gap: 10px;
+  gap: 12px;
 
   margin-bottom: 14px;
 }
 
 .report-kpi {
 
-  padding: 13px 14px;
+  position: relative;
+
+  padding: 14px 15px;
 
   background: var(--surface);
 
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+
+  overflow: hidden;
 }
 
 .report-kpi-label {
@@ -1580,6 +1674,41 @@ tbody td {
   font-weight: 700;
 
   font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Comvi-style pill cycle สำหรับ Daily report KPI ด้วย ---------- */
+
+.report-kpi-grid .report-kpi:nth-child(3n+1) {
+  background: var(--pill-1-bg);
+  border-color: transparent;
+}
+
+.report-kpi-grid .report-kpi:nth-child(3n+2) {
+  background: var(--pill-2-bg);
+  border-color: transparent;
+}
+
+.report-kpi-grid .report-kpi:nth-child(3n+3) {
+  background: var(--pill-3-bg);
+  border-color: transparent;
+}
+
+.report-kpi-grid .report-kpi:nth-child(3n+1) .report-kpi-label,
+.report-kpi-grid .report-kpi:nth-child(3n+2) .report-kpi-label {
+  color: var(--pill-1-sub);
+}
+
+.report-kpi-grid .report-kpi:nth-child(3n+1) .report-kpi-value,
+.report-kpi-grid .report-kpi:nth-child(3n+2) .report-kpi-value {
+  color: var(--pill-1-fg);
+}
+
+.report-kpi-grid .report-kpi:nth-child(3n+3) .report-kpi-label {
+  color: var(--pill-3-sub);
+}
+
+.report-kpi-grid .report-kpi:nth-child(3n+3) .report-kpi-value {
+  color: var(--pill-3-fg);
 }
 
 
@@ -1646,12 +1775,12 @@ tbody td {
 
   min-height: 34px;
 
-  padding: 0 13px;
+  padding: 0 16px;
 
   background: var(--brand-700);
 
   border: 1px solid var(--brand-700);
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
 
   color: #ffffff;
 
@@ -1716,7 +1845,7 @@ tbody td {
 
   min-height: 22px;
 
-  padding: 2px 8px;
+  padding: 2px 9px;
 
   background: var(--surface-3);
 
@@ -1798,13 +1927,13 @@ tbody td {
       var(--content-width)
     );
 
-    padding-top: 14px;
+    padding-top: 16px;
   }
 
   .kpi-grid,
   .cards {
 
-    gap: 10px;
+    gap: 12px;
   }
 
   .chart-wrapper,
@@ -2070,7 +2199,7 @@ tbody td {
   .kpi-card,
   .report-kpi {
 
-    padding: 11px 12px;
+    padding: 12px 13px;
   }
 
   .kpi-value {
