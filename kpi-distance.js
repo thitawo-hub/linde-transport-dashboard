@@ -14,9 +14,6 @@ const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 let summaryData = null;
 let carData = [];
-let dailyData = [];
-
-let distanceChart = null;
 
 // ============================================================
 // CONFIG
@@ -37,18 +34,70 @@ const FLEET_COUNTS = [
   { branch: 'หาดใหญ่', vehicleType: null, count: 2 }
 ];
 
-function getFleetCount(branch) {
-  const normalized = normalizeText(branch);
-  return FLEET_COUNTS.filter(entry => normalizeText(entry.branch) === normalized).reduce(
-    (sum, entry) => sum + entry.count,
-    0
-  );
-}
+// Target KM สำหรับรถที่ไม่มี target_km จาก Supabase (เช่น 10W ที่ view ยังไม่ตั้งเป้าไว้)
+// ให้ใช้ Target เดียวกับ 22W คือ 13,000 กม. — ใช้ทั้งกับรถจริงที่ target เป็น 0/ว่าง
+// และรถ "หลอน" (virtual) ที่เติมให้ครบจำนวนตาม FLEET_COUNTS
+const VIRTUAL_CAR_TARGETS = {
+  '10W': 13000
+};
 
 function getFleetCountsForBranchFilter(branchFilter) {
   if (!branchFilter) return FLEET_COUNTS;
   const normalized = normalizeText(branchFilter);
   return FLEET_COUNTS.filter(entry => normalizeText(entry.branch) === normalized);
+}
+
+// หา target เริ่มต้นตามประเภทรถ (case-insensitive) จาก VIRTUAL_CAR_TARGETS
+function getDefaultTargetForType(vehicleType) {
+  const normalized = normalizeText(vehicleType);
+  const matchKey = Object.keys(VIRTUAL_CAR_TARGETS).find(
+    key => normalizeText(key) === normalized
+  );
+  return matchKey ? VIRTUAL_CAR_TARGETS[matchKey] : 0;
+}
+
+// Target ที่แท้จริงของรถแต่ละคัน: ใช้ target_km จาก Supabase ถ้ามี (>0)
+// ถ้าไม่มี (null/0/ว่าง) ให้ fallback ไปใช้ default ตามประเภทรถ (เช่น 10W = 13000 เท่า 22W)
+function getTargetKm(car) {
+  const target = toNumber(car.target_km);
+  if (target > 0) return target;
+  return getDefaultTargetForType(car.vehicle_type);
+}
+
+// เติมรถ "หลอน" (ยังไม่มีข้อมูลทริปจริงใน Supabase) ให้ครบตามจำนวนใน FLEET_COUNTS
+// เพื่อให้ตารางรายละเอียด/สรุปแสดงรถครบทุกคัน แม้ Supabase จะยังไม่มีข้อมูลของคันนั้น
+function ensureFleetCoverage(cars) {
+  const merged = [...cars];
+
+  FLEET_COUNTS.forEach(entry => {
+    if (!entry.vehicleType) return; // ไม่รู้ breakdown รายคัน ข้ามไป
+
+    const matchCount = merged.filter(
+      car =>
+        normalizeText(car.branch) === normalizeText(entry.branch) &&
+        normalizeText(normalizeVehicleType(car.vehicle_type)) === normalizeText(entry.vehicleType)
+    ).length;
+
+    const missing = entry.count - matchCount;
+    if (missing <= 0) return;
+
+    const defaultTarget = getDefaultTargetForType(entry.vehicleType);
+
+    for (let i = 1; i <= missing; i++) {
+      merged.push({
+        car_no: `${entry.vehicleType}-${matchCount + i}`,
+        license_plate: '-',
+        branch: entry.branch,
+        vehicle_type: entry.vehicleType,
+        target_km: defaultTarget,
+        total_km: 0,
+        forecast_km: 0,
+        _virtual: true
+      });
+    }
+  });
+
+  return merged;
 }
 
 // ============================================================
@@ -107,19 +156,16 @@ async function loadKpiDistance() {
   try {
     setPageStatus('กำลังโหลดข้อมูล KPI ระยะทาง...');
 
-    const [summary, cars, daily] = await Promise.all([
+    const [summary, cars] = await Promise.all([
       fetchSupabase('v_kpi_distance_summary', 'select=*'),
-      fetchSupabase('v_kpi_distance_car', 'select=*'),
-      fetchSupabase('v_kpi_distance_daily', 'select=*')
+      fetchSupabase('v_kpi_distance_car', 'select=*')
     ]);
 
     summaryData = summary?.[0] || null;
-    carData = cars || [];
-    dailyData = daily || [];
+    carData = ensureFleetCoverage(cars || []);
 
     console.log('KPI Distance Summary:', summaryData);
     console.log('KPI Distance Cars:', carData.length);
-    console.log('KPI Distance Daily:', dailyData.length);
 
     populateBranchFilter();
     render();
@@ -178,23 +224,16 @@ function render() {
     return normalizeText(car.branch) === normalizeText(branch);
   });
 
-  const filteredDaily = dailyData.filter(row => {
-    if (isExcludedBranch(row.branch)) return false;
-    if (!branch) return true;
-    return normalizeText(row.branch) === normalizeText(branch);
-  });
-
   const fixedTotalCars = getFleetCountsForBranchFilter(branch).reduce(
     (sum, entry) => sum + entry.count,
     0
   );
 
   renderSummary(filteredCars, fixedTotalCars);
+  renderFleetBreakdown(branch);
   renderCycle();
-  renderFleetSummary(branch);
   renderAlerts(filteredCars);
   renderRankings(filteredCars);
-  renderChart(filteredDaily);
   renderTable(filteredCars);
 }
 
@@ -205,11 +244,11 @@ function render() {
 function renderSummary(cars, fixedTotalCars) {
   const totalCars = fixedTotalCars;
 
-  const targetCars = cars.filter(car => toNumber(car.target_km) > 0);
+  const targetCars = cars.filter(car => getTargetKm(car) > 0);
   const runningCars = cars.filter(car => toNumber(car.total_km) > 0);
 
   const totalKm = targetCars.reduce((sum, car) => sum + toNumber(car.total_km), 0);
-  const totalTarget = targetCars.reduce((sum, car) => sum + toNumber(car.target_km), 0);
+  const totalTarget = targetCars.reduce((sum, car) => sum + getTargetKm(car), 0);
 
   const achievement = totalTarget > 0 ? (totalKm / totalTarget) * 100 : 0;
   const avgKmCar = targetCars.length > 0 ? totalKm / targetCars.length : 0;
@@ -241,60 +280,25 @@ function renderSummary(cars, fixedTotalCars) {
 }
 
 // ============================================================
-// VEHICLE TYPE SUMMARY
+// FLEET BREAKDOWN (รายละเอียดเล็กๆ ใต้การ์ด "รถ COCO")
 // ============================================================
 
-function renderFleetSummary(branchFilter) {
-  const container = document.getElementById('fleetSummaryCard');
+function renderFleetBreakdown(branchFilter) {
+  const container = document.getElementById('totalCarsBreakdown');
   if (!container) return;
 
-  const entries = getFleetCountsForBranchFilter(branchFilter);
+  const typedEntries = getFleetCountsForBranchFilter(branchFilter).filter(
+    entry => entry.vehicleType
+  );
 
-  if (!entries.length) {
-    container.innerHTML = `<div class="empty-state">ไม่พบข้อมูลรถ</div>`;
+  if (!typedEntries.length) {
+    container.innerHTML = '';
     return;
   }
 
-  // จัดกลุ่มตามสาขา
-  const branchGroups = new Map();
-
-  entries.forEach(entry => {
-    if (!branchGroups.has(entry.branch)) {
-      branchGroups.set(entry.branch, []);
-    }
-    branchGroups.get(entry.branch).push(entry);
-  });
-
-  const branches = [...branchGroups.keys()].sort(
-    (a, b) => getBranchOrder(a) - getBranchOrder(b)
-  );
-
-  container.innerHTML = branches
-    .map(branch => {
-      const branchEntries = branchGroups.get(branch);
-      const branchTotal = branchEntries.reduce((sum, e) => sum + e.count, 0);
-
-      const rows = branchEntries
-        .map(entry => {
-          const label = entry.vehicleType || 'ทุกประเภท';
-          return `
-            <div class="fleet-type-row">
-              <span>${escapeHtml(label)}</span>
-              <span>${formatNumber(entry.count)} คัน</span>
-            </div>
-          `;
-        })
-        .join('');
-
-      return `
-        <div class="fleet-branch-group">
-          <div class="fleet-branch-name">${escapeHtml(branch)}</div>
-          ${rows}
-          <div class="fleet-branch-total">รวม ${formatNumber(branchTotal)} คัน</div>
-        </div>
-      `;
-    })
-    .join('');
+  container.innerHTML = typedEntries
+    .map(entry => `<span>${escapeHtml(entry.vehicleType)} = ${formatNumber(entry.count)}</span>`)
+    .join(' &nbsp;•&nbsp; ');
 }
 
 // ============================================================
@@ -348,7 +352,7 @@ function renderCycle() {
 // ============================================================
 
 function renderAlerts(cars) {
-  const targetCars = cars.filter(car => toNumber(car.target_km) > 0);
+  const targetCars = cars.filter(car => getTargetKm(car) > 0);
 
   const forecastOver = targetCars
     .filter(car => getForecastOver(car) > 0)
@@ -408,7 +412,7 @@ function renderAlertList(elementId, cars, type) {
 // ============================================================
 
 function renderRankings(cars) {
-  const targetCars = cars.filter(car => toNumber(car.target_km) > 0);
+  const targetCars = cars.filter(car => getTargetKm(car) > 0);
 
   const highest = [...targetCars]
     .sort((a, b) => toNumber(b.total_km) - toNumber(a.total_km))
@@ -452,76 +456,6 @@ function renderRankingList(elementId, cars) {
 }
 
 // ============================================================
-// CHART
-// ============================================================
-
-function renderChart(dailyRows) {
-  const canvas = document.getElementById('distanceDailyChart');
-  if (!canvas) return;
-
-  // NOTE: ปรับชื่อ field ตรงนี้ให้ตรงกับ column จริงใน view
-  // v_kpi_distance_daily ถ้าชื่อ column ไม่ตรงกับที่เดาไว้ (trip_date / km)
-  const grouped = new Map();
-
-  dailyRows.forEach(row => {
-    const date = row.trip_date || row.date;
-    if (!date) return;
-
-    const km = toNumber(row.km ?? row.total_km ?? row.distance_km);
-    grouped.set(date, (grouped.get(date) || 0) + km);
-  });
-
-  const sortedDates = [...grouped.keys()].sort((a, b) => new Date(a) - new Date(b));
-  const labels = sortedDates.map(d => formatThaiDate(d));
-  const dailyValues = sortedDates.map(d => grouped.get(d));
-
-  let running = 0;
-  const cumulativeValues = dailyValues.map(v => (running += v));
-
-  if (distanceChart) {
-    distanceChart.destroy();
-  }
-
-  distanceChart = new Chart(canvas.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'KM สะสม',
-          data: cumulativeValues,
-          borderColor: '#111827',
-          backgroundColor: 'rgba(17,24,39,0.08)',
-          fill: true,
-          tension: 0.3,
-          pointRadius: 2
-        },
-        {
-          label: 'KM รายวัน',
-          data: dailyValues,
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37,99,235,0.08)',
-          fill: false,
-          tension: 0.3,
-          pointRadius: 2
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { position: 'top' }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
-    }
-  });
-}
-
-// ============================================================
 // TABLE
 // ============================================================
 
@@ -538,7 +472,7 @@ function renderTable(cars) {
 
   tbody.innerHTML = sorted
     .map(car => {
-      const target = toNumber(car.target_km);
+      const target = getTargetKm(car);
       const km = toNumber(car.total_km);
       const forecast = toNumber(car.forecast_km);
 
@@ -643,13 +577,13 @@ function formatThaiDate(dateStr) {
 }
 
 function getAchievement(car) {
-  const target = toNumber(car.target_km);
+  const target = getTargetKm(car);
   const km = toNumber(car.total_km);
   return target > 0 ? (km / target) * 100 : 0;
 }
 
 function getForecastOver(car) {
-  const target = toNumber(car.target_km);
+  const target = getTargetKm(car);
   const forecast = toNumber(car.forecast_km);
   return target > 0 ? forecast - target : 0;
 }
