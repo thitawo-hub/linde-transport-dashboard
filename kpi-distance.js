@@ -191,7 +191,7 @@ function render() {
 
   renderSummary(filteredCars, fixedTotalCars);
   renderCycle();
-  renderVehicleTypeSummary(filteredCars, branch);
+  renderFleetSummary(branch);
   renderAlerts(filteredCars);
   renderRankings(filteredCars);
   renderChart(filteredDaily);
@@ -244,66 +244,54 @@ function renderSummary(cars, fixedTotalCars) {
 // VEHICLE TYPE SUMMARY
 // ============================================================
 
-function renderVehicleTypeSummary(cars, branchFilter) {
-  const tbody = document.getElementById('vehicleTypeSummaryBody');
-  if (!tbody) return;
+function renderFleetSummary(branchFilter) {
+  const container = document.getElementById('fleetSummaryCard');
+  if (!container) return;
 
   const entries = getFleetCountsForBranchFilter(branchFilter);
 
   if (!entries.length) {
-    tbody.innerHTML = `<tr><td colspan="10" class="empty-state">ไม่พบข้อมูลรถ</td></tr>`;
+    container.innerHTML = `<div class="empty-state">ไม่พบข้อมูลรถ</div>`;
     return;
   }
 
-  const rows = [...entries].sort((a, b) => {
-    const branchDiff = getBranchOrder(a.branch) - getBranchOrder(b.branch);
-    if (branchDiff !== 0) return branchDiff;
-    return String(a.vehicleType || '').localeCompare(String(b.vehicleType || ''), 'th');
+  // จัดกลุ่มตามสาขา
+  const branchGroups = new Map();
+
+  entries.forEach(entry => {
+    if (!branchGroups.has(entry.branch)) {
+      branchGroups.set(entry.branch, []);
+    }
+    branchGroups.get(entry.branch).push(entry);
   });
 
-  tbody.innerHTML = rows
-    .map(entry => {
-      // ดึงเฉพาะรถจริงที่ตรงกับสาขา (และประเภทรถ ถ้าระบุ) มาคำนวณ KM/Target
-      // ส่วนจำนวนคัน ("จำนวนรถ") ใช้ค่าคงที่จาก FLEET_COUNTS เสมอ
-      const matchedCars = cars.filter(car => {
-        if (normalizeText(car.branch) !== normalizeText(entry.branch)) return false;
-        if (entry.vehicleType && normalizeText(normalizeVehicleType(car.vehicle_type)) !== normalizeText(entry.vehicleType)) {
-          return false;
-        }
-        return true;
-      });
+  const branches = [...branchGroups.keys()].sort(
+    (a, b) => getBranchOrder(a) - getBranchOrder(b)
+  );
 
-      const targetCars = matchedCars.filter(car => toNumber(car.target_km) > 0);
-      const targetTotal = targetCars.reduce((sum, car) => sum + toNumber(car.target_km), 0);
-      const totalKm = targetCars.reduce((sum, car) => sum + toNumber(car.total_km), 0);
-      const forecastTotal = targetCars.reduce((sum, car) => sum + toNumber(car.forecast_km), 0);
+  container.innerHTML = branches
+    .map(branch => {
+      const branchEntries = branchGroups.get(branch);
+      const branchTotal = branchEntries.reduce((sum, e) => sum + e.count, 0);
 
-      const achievement = targetTotal > 0 ? (totalKm / targetTotal) * 100 : null;
-      const forecastAchievement = targetTotal > 0 ? (forecastTotal / targetTotal) * 100 : null;
-      const avgTarget = targetCars.length > 0 ? targetTotal / targetCars.length : null;
-      const forecastOver = forecastTotal - targetTotal;
-
-      const status = getGroupStatus(achievement, forecastAchievement, targetTotal);
-      const vehicleTypeLabel = entry.vehicleType || 'ทุกประเภท';
+      const rows = branchEntries
+        .map(entry => {
+          const label = entry.vehicleType || 'ทุกประเภท';
+          return `
+            <div class="fleet-type-row">
+              <span>${escapeHtml(label)}</span>
+              <span>${formatNumber(entry.count)} คัน</span>
+            </div>
+          `;
+        })
+        .join('');
 
       return `
-        <tr>
-          <td><strong>${escapeHtml(entry.branch)}</strong></td>
-          <td><span class="vehicle-type-badge">${escapeHtml(vehicleTypeLabel)}</span></td>
-          <td class="num">${formatNumber(entry.count)}</td>
-          <td class="num target-value">${avgTarget !== null ? formatNumber(avgTarget) : '-'}</td>
-          <td class="num target-value">${targetTotal > 0 ? formatNumber(targetTotal) : '-'}</td>
-          <td class="num">${formatNumber(totalKm)}</td>
-          <td class="num ${getAchievementClass(achievement)}">
-            ${achievement !== null ? achievement.toFixed(1) + '%' : '-'}
-          </td>
-          <td class="num">${targetTotal > 0 ? formatNumber(forecastTotal) : '-'}</td>
-          <td class="num ${getAchievementClass(forecastAchievement)}">
-            ${forecastAchievement !== null ? forecastAchievement.toFixed(1) + '%' : '-'}
-            ${forecastOver > 0 ? `<small style="display:block;color:#dc2626;">+${formatNumber(forecastOver)} KM</small>` : ''}
-          </td>
-          <td><span class="distance-status ${status.className}">${status.text}</span></td>
-        </tr>
+        <div class="fleet-branch-group">
+          <div class="fleet-branch-name">${escapeHtml(branch)}</div>
+          ${rows}
+          <div class="fleet-branch-total">รวม ${formatNumber(branchTotal)} คัน</div>
+        </div>
       `;
     })
     .join('');
