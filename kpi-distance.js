@@ -3,10 +3,8 @@
 // KPI DISTANCE
 // ============================================================
 
-
 const SUPABASE_URL =
   'https://hhsqijlcebaijtklskag.supabase.co';
-
 
 const SUPABASE_KEY =
   'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
@@ -16,7 +14,7 @@ const SUPABASE_KEY =
 // GLOBAL
 // ============================================================
 
-let summaryData = null;
+let summaryData = [];
 let carData = [];
 let dailyData = [];
 
@@ -43,7 +41,6 @@ async function fetchSupabase(
 
     const separator =
       params ? '&' : '';
-
 
     const url =
       `${SUPABASE_URL}/rest/v1/${table}?` +
@@ -161,7 +158,7 @@ async function loadKpiDistance() {
 
 
     summaryData =
-      summary?.[0] || null;
+      summary || [];
 
 
     carData =
@@ -393,6 +390,11 @@ function render() {
   renderCycle();
 
 
+  renderVehicleTypeSummary(
+    filteredCars
+  );
+
+
   renderAlerts(
     filteredCars
   );
@@ -453,8 +455,8 @@ function renderSummary(
       ) =>
         sum +
         Number(
-          car.total_km
-        || 0
+          car.total_km ||
+          0
         ),
       0
     );
@@ -468,8 +470,8 @@ function renderSummary(
       ) =>
         sum +
         Number(
-          car.target_km
-        || 0
+          car.target_km ||
+          0
         ),
       0
     );
@@ -496,8 +498,8 @@ function renderSummary(
     targetCars.filter(
       car =>
         Number(
-          car.achievement_percent
-        || 0
+          car.achievement_percent ||
+          0
         ) >= 90
     ).length;
 
@@ -506,8 +508,8 @@ function renderSummary(
     targetCars.filter(
       car =>
         Number(
-          car.forecast_over_km
-        || 0
+          car.forecast_over_km ||
+          0
         ) > 0
     ).length;
 
@@ -520,8 +522,8 @@ function renderSummary(
       ) =>
         sum +
         Number(
-          car.forecast_km
-        || 0
+          car.forecast_km ||
+          0
         ),
       0
     );
@@ -636,40 +638,469 @@ function renderSummary(
 
 
 // ============================================================
+// VEHICLE TYPE SUMMARY
+// ============================================================
+
+function renderVehicleTypeSummary(
+  cars
+) {
+
+  const element =
+    document.getElementById(
+      'vehicleTypeSummary'
+    );
+
+
+  if (!element) {
+    return;
+  }
+
+
+  /*
+   * แยกตาม branch + vehicle_type
+   *
+   * ใช้ carData เป็นตัวจริง
+   * เพราะรถทุกคันมาจาก Master Car
+   */
+
+  const groups =
+    new Map();
+
+
+  cars.forEach(
+    car => {
+
+      const branch =
+        String(
+          car.branch ||
+          '-'
+        ).trim();
+
+
+      const vehicleType =
+        String(
+          car.vehicle_type ||
+          'ไม่ระบุ'
+        ).trim();
+
+
+      const key =
+        `${normalizeText(branch)}||${normalizeText(vehicleType)}`;
+
+
+      if (!groups.has(key)) {
+
+        groups.set(
+          key,
+          {
+            branch,
+            vehicleType,
+            cars: []
+          }
+        );
+
+      }
+
+
+      groups
+        .get(key)
+        .cars
+        .push(car);
+
+    }
+  );
+
+
+  const sortedGroups =
+    [...groups.values()]
+      .sort(
+        (a, b) => {
+
+          const branchCompare =
+            a.branch.localeCompare(
+              b.branch,
+              'th'
+            );
+
+
+          if (
+            branchCompare !== 0
+          ) {
+
+            return branchCompare;
+
+          }
+
+
+          return a.vehicleType.localeCompare(
+            b.vehicleType,
+            'th'
+          );
+
+        }
+      );
+
+
+  if (!sortedGroups.length) {
+
+    element.innerHTML = `
+      <div class="empty-alert">
+        ไม่พบข้อมูลรถ
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  element.innerHTML =
+    sortedGroups
+      .map(
+        group => {
+
+          const groupCars =
+            group.cars;
+
+
+          const targetCars =
+            groupCars.filter(
+              car =>
+                Number(
+                  car.target_km
+                ) > 0
+            );
+
+
+          const totalKm =
+            targetCars.reduce(
+              (
+                sum,
+                car
+              ) =>
+                sum +
+                Number(
+                  car.total_km ||
+                  0
+                ),
+              0
+            );
+
+
+          const totalTarget =
+            targetCars.reduce(
+              (
+                sum,
+                car
+              ) =>
+                sum +
+                Number(
+                  car.target_km ||
+                  0
+                ),
+              0
+            );
+
+
+          const achievement =
+            totalTarget > 0
+              ? (
+                  totalKm /
+                  totalTarget
+                ) *
+                100
+              : null;
+
+
+          const avgTarget =
+            targetCars.length > 0
+              ? totalTarget /
+                targetCars.length
+              : null;
+
+
+          const runningCars =
+            groupCars.filter(
+              car =>
+                Number(
+                  car.total_km ||
+                  0
+                ) > 0
+            ).length;
+
+
+          const forecastOver =
+            targetCars.filter(
+              car =>
+                Number(
+                  car.forecast_over_km ||
+                  0
+                ) > 0
+            ).length;
+
+
+          return `
+
+            <div class="vehicle-type-card">
+
+              <div class="vehicle-type-card-header">
+
+                <div class="vehicle-type-title">
+
+                  ${escapeHtml(
+                    group.branch
+                  )}
+
+                  •
+
+                  ${escapeHtml(
+                    group.vehicleType
+                  )}
+
+                </div>
+
+                <div class="vehicle-type-count">
+
+                  ${formatNumber(
+                    groupCars.length
+                  )}
+                  คัน
+
+                </div>
+
+              </div>
+
+
+              <div class="vehicle-type-body">
+
+                <div class="vehicle-type-grid">
+
+
+                  <div class="vehicle-type-metric">
+
+                    <span>
+                      🚛 จำนวนรถ
+                    </span>
+
+                    <strong>
+                      ${formatNumber(
+                        groupCars.length
+                      )}
+                      คัน
+                    </strong>
+
+                  </div>
+
+
+                  <div class="vehicle-type-metric">
+
+                    <span>
+                      🎯 Target / คัน
+                    </span>
+
+                    <strong>
+                      ${
+                        avgTarget !== null
+                          ? formatNumber(
+                              avgTarget
+                            )
+                          : '-'
+                      }
+                    </strong>
+
+                  </div>
+
+
+                  <div class="vehicle-type-metric">
+
+                    <span>
+                      🎯 Target รวม
+                    </span>
+
+                    <strong>
+                      ${
+                        totalTarget > 0
+                          ? formatNumber(
+                              totalTarget
+                            )
+                          : '-'
+                      }
+                    </strong>
+
+                  </div>
+
+
+                  <div class="vehicle-type-metric">
+
+                    <span>
+                      📍 KM สะสม
+                    </span>
+
+                    <strong>
+                      ${formatNumber(
+                        totalKm
+                      )}
+                    </strong>
+
+                  </div>
+
+
+                </div>
+
+
+                <div class="vehicle-type-achievement">
+
+                  <div class="vehicle-type-achievement-row">
+
+                    <span>
+                      Achievement
+                    </span>
+
+                    <strong
+                      class="vehicle-type-achievement-value"
+                    >
+
+                      ${
+                        achievement !== null
+                          ? achievement.toFixed(1) + '%'
+                          : '-'
+                      }
+
+                    </strong>
+
+                  </div>
+
+
+                  <div class="vehicle-type-achievement-row">
+
+                    <span>
+                      รถที่มี KM
+                    </span>
+
+                    <span>
+                      ${formatNumber(
+                        runningCars
+                      )}
+                      /
+                      ${formatNumber(
+                        groupCars.length
+                      )}
+                      คัน
+                    </span>
+
+                  </div>
+
+
+                  <div class="vehicle-type-achievement-row">
+
+                    <span>
+                      Forecast เกินเป้า
+                    </span>
+
+                    <span>
+
+                      ${
+                        forecastOver > 0
+                          ? `
+                            🚨
+                            ${formatNumber(
+                              forecastOver
+                            )}
+                            คัน
+                          `
+                          : `
+                            0 คัน
+                          `
+                      }
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join('');
+
+}
+
+
+// ============================================================
 // CYCLE
 // ============================================================
 
 function renderCycle() {
 
-  if (!summaryData) {
+  if (!summaryData.length) {
     return;
   }
 
 
+  const first =
+    summaryData[0];
+
+
   const start =
-    summaryData.cycle_start;
+    first.cycle_start;
 
 
   const end =
-    summaryData.cycle_end;
+    first.cycle_end;
 
 
   const elapsed =
     Number(
-      summaryData.elapsed_days
-      || 0
+      first.elapsed_days ||
+      0
     );
 
 
   const remaining =
     Number(
-      summaryData.remaining_calendar_days
-      || 0
+      first.remaining_calendar_days ||
+      0
     );
 
 
   const latest =
-    summaryData.latest_trip_date;
+    summaryData.reduce(
+      (
+        latestDate,
+        row
+      ) => {
+
+        if (
+          !row.latest_trip_date
+        ) {
+
+          return latestDate;
+
+        }
+
+
+        if (
+          !latestDate ||
+          row.latest_trip_date >
+          latestDate
+        ) {
+
+          return row.latest_trip_date;
+
+        }
+
+
+        return latestDate;
+
+      },
+      ''
+    );
 
 
   const cycleText =
@@ -732,8 +1163,8 @@ function renderAlerts(
       .filter(
         car =>
           Number(
-            car.forecast_over_km
-            || 0
+            car.forecast_over_km ||
+            0
           ) > 0
       )
       .sort(
@@ -742,12 +1173,12 @@ function renderAlerts(
           b
         ) =>
           Number(
-            b.forecast_over_km
-            || 0
+            b.forecast_over_km ||
+            0
           ) -
           Number(
-            a.forecast_over_km
-            || 0
+            a.forecast_over_km ||
+            0
           )
       );
 
@@ -759,15 +1190,15 @@ function renderAlerts(
 
           const achievement =
             Number(
-              car.achievement_percent
-              || 0
+              car.achievement_percent ||
+              0
             );
 
 
           const isForecastOver =
             Number(
-              car.forecast_over_km
-              || 0
+              car.forecast_over_km ||
+              0
             ) > 0;
 
 
@@ -784,12 +1215,12 @@ function renderAlerts(
           b
         ) =>
           Number(
-            b.achievement_percent
-            || 0
+            b.achievement_percent ||
+            0
           ) -
           Number(
-            a.achievement_percent
-            || 0
+            a.achievement_percent ||
+            0
           )
       );
 
@@ -855,29 +1286,29 @@ function renderAlertList(
 
           const km =
             Number(
-              car.total_km
-              || 0
+              car.total_km ||
+              0
             );
 
 
           const forecast =
             Number(
-              car.forecast_km
-              || 0
+              car.forecast_km ||
+              0
             );
 
 
           const achievement =
             Number(
-              car.achievement_percent
-              || 0
+              car.achievement_percent ||
+              0
             );
 
 
           const over =
             Number(
-              car.forecast_over_km
-              || 0
+              car.forecast_over_km ||
+              0
             );
 
 
@@ -894,10 +1325,19 @@ function renderAlertList(
                 </div>
 
                 <div class="alert-plate">
+
+                  ${escapeHtml(
+                    car.vehicle_type ||
+                    '-'
+                  )}
+
+                  •
+
                   ${escapeHtml(
                     car.license_plate ||
                     '-'
                   )}
+
                 </div>
 
               </div>
@@ -927,19 +1367,20 @@ function renderAlertList(
 
                 <div class="alert-percent">
 
-                  ${
-                    achievement.toFixed(1)
-                  }%
+                  ${achievement.toFixed(1)}%
 
                 </div>
+
 
                 ${
                   type === 'forecast'
                     ? `
                       <div class="alert-plate">
+
                         +${formatNumber(
                           over
                         )} KM
+
                       </div>
                     `
                     : ''
@@ -983,12 +1424,12 @@ function renderRankings(
           b
         ) =>
           Number(
-            b.total_km
-            || 0
+            b.total_km ||
+            0
           ) -
           Number(
-            a.total_km
-            || 0
+            a.total_km ||
+            0
           )
       )
       .slice(
@@ -1005,12 +1446,12 @@ function renderRankings(
           b
         ) =>
           Number(
-            a.total_km
-            || 0
+            a.total_km ||
+            0
           ) -
           Number(
-            b.total_km
-            || 0
+            b.total_km ||
+            0
           )
       )
       .slice(
@@ -1088,10 +1529,19 @@ function renderRankingList(
               )}
 
               <small>
+
+                ${escapeHtml(
+                  car.vehicle_type ||
+                  '-'
+                )}
+
+                •
+
                 ${escapeHtml(
                   car.license_plate ||
                   '-'
                 )}
+
               </small>
 
             </div>
@@ -1155,8 +1605,8 @@ function renderChart(
 
       const km =
         Number(
-          row.total_km
-          || 0
+          row.total_km ||
+          0
         );
 
 
@@ -1339,12 +1789,12 @@ function renderTable(
           b
         ) =>
           Number(
-            b.total_km
-            || 0
+            b.total_km ||
+            0
           ) -
           Number(
-            a.total_km
-            || 0
+            a.total_km ||
+            0
           )
       );
 
@@ -1356,50 +1806,53 @@ function renderTable(
 
           const km =
             Number(
-              car.total_km
-              || 0
+              car.total_km ||
+              0
             );
 
 
           const target =
             Number(
-              car.target_km
-              || 0
+              car.target_km ||
+              0
             );
 
 
           const achievement =
             Number(
-              car.achievement_percent
-              || 0
+              car.achievement_percent ||
+              0
             );
 
 
           const forecast =
             Number(
-              car.forecast_km
-              || 0
+              car.forecast_km ||
+              0
             );
 
 
           const forecastAchievement =
-            Number(
-              car.forecast_achievement_percent
-              || 0
-            );
+            target > 0
+              ? (
+                  forecast /
+                  target
+                ) *
+                100
+              : 0;
 
 
           const forecastOver =
             Number(
-              car.forecast_over_km
-              || 0
+              car.forecast_over_km ||
+              0
             );
 
 
           const status =
             String(
-              car.status
-              || ''
+              car.status ||
+              ''
             );
 
 
@@ -1480,6 +1933,14 @@ function renderTable(
 
               <td>
                 ${escapeHtml(
+                  car.vehicle_type ||
+                  '-'
+                )}
+              </td>
+
+
+              <td>
+                ${escapeHtml(
                   car.branch ||
                   '-'
                 )}
@@ -1534,6 +1995,7 @@ function renderTable(
                   target > 0
                     ? `
                       ${forecastAchievement.toFixed(1)}%
+
                       ${
                         forecastOver > 0
                           ? `
