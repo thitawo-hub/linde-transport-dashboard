@@ -1,3 +1,4 @@
+```javascript
 // ============================================================
 // LINDE TRANSPORT
 // KPI DISTANCE
@@ -6,6 +7,8 @@
 const SUPABASE_URL =
   'https://hhsqijlcebaijtklskag.supabase.co';
 
+
+// ใช้ Publishable Key เท่านั้น
 const SUPABASE_KEY =
   'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
@@ -14,11 +17,27 @@ const SUPABASE_KEY =
 // GLOBAL
 // ============================================================
 
-let summaryData = [];
+let summaryData = null;
 let carData = [];
 let dailyData = [];
 
 let distanceChart = null;
+
+
+// ============================================================
+// CONFIG
+// ============================================================
+
+const EXCLUDED_BRANCHES = [
+  'linde oil'
+];
+
+const BRANCH_ORDER = [
+  'ระยอง',
+  'ท่าลาน',
+  'บางปะอิน',
+  'หาดใหญ่'
+];
 
 
 // ============================================================
@@ -33,7 +52,6 @@ async function fetchSupabase(
   const pageSize = 1000;
 
   let offset = 0;
-
   let result = [];
 
 
@@ -55,12 +73,9 @@ async function fetchSupabase(
           method: 'GET',
 
           headers: {
-            'apikey':
-              SUPABASE_KEY,
-
+            'apikey': SUPABASE_KEY,
             'Authorization':
               `Bearer ${SUPABASE_KEY}`,
-
             'Content-Type':
               'application/json'
           }
@@ -94,9 +109,7 @@ async function fetchSupabase(
 
 
     result =
-      result.concat(
-        data
-      );
+      result.concat(data);
 
 
     if (
@@ -158,7 +171,7 @@ async function loadKpiDistance() {
 
 
     summaryData =
-      summary || [];
+      summary?.[0] || null;
 
 
     carData =
@@ -188,7 +201,6 @@ async function loadKpiDistance() {
 
 
     populateBranchFilter();
-
 
     render();
 
@@ -232,6 +244,10 @@ function populateBranchFilter() {
   }
 
 
+  const currentValue =
+    select.value || '';
+
+
   const branches =
     [
       ...new Set(
@@ -239,28 +255,20 @@ function populateBranchFilter() {
           .map(
             row =>
               String(
-                row.branch ||
-                ''
+                row.branch || ''
               ).trim()
           )
           .filter(
             branch =>
               branch &&
-              normalizeText(
-                branch
-              ) !==
-              normalizeText(
-                'linde oil'
-              )
+              !isExcludedBranch(branch)
           )
       )
     ]
     .sort(
       (a, b) =>
-        a.localeCompare(
-          b,
-          'th'
-        )
+        getBranchOrder(a) -
+        getBranchOrder(b)
     );
 
 
@@ -295,11 +303,23 @@ function populateBranchFilter() {
     }
   );
 
+
+  if (
+    branches.includes(
+      currentValue
+    )
+  ) {
+
+    select.value =
+      currentValue;
+
+  }
+
 }
 
 
 // ============================================================
-// RENDER
+// MAIN RENDER
 // ============================================================
 
 function render() {
@@ -315,11 +335,8 @@ function render() {
       car => {
 
         if (
-          normalizeText(
+          isExcludedBranch(
             car.branch
-          ) ===
-          normalizeText(
-            'linde oil'
           )
         ) {
 
@@ -351,11 +368,8 @@ function render() {
       row => {
 
         if (
-          normalizeText(
+          isExcludedBranch(
             row.branch
-          ) ===
-          normalizeText(
-            'linde oil'
           )
         ) {
 
@@ -382,33 +396,61 @@ function render() {
     );
 
 
+  // ----------------------------------------------------------
+  // SUMMARY
+  // ----------------------------------------------------------
+
   renderSummary(
     filteredCars
   );
 
 
+  // ----------------------------------------------------------
+  // CYCLE
+  // ----------------------------------------------------------
+
   renderCycle();
 
+
+  // ----------------------------------------------------------
+  // VEHICLE TYPE SUMMARY
+  // ----------------------------------------------------------
 
   renderVehicleTypeSummary(
     filteredCars
   );
 
 
+  // ----------------------------------------------------------
+  // ALERT
+  // ----------------------------------------------------------
+
   renderAlerts(
     filteredCars
   );
 
+
+  // ----------------------------------------------------------
+  // RANKING
+  // ----------------------------------------------------------
 
   renderRankings(
     filteredCars
   );
 
 
+  // ----------------------------------------------------------
+  // CHART
+  // ----------------------------------------------------------
+
   renderChart(
     filteredDaily
   );
 
+
+  // ----------------------------------------------------------
+  // TABLE
+  // ----------------------------------------------------------
 
   renderTable(
     filteredCars
@@ -454,9 +496,8 @@ function renderSummary(
         car
       ) =>
         sum +
-        Number(
-          car.total_km ||
-          0
+        toNumber(
+          car.total_km
         ),
       0
     );
@@ -469,9 +510,8 @@ function renderSummary(
         car
       ) =>
         sum +
-        Number(
-          car.target_km ||
-          0
+        toNumber(
+          car.target_km
         ),
       0
     );
@@ -497,19 +537,20 @@ function renderSummary(
   const nearTargetCars =
     targetCars.filter(
       car =>
-        Number(
-          car.achievement_percent ||
-          0
-        ) >= 90
+        getAchievement(
+          car
+        ) >= 90 &&
+        getForecastOver(
+          car
+        ) <= 0
     ).length;
 
 
   const forecastOverCars =
     targetCars.filter(
       car =>
-        Number(
-          car.forecast_over_km ||
-          0
+        getForecastOver(
+          car
         ) > 0
     ).length;
 
@@ -521,9 +562,8 @@ function renderSummary(
         car
       ) =>
         sum +
-        Number(
-          car.forecast_km ||
-          0
+        toNumber(
+          car.forecast_km
         ),
       0
     );
@@ -613,9 +653,11 @@ function renderSummary(
 
   setText(
     'forecastKm',
-    formatNumber(
-      forecastKm
-    )
+    totalTarget > 0
+      ? formatNumber(
+          forecastKm
+        )
+      : '-'
   );
 
 
@@ -645,23 +687,34 @@ function renderVehicleTypeSummary(
   cars
 ) {
 
-  const element =
+  const tbody =
     document.getElementById(
-      'vehicleTypeSummary'
+      'vehicleTypeSummaryBody'
     );
 
 
-  if (!element) {
+  if (!tbody) {
     return;
   }
 
 
-  /*
-   * แยกตาม branch + vehicle_type
-   *
-   * ใช้ carData เป็นตัวจริง
-   * เพราะรถทุกคันมาจาก Master Car
-   */
+  if (!cars.length) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="10"
+          class="empty-state"
+        >
+          ไม่พบข้อมูลรถ
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
 
   const groups =
     new Map();
@@ -672,20 +725,18 @@ function renderVehicleTypeSummary(
 
       const branch =
         String(
-          car.branch ||
-          '-'
+          car.branch || '-'
         ).trim();
 
 
       const vehicleType =
-        String(
-          car.vehicle_type ||
-          'ไม่ระบุ'
-        ).trim();
+        normalizeVehicleType(
+          car.vehicle_type
+        );
 
 
       const key =
-        `${normalizeText(branch)}||${normalizeText(vehicleType)}`;
+        `${normalizeText(branch)}|||${normalizeText(vehicleType)}`;
 
 
       if (!groups.has(key)) {
@@ -711,64 +762,72 @@ function renderVehicleTypeSummary(
   );
 
 
-  const sortedGroups =
+  const rows =
     [...groups.values()]
       .sort(
         (a, b) => {
 
-          const branchCompare =
-            a.branch.localeCompare(
-              b.branch,
-              'th'
+          const branchDiff =
+            getBranchOrder(
+              a.branch
+            ) -
+            getBranchOrder(
+              b.branch
             );
 
 
           if (
-            branchCompare !== 0
+            branchDiff !== 0
           ) {
 
-            return branchCompare;
+            return branchDiff;
 
           }
 
 
-          return a.vehicleType.localeCompare(
-            b.vehicleType,
-            'th'
-          );
+          return a.vehicleType
+            .localeCompare(
+              b.vehicleType,
+              'th'
+            );
 
         }
       );
 
 
-  if (!sortedGroups.length) {
-
-    element.innerHTML = `
-      <div class="empty-alert">
-        ไม่พบข้อมูลรถ
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  element.innerHTML =
-    sortedGroups
+  tbody.innerHTML =
+    rows
       .map(
         group => {
 
-          const groupCars =
+          const carsInGroup =
             group.cars;
 
 
+          const totalCars =
+            carsInGroup.length;
+
+
           const targetCars =
-            groupCars.filter(
+            carsInGroup.filter(
               car =>
-                Number(
+                toNumber(
                   car.target_km
                 ) > 0
+            );
+
+
+          const targetTotal =
+            targetCars.reduce(
+              (
+                sum,
+                car
+              ) =>
+                sum +
+                toNumber(
+                  car.target_km
+                ),
+              0
             );
 
 
@@ -779,34 +838,42 @@ function renderVehicleTypeSummary(
                 car
               ) =>
                 sum +
-                Number(
-                  car.total_km ||
-                  0
+                toNumber(
+                  car.total_km
                 ),
               0
             );
 
 
-          const totalTarget =
+          const forecastTotal =
             targetCars.reduce(
               (
                 sum,
                 car
               ) =>
                 sum +
-                Number(
-                  car.target_km ||
-                  0
+                toNumber(
+                  car.forecast_km
                 ),
               0
             );
 
 
           const achievement =
-            totalTarget > 0
+            targetTotal > 0
               ? (
                   totalKm /
-                  totalTarget
+                  targetTotal
+                ) *
+                100
+              : null;
+
+
+          const forecastAchievement =
+            targetTotal > 0
+              ? (
+                  forecastTotal /
+                  targetTotal
                 ) *
                 100
               : null;
@@ -814,214 +881,147 @@ function renderVehicleTypeSummary(
 
           const avgTarget =
             targetCars.length > 0
-              ? totalTarget /
+              ? targetTotal /
                 targetCars.length
               : null;
 
 
-          const runningCars =
-            groupCars.filter(
-              car =>
-                Number(
-                  car.total_km ||
-                  0
-                ) > 0
-            ).length;
-
-
           const forecastOver =
-            targetCars.filter(
-              car =>
-                Number(
-                  car.forecast_over_km ||
-                  0
-                ) > 0
-            ).length;
+            forecastTotal -
+            targetTotal;
+
+
+          const status =
+            getGroupStatus(
+              achievement,
+              forecastAchievement,
+              targetTotal
+            );
 
 
           return `
 
-            <div class="vehicle-type-card">
+            <tr>
 
-              <div class="vehicle-type-card-header">
-
-                <div class="vehicle-type-title">
-
+              <td>
+                <strong>
                   ${escapeHtml(
                     group.branch
                   )}
+                </strong>
+              </td>
 
-                  •
 
+              <td>
+                <span class="vehicle-type-badge">
                   ${escapeHtml(
                     group.vehicleType
                   )}
-
-                </div>
-
-                <div class="vehicle-type-count">
-
-                  ${formatNumber(
-                    groupCars.length
-                  )}
-                  คัน
-
-                </div>
-
-              </div>
+                </span>
+              </td>
 
 
-              <div class="vehicle-type-body">
-
-                <div class="vehicle-type-grid">
-
-
-                  <div class="vehicle-type-metric">
-
-                    <span>
-                      🚛 จำนวนรถ
-                    </span>
-
-                    <strong>
-                      ${formatNumber(
-                        groupCars.length
-                      )}
-                      คัน
-                    </strong>
-
-                  </div>
+              <td class="num">
+                ${formatNumber(
+                  totalCars
+                )}
+              </td>
 
 
-                  <div class="vehicle-type-metric">
-
-                    <span>
-                      🎯 Target / คัน
-                    </span>
-
-                    <strong>
-                      ${
-                        avgTarget !== null
-                          ? formatNumber(
-                              avgTarget
-                            )
-                          : '-'
-                      }
-                    </strong>
-
-                  </div>
+              <td class="num target-value">
+                ${
+                  avgTarget !== null
+                    ? formatNumber(
+                        avgTarget
+                      )
+                    : '-'
+                }
+              </td>
 
 
-                  <div class="vehicle-type-metric">
-
-                    <span>
-                      🎯 Target รวม
-                    </span>
-
-                    <strong>
-                      ${
-                        totalTarget > 0
-                          ? formatNumber(
-                              totalTarget
-                            )
-                          : '-'
-                      }
-                    </strong>
-
-                  </div>
+              <td class="num target-value">
+                ${
+                  targetTotal > 0
+                    ? formatNumber(
+                        targetTotal
+                      )
+                    : '-'
+                }
+              </td>
 
 
-                  <div class="vehicle-type-metric">
-
-                    <span>
-                      📍 KM สะสม
-                    </span>
-
-                    <strong>
-                      ${formatNumber(
-                        totalKm
-                      )}
-                    </strong>
-
-                  </div>
+              <td class="num">
+                ${formatNumber(
+                  totalKm
+                )}
+              </td>
 
 
-                </div>
+              <td
+                class="num ${
+                  getAchievementClass(
+                    achievement
+                  )
+                }"
+              >
+                ${
+                  achievement !== null
+                    ? achievement.toFixed(1) + '%'
+                    : '-'
+                }
+              </td>
 
 
-                <div class="vehicle-type-achievement">
-
-                  <div class="vehicle-type-achievement-row">
-
-                    <span>
-                      Achievement
-                    </span>
-
-                    <strong
-                      class="vehicle-type-achievement-value"
-                    >
-
-                      ${
-                        achievement !== null
-                          ? achievement.toFixed(1) + '%'
-                          : '-'
-                      }
-
-                    </strong>
-
-                  </div>
+              <td class="num">
+                ${
+                  targetTotal > 0
+                    ? formatNumber(
+                        forecastTotal
+                      )
+                    : '-'
+                }
+              </td>
 
 
-                  <div class="vehicle-type-achievement-row">
+              <td
+                class="num ${
+                  getAchievementClass(
+                    forecastAchievement
+                  )
+                }"
+              >
+                ${
+                  forecastAchievement !== null
+                    ? forecastAchievement.toFixed(1) + '%'
+                    : '-'
+                }
 
-                    <span>
-                      รถที่มี KM
-                    </span>
+                ${
+                  forecastOver > 0
+                    ? `
+                      <small style="display:block;color:#dc2626;">
+                        +${formatNumber(
+                          forecastOver
+                        )} KM
+                      </small>
+                    `
+                    : ''
+                }
 
-                    <span>
-                      ${formatNumber(
-                        runningCars
-                      )}
-                      /
-                      ${formatNumber(
-                        groupCars.length
-                      )}
-                      คัน
-                    </span>
-
-                  </div>
+              </td>
 
 
-                  <div class="vehicle-type-achievement-row">
+              <td>
 
-                    <span>
-                      Forecast เกินเป้า
-                    </span>
+                <span
+                  class="distance-status ${status.className}"
+                >
+                  ${status.text}
+                </span>
 
-                    <span>
+              </td>
 
-                      ${
-                        forecastOver > 0
-                          ? `
-                            🚨
-                            ${formatNumber(
-                              forecastOver
-                            )}
-                            คัน
-                          `
-                          : `
-                            0 คัน
-                          `
-                      }
-
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
+            </tr>
 
           `;
 
@@ -1033,74 +1033,105 @@ function renderVehicleTypeSummary(
 
 
 // ============================================================
+// GROUP STATUS
+// ============================================================
+
+function getGroupStatus(
+  achievement,
+  forecastAchievement,
+  targetTotal
+) {
+
+  if (
+    !targetTotal ||
+    targetTotal <= 0
+  ) {
+
+    return {
+      className: 'no-target',
+      text: 'ไม่มี Target'
+    };
+
+  }
+
+
+  if (
+    achievement >= 100
+  ) {
+
+    return {
+      className: 'over',
+      text: 'เกินเป้า'
+    };
+
+  }
+
+
+  if (
+    forecastAchievement >= 100
+  ) {
+
+    return {
+      className: 'forecast',
+      text: 'Forecast เกินเป้า'
+    };
+
+  }
+
+
+  if (
+    achievement >= 90
+  ) {
+
+    return {
+      className: 'near',
+      text: 'ใกล้เป้า'
+    };
+
+  }
+
+
+  return {
+    className: 'normal',
+    text: 'ปกติ'
+  };
+
+}
+
+
+// ============================================================
 // CYCLE
 // ============================================================
 
 function renderCycle() {
 
-  if (!summaryData.length) {
+  if (!summaryData) {
     return;
   }
 
 
-  const first =
-    summaryData[0];
-
-
   const start =
-    first.cycle_start;
+    summaryData.cycle_start;
 
 
   const end =
-    first.cycle_end;
+    summaryData.cycle_end;
 
 
   const elapsed =
-    Number(
-      first.elapsed_days ||
-      0
+    toNumber(
+      summaryData.elapsed_days
     );
 
 
   const remaining =
-    Number(
-      first.remaining_calendar_days ||
-      0
+    toNumber(
+      summaryData.remaining_calendar_days
     );
 
 
   const latest =
-    summaryData.reduce(
-      (
-        latestDate,
-        row
-      ) => {
-
-        if (
-          !row.latest_trip_date
-        ) {
-
-          return latestDate;
-
-        }
-
-
-        if (
-          !latestDate ||
-          row.latest_trip_date >
-          latestDate
-        ) {
-
-          return row.latest_trip_date;
-
-        }
-
-
-        return latestDate;
-
-      },
-      ''
-    );
+    summaryData.latest_trip_date;
 
 
   const cycleText =
@@ -1152,7 +1183,7 @@ function renderAlerts(
   const targetCars =
     cars.filter(
       car =>
-        Number(
+        toNumber(
           car.target_km
         ) > 0
     );
@@ -1162,9 +1193,8 @@ function renderAlerts(
     targetCars
       .filter(
         car =>
-          Number(
-            car.forecast_over_km ||
-            0
+          getForecastOver(
+            car
           ) > 0
       )
       .sort(
@@ -1172,13 +1202,11 @@ function renderAlerts(
           a,
           b
         ) =>
-          Number(
-            b.forecast_over_km ||
-            0
+          getForecastOver(
+            b
           ) -
-          Number(
-            a.forecast_over_km ||
-            0
+          getForecastOver(
+            a
           )
       );
 
@@ -1189,22 +1217,20 @@ function renderAlerts(
         car => {
 
           const achievement =
-            Number(
-              car.achievement_percent ||
-              0
+            getAchievement(
+              car
             );
 
 
-          const isForecastOver =
-            Number(
-              car.forecast_over_km ||
-              0
-            ) > 0;
+          const forecastOver =
+            getForecastOver(
+              car
+            );
 
 
           return (
             achievement >= 90 &&
-            !isForecastOver
+            forecastOver <= 0
           );
 
         }
@@ -1214,13 +1240,11 @@ function renderAlerts(
           a,
           b
         ) =>
-          Number(
-            b.achievement_percent ||
-            0
+          getAchievement(
+            b
           ) -
-          Number(
-            a.achievement_percent ||
-            0
+          getAchievement(
+            a
           )
       );
 
@@ -1279,36 +1303,32 @@ function renderAlertList(
     cars
       .slice(
         0,
-        8
+        10
       )
       .map(
         car => {
 
           const km =
-            Number(
-              car.total_km ||
-              0
+            toNumber(
+              car.total_km
             );
 
 
           const forecast =
-            Number(
-              car.forecast_km ||
-              0
+            toNumber(
+              car.forecast_km
             );
 
 
           const achievement =
-            Number(
-              car.achievement_percent ||
-              0
+            getAchievement(
+              car
             );
 
 
           const over =
-            Number(
-              car.forecast_over_km ||
-              0
+            getForecastOver(
+              car
             );
 
 
@@ -1320,24 +1340,24 @@ function renderAlertList(
 
                 <div class="alert-car">
                   ${escapeHtml(
-                    car.car_no
+                    car.car_no ||
+                    '-'
                   )}
                 </div>
 
                 <div class="alert-plate">
-
-                  ${escapeHtml(
-                    car.vehicle_type ||
-                    '-'
-                  )}
-
-                  •
-
                   ${escapeHtml(
                     car.license_plate ||
                     '-'
                   )}
+                </div>
 
+                <div class="alert-type">
+                  ${escapeHtml(
+                    normalizeVehicleType(
+                      car.vehicle_type
+                    )
+                  )}
                 </div>
 
               </div>
@@ -1366,9 +1386,7 @@ function renderAlertList(
               <div>
 
                 <div class="alert-percent">
-
                   ${achievement.toFixed(1)}%
-
                 </div>
 
 
@@ -1376,11 +1394,9 @@ function renderAlertList(
                   type === 'forecast'
                     ? `
                       <div class="alert-plate">
-
                         +${formatNumber(
                           over
                         )} KM
-
                       </div>
                     `
                     : ''
@@ -1410,7 +1426,7 @@ function renderRankings(
   const targetCars =
     cars.filter(
       car =>
-        Number(
+        toNumber(
           car.target_km
         ) > 0
     );
@@ -1423,13 +1439,11 @@ function renderRankings(
           a,
           b
         ) =>
-          Number(
-            b.total_km ||
-            0
+          toNumber(
+            b.total_km
           ) -
-          Number(
-            a.total_km ||
-            0
+          toNumber(
+            a.total_km
           )
       )
       .slice(
@@ -1445,13 +1459,11 @@ function renderRankings(
           a,
           b
         ) =>
-          Number(
-            a.total_km ||
-            0
+          toNumber(
+            a.total_km
           ) -
-          Number(
-            b.total_km ||
-            0
+          toNumber(
+            b.total_km
           )
       )
       .slice(
@@ -1518,879 +1530,4 @@ function renderRankingList(
           <li class="ranking-item">
 
             <div class="ranking-number">
-              #${index + 1}
-            </div>
-
-
-            <div class="ranking-car">
-
-              ${escapeHtml(
-                car.car_no
-              )}
-
-              <small>
-
-                ${escapeHtml(
-                  car.vehicle_type ||
-                  '-'
-                )}
-
-                •
-
-                ${escapeHtml(
-                  car.license_plate ||
-                  '-'
-                )}
-
-              </small>
-
-            </div>
-
-
-            <div class="ranking-value">
-
-              ${formatNumber(
-                car.total_km
-              )}
-
-              KM
-
-            </div>
-
-          </li>
-
-        `
-      )
-      .join('');
-
-}
-
-
-// ============================================================
-// DAILY CHART
-// ============================================================
-
-function renderChart(
-  rows
-) {
-
-  const canvas =
-    document.getElementById(
-      'distanceDailyChart'
-    );
-
-
-  if (!canvas) {
-    return;
-  }
-
-
-  const grouped =
-    new Map();
-
-
-  rows.forEach(
-    row => {
-
-      const date =
-        normalizeDate(
-          row.work_date
-        );
-
-
-      if (!date) {
-        return;
-      }
-
-
-      const km =
-        Number(
-          row.total_km ||
-          0
-        );
-
-
-      grouped.set(
-        date,
-        (
-          grouped.get(
-            date
-          ) || 0
-        ) +
-        km
-      );
-
-    }
-  );
-
-
-  const dates =
-    [
-      ...grouped.keys()
-    ]
-    .sort();
-
-
-  const values =
-    dates.map(
-      date =>
-        grouped.get(
-          date
-        ) || 0
-    );
-
-
-  if (distanceChart) {
-
-    distanceChart.destroy();
-
-  }
-
-
-  const context =
-    canvas.getContext(
-      '2d'
-    );
-
-
-  distanceChart =
-    new Chart(
-      context,
-      {
-
-        type: 'line',
-
-        data: {
-
-          labels:
-            dates.map(
-              formatDisplayDate
-            ),
-
-          datasets: [
-
-            {
-
-              label:
-                'KM รถ COCO',
-
-              data:
-                values,
-
-              borderWidth:
-                2,
-
-              tension:
-                0.25,
-
-              fill:
-                false
-
-            }
-
-          ]
-
-        },
-
-        options: {
-
-          responsive:
-            true,
-
-          maintainAspectRatio:
-            false,
-
-          interaction: {
-
-            mode:
-              'index',
-
-            intersect:
-              false
-
-          },
-
-          plugins: {
-
-            legend: {
-
-              position:
-                'top'
-
-            }
-
-          },
-
-          scales: {
-
-            y: {
-
-              beginAtZero:
-                true
-
-            }
-
-          }
-
-        }
-
-      }
-    );
-
-}
-
-
-// ============================================================
-// TABLE
-// ============================================================
-
-function renderTable(
-  cars
-) {
-
-  const tbody =
-    document.getElementById(
-      'carTableBody'
-    );
-
-
-  if (!tbody) {
-    return;
-  }
-
-
-  if (!cars.length) {
-
-    tbody.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="9"
-          class="empty-state"
-        >
-          ไม่พบข้อมูลรถ COCO
-        </td>
-
-      </tr>
-
-    `;
-
-    return;
-
-  }
-
-
-  const sorted =
-    [...cars]
-      .sort(
-        (
-          a,
-          b
-        ) =>
-          Number(
-            b.total_km ||
-            0
-          ) -
-          Number(
-            a.total_km ||
-            0
-          )
-      );
-
-
-  tbody.innerHTML =
-    sorted
-      .map(
-        car => {
-
-          const km =
-            Number(
-              car.total_km ||
-              0
-            );
-
-
-          const target =
-            Number(
-              car.target_km ||
-              0
-            );
-
-
-          const achievement =
-            Number(
-              car.achievement_percent ||
-              0
-            );
-
-
-          const forecast =
-            Number(
-              car.forecast_km ||
-              0
-            );
-
-
-          const forecastAchievement =
-            target > 0
-              ? (
-                  forecast /
-                  target
-                ) *
-                100
-              : 0;
-
-
-          const forecastOver =
-            Number(
-              car.forecast_over_km ||
-              0
-            );
-
-
-          const status =
-            String(
-              car.status ||
-              ''
-            );
-
-
-          let statusClass =
-            'normal';
-
-
-          let statusText =
-            'ปกติ';
-
-
-          if (
-            status ===
-            'OVER_TARGET'
-          ) {
-
-            statusClass =
-              'over';
-
-            statusText =
-              'เกินเป้า';
-
-          } else if (
-            status ===
-            'FORECAST_OVER'
-          ) {
-
-            statusClass =
-              'forecast';
-
-            statusText =
-              'Forecast เกินเป้า';
-
-          } else if (
-            status ===
-            'NEAR_TARGET'
-          ) {
-
-            statusClass =
-              'near';
-
-            statusText =
-              'ใกล้เป้า';
-
-          } else if (
-            status ===
-            'NO_TARGET'
-          ) {
-
-            statusClass =
-              'no-target';
-
-            statusText =
-              'ไม่มี Target';
-
-          }
-
-
-          return `
-
-            <tr>
-
-              <td>
-                ${escapeHtml(
-                  car.car_no ||
-                  '-'
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  car.license_plate ||
-                  '-'
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  car.vehicle_type ||
-                  '-'
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  car.branch ||
-                  '-'
-                )}
-              </td>
-
-
-              <td class="num">
-                ${formatNumber(
-                  km
-                )}
-              </td>
-
-
-              <td class="num">
-                ${
-                  target > 0
-                    ? formatNumber(
-                        target
-                      )
-                    : '-'
-                }
-              </td>
-
-
-              <td class="num">
-
-                ${
-                  target > 0
-                    ? achievement.toFixed(1) + '%'
-                    : '-'
-                }
-
-              </td>
-
-
-              <td class="num">
-
-                ${
-                  target > 0
-                    ? formatNumber(
-                        forecast
-                      )
-                    : '-'
-                }
-
-              </td>
-
-
-              <td class="num">
-
-                ${
-                  target > 0
-                    ? `
-                      ${forecastAchievement.toFixed(1)}%
-
-                      ${
-                        forecastOver > 0
-                          ? `
-                            <small style="color:#dc2626;">
-                              +${formatNumber(
-                                forecastOver
-                              )}
-                            </small>
-                          `
-                          : ''
-                      }
-                    `
-                    : '-'
-                }
-
-              </td>
-
-
-              <td>
-
-                <span
-                  class="distance-status ${statusClass}"
-                >
-                  ${statusText}
-                </span>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      )
-      .join('');
-
-}
-
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-
-function goToPage(
-  page
-) {
-
-  if (
-    page ===
-    'overview'
-  ) {
-
-    window.location.href =
-      'index.html';
-
-    return;
-
-  }
-
-
-  if (
-    page ===
-    'daily'
-  ) {
-
-    window.location.href =
-      'daily-report.html';
-
-    return;
-
-  }
-
-}
-
-
-// ============================================================
-// HELPERS
-// ============================================================
-
-function normalizeText(
-  value
-) {
-
-  return String(
-    value || ''
-  )
-    .trim()
-    .replace(
-      /\s+/g,
-      ' '
-    )
-    .toLowerCase();
-
-}
-
-
-function normalizeDate(
-  value
-) {
-
-  if (!value) {
-    return '';
-  }
-
-
-  if (
-    typeof value ===
-    'string'
-  ) {
-
-    const match =
-      value.match(
-        /^(\d{4})-(\d{2})-(\d{2})/
-      );
-
-
-    if (match) {
-
-      return match[0];
-
-    }
-
-  }
-
-
-  const date =
-    new Date(
-      value
-    );
-
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return '';
-
-  }
-
-
-  return [
-
-    date.getFullYear(),
-
-    String(
-      date.getMonth() + 1
-    ).padStart(
-      2,
-      '0'
-    ),
-
-    String(
-      date.getDate()
-    ).padStart(
-      2,
-      '0'
-    )
-
-  ].join('-');
-
-}
-
-
-function formatThaiDate(
-  value
-) {
-
-  const date =
-    normalizeDate(
-      value
-    );
-
-
-  if (!date) {
-    return '-';
-  }
-
-
-  const [
-    year,
-    month,
-    day
-  ] =
-    date.split('-');
-
-
-  return `${day}/${month}/${year}`;
-
-}
-
-
-function formatDisplayDate(
-  value
-) {
-
-  const date =
-    normalizeDate(
-      value
-    );
-
-
-  if (!date) {
-    return value;
-  }
-
-
-  const [
-    year,
-    month,
-    day
-  ] =
-    date.split('-');
-
-
-  return `${day}/${month}`;
-
-}
-
-
-function formatNumber(
-  value
-) {
-
-  const number =
-    Number(
-      value
-    );
-
-
-  if (
-    !Number.isFinite(
-      number
-    )
-  ) {
-
-    return '-';
-
-  }
-
-
-  return number.toLocaleString(
-    'th-TH',
-    {
-      maximumFractionDigits:
-        0
-    }
-  );
-
-}
-
-
-function getAchievementText(
-  value
-) {
-
-  const number =
-    Number(
-      value
-    );
-
-
-  if (
-    !Number.isFinite(
-      number
-    ) ||
-    number <= 0
-  ) {
-
-    return '-';
-
-  }
-
-
-  if (
-    number >= 100
-  ) {
-
-    return 'เกินเป้า';
-
-  }
-
-
-  if (
-    number >= 90
-  ) {
-
-    return 'ใกล้เป้า';
-
-  }
-
-
-  return 'ต่ำกว่าเป้า';
-
-}
-
-
-function setText(
-  id,
-  value
-) {
-
-  const element =
-    document.getElementById(
-      id
-    );
-
-
-  if (element) {
-
-    element.textContent =
-      value;
-
-  }
-
-}
-
-
-function setPageStatus(
-  message
-) {
-
-  const element =
-    document.getElementById(
-      'pageStatus'
-    );
-
-
-  if (element) {
-
-    element.textContent =
-      message;
-
-  }
-
-}
-
-
-function escapeHtml(
-  value
-) {
-
-  return String(
-    value ?? ''
-  )
-    .replace(
-      /&/g,
-      '&amp;'
-    )
-    .replace(
-      /</g,
-      '&lt;'
-    )
-    .replace(
-      />/g,
-      '&gt;'
-    )
-    .replace(
-      /"/g,
-      '&quot;'
-    )
-    .replace(
-      /'/g,
-      '&#039;'
-    );
-
-}
-
-
-// ============================================================
-// EVENTS
-// ============================================================
-
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-
-    const branch =
-      document.getElementById(
-        'branchFilter'
-      );
-
-
-    if (branch) {
-
-      branch.addEventListener(
-        'change',
-        render
-      );
-
-    }
-
-
-    loadKpiDistance();
-
-  }
-);
+```
