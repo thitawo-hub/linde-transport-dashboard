@@ -179,6 +179,13 @@
       color: #9ca3af;
     }
 
+    .kpi-card-breakdown {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #6b7280;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
     .kpi-card.actual {
       border-left: 4px solid #111827;
     }
@@ -252,59 +259,6 @@
 
     .achievement-side-item strong {
       font-size: 20px;
-    }
-
-
-    /* =====================================================
-       FLEET SUMMARY CARD
-    ===================================================== */
-
-    .fleet-summary-card {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-    }
-
-    .fleet-branch-group {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 16px 18px;
-    }
-
-    .fleet-branch-name {
-      font-size: 15px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .fleet-type-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      font-size: 13px;
-      color: #374151;
-      border-bottom: 1px dashed #f1f5f9;
-    }
-
-    .fleet-type-row:last-of-type {
-      border-bottom: none;
-    }
-
-    .fleet-type-row span:last-child {
-      font-weight: 700;
-      font-family: 'IBM Plex Mono', monospace;
-    }
-
-    .fleet-branch-total {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #e5e7eb;
-      font-size: 13px;
-      font-weight: 800;
-      color: #111827;
-      text-align: right;
     }
 
 
@@ -476,21 +430,6 @@
       text-align: right;
       font-weight: 800;
       font-family: 'IBM Plex Mono', monospace;
-    }
-
-
-    /* =====================================================
-       CHART
-    ===================================================== */
-
-    .distance-chart-wrapper {
-      position: relative;
-      height: 390px;
-      width: 100%;
-      padding: 18px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      background: #ffffff;
     }
 
 
@@ -686,11 +625,6 @@
 
       .cycle-info-meta {
         gap: 12px;
-      }
-
-      .distance-chart-wrapper {
-        height: 300px;
-        padding: 10px;
       }
 
     }
@@ -894,6 +828,11 @@
         <div class="kpi-card-note">
           จาก Master Car
         </div>
+
+        <div
+          id="totalCarsBreakdown"
+          class="kpi-card-breakdown"
+        ></div>
 
       </div>
 
@@ -1119,35 +1058,6 @@
 
 
     <!-- ===================================================
-         FLEET SUMMARY (จำนวนรถตายตัวตามสาขา/ประเภท)
-    ==================================================== -->
-
-    <section class="section">
-
-      <h2>
-        🚛 จำนวนรถตามสาขา
-      </h2>
-
-      <p class="section-subtitle">
-        จำนวนรถ COCO ต่อสาขาและประเภทรถ
-      </p>
-
-
-      <div
-        id="fleetSummaryCard"
-        class="fleet-summary-card"
-      >
-
-        <div class="empty-state">
-          กำลังโหลดข้อมูล...
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
          ALERT
     ==================================================== -->
 
@@ -1308,30 +1218,6 @@
 
 
     <!-- ===================================================
-         DAILY CHART
-    ==================================================== -->
-
-    <section class="section">
-
-      <h2>
-        📈 KM รายวัน
-      </h2>
-
-      <p class="section-subtitle">
-        แสดง KM ของรถ COCO ตลอดรอบ 26–25
-      </p>
-
-
-      <div class="distance-chart-wrapper">
-
-        <canvas id="distanceDailyChart"></canvas>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
          CAR TABLE
     ==================================================== -->
 
@@ -1443,8 +1329,6 @@
   <!-- =====================================================
        SCRIPTS
   ====================================================== -->
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script src="kpi-distance.js"></script>
 
