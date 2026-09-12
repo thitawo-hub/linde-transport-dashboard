@@ -60,9 +60,9 @@ async function fetchSupabase(
       params ? '&' : '';
 
     const url =
-      `${SUPABASE_URL}/rest/v1/${table}?` +
-      `${params}${separator}` +
-      `limit=${pageSize}&offset=${offset}`;
+      ${SUPABASE_URL}/rest/v1/${table}? +
+      ${params}${separator} +
+      limit=${pageSize}&offset=${offset};
 
 
     const response =
