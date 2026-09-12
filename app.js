@@ -587,6 +587,36 @@ function updateMasterKpi(
 
 
   // ==========================================================
+  // รถ COCO แยกตามประเภท (Trailer / 10W)
+  // ==========================================================
+
+  const carTypeBreakdown =
+    getCarTypeBreakdown(
+      branch
+    );
+
+
+  setText(
+    'cocoCarsTrailer',
+    carTypeBreakdown.trailer > 0
+      ? formatNumber(
+          carTypeBreakdown.trailer
+        )
+      : '-'
+  );
+
+
+  setText(
+    'cocoCarsW10',
+    carTypeBreakdown.w10 > 0
+      ? formatNumber(
+          carTypeBreakdown.w10
+        )
+      : '-'
+  );
+
+
+  // ==========================================================
   // พขร.
   // ==========================================================
 
@@ -3314,6 +3344,113 @@ function getMasterBranchData(
       cars.size,
 
     drivers
+
+  };
+
+}
+
+
+// ============================================================
+// Car Type Breakdown (Trailer / 10W)
+//
+// นับจากรถจริงใน master_cars (dedupe ด้วย car_no) โดยแยกตาม
+// vehicle_type — รองรับกรอง branch เดียวกับตัวกรองหน้า dashboard
+// ============================================================
+
+function getCarTypeBreakdown(
+  branch
+) {
+
+  const cars =
+    new Map();
+
+
+  masterCarData.forEach(
+    car => {
+
+      if (
+        branch &&
+        normalizeText(
+          car.branch
+        ) !==
+        normalizeText(
+          branch
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      const carNo =
+        normalizeCarNo(
+          car.car_no
+        );
+
+
+      if (!carNo) {
+        return;
+      }
+
+
+      if (
+        !cars.has(
+          carNo
+        )
+      ) {
+
+        cars.set(
+          carNo,
+          normalizeText(
+            car.vehicle_type
+          )
+        );
+
+      }
+
+    }
+  );
+
+
+  let trailer = 0;
+
+  let w10 = 0;
+
+
+  cars.forEach(
+    type => {
+
+      if (
+        type.includes(
+          'trailer'
+        )
+      ) {
+
+        trailer += 1;
+
+      } else if (
+        type.includes(
+          '10w'
+        ) ||
+        type.includes(
+          '10 w'
+        )
+      ) {
+
+        w10 += 1;
+
+      }
+
+    }
+  );
+
+
+  return {
+
+    trailer,
+
+    w10
 
   };
 
