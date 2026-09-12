@@ -1,8 +1,8 @@
+```html
 <!DOCTYPE html>
 <html lang="th">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -46,6 +46,7 @@
       flex-wrap: wrap;
     }
 
+    .nav a,
     .nav button {
       border: 0;
       background: transparent;
@@ -55,13 +56,16 @@
       color: #6b7280;
       font-size: 13px;
       font-weight: 600;
+      text-decoration: none;
     }
 
+    .nav a:hover,
     .nav button:hover {
       background: #f3f4f6;
       color: #111827;
     }
 
+    .nav a.active,
     .nav button.active {
       background: #111827;
       color: #ffffff;
@@ -253,6 +257,83 @@
 
 
     /* =====================================================
+       VEHICLE TYPE SUMMARY
+    ===================================================== */
+
+    .vehicle-type-summary-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #ffffff;
+    }
+
+    .vehicle-type-summary-table {
+      width: 100%;
+      min-width: 1250px;
+      border-collapse: collapse;
+    }
+
+    .vehicle-type-summary-table th {
+      padding: 13px 14px;
+      text-align: left;
+      background: #f8fafc;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    .vehicle-type-summary-table td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .vehicle-type-summary-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .vehicle-type-summary-table td.num {
+      text-align: right;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600;
+    }
+
+    .vehicle-type-name {
+      font-weight: 800;
+    }
+
+    .vehicle-type-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #374151;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .target-value {
+      font-weight: 700;
+    }
+
+    .achievement-good {
+      font-weight: 800;
+    }
+
+    .achievement-warning {
+      font-weight: 800;
+    }
+
+    .achievement-danger {
+      font-weight: 800;
+    }
+
+
+    /* =====================================================
        ALERT SECTION
     ===================================================== */
 
@@ -301,7 +382,7 @@
 
     .alert-item {
       display: grid;
-      grid-template-columns: 70px 1fr auto;
+      grid-template-columns: 75px 1fr auto;
       align-items: center;
       gap: 12px;
       padding: 13px 16px;
@@ -320,6 +401,12 @@
     .alert-plate {
       color: #6b7280;
       font-size: 12px;
+    }
+
+    .alert-type {
+      color: #9ca3af;
+      font-size: 11px;
+      margin-top: 2px;
     }
 
     .alert-km {
@@ -445,7 +532,7 @@
 
     .distance-table {
       width: 100%;
-      min-width: 1100px;
+      min-width: 1250px;
       border-collapse: collapse;
     }
 
@@ -478,6 +565,10 @@
 
     .distance-table td:first-child {
       font-weight: 800;
+    }
+
+    .vehicle-type-cell {
+      font-weight: 700;
     }
 
     .distance-status {
@@ -527,6 +618,36 @@
       font-size: 12px;
       color: #6b7280;
       margin-top: 7px;
+    }
+
+
+    /* =====================================================
+       SECTION
+    ===================================================== */
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section h2 {
+      margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+      margin: 0 0 14px;
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    .empty-state {
+      padding: 30px !important;
+      text-align: center;
+      color: #9ca3af;
     }
 
 
@@ -619,26 +740,24 @@
 
     <div class="nav">
 
-      <button
-        type="button"
-        onclick="goToPage('overview')"
+      <a
+        href="index.html"
       >
         ภาพรวม
-      </button>
+      </a>
 
-      <button
-        type="button"
+      <a
+        href="kpi-distance.html"
         class="active"
       >
         KPI ระยะทาง
-      </button>
+      </a>
 
-      <button
-        type="button"
-        onclick="goToPage('daily')"
+      <a
+        href="daily-report.html"
       >
         Daily Report
-      </button>
+      </a>
 
     </div>
 
@@ -651,6 +770,10 @@
 
   <main class="container">
 
+
+    <!-- ===================================================
+         PAGE HEADER
+    ==================================================== -->
 
     <div class="page-header">
 
@@ -686,6 +809,7 @@
         </select>
 
       </div>
+
 
       <div>
 
@@ -773,7 +897,7 @@
 
 
     <!-- ===================================================
-         KPI
+         MAIN KPI
     ==================================================== -->
 
     <div class="kpi-grid">
@@ -860,7 +984,6 @@
         </div>
 
       </div>
-
 
     </div>
 
@@ -951,7 +1074,6 @@
 
       </div>
 
-
     </div>
 
 
@@ -1022,6 +1144,96 @@
 
 
     <!-- ===================================================
+         VEHICLE TYPE / TARGET SUMMARY
+    ==================================================== -->
+
+    <section class="section">
+
+      <h2>
+        🚛 สรุปตามสาขาและประเภทรถ
+      </h2>
+
+      <p class="section-subtitle">
+        เปรียบเทียบจำนวนรถ KM สะสม และ Target แยกตามประเภทของรถ
+      </p>
+
+
+      <div class="vehicle-type-summary-wrapper">
+
+        <table class="vehicle-type-summary-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                สาขา
+              </th>
+
+              <th>
+                ประเภทรถ
+              </th>
+
+              <th>
+                จำนวนรถ
+              </th>
+
+              <th>
+                Target / คันเฉลี่ย
+              </th>
+
+              <th>
+                Target รวม
+              </th>
+
+              <th>
+                KM สะสม
+              </th>
+
+              <th>
+                Achievement
+              </th>
+
+              <th>
+                KM คาดการณ์
+              </th>
+
+              <th>
+                Forecast Achievement
+              </th>
+
+              <th>
+                สถานะ
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody id="vehicleTypeSummaryBody">
+
+            <tr>
+
+              <td
+                colspan="10"
+                class="empty-state"
+              >
+                กำลังโหลดข้อมูล...
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
          ALERT
     ==================================================== -->
 
@@ -1053,6 +1265,7 @@
 
           </div>
 
+
           <ul
             id="forecastOverList"
             class="alert-list"
@@ -1081,6 +1294,7 @@
 
           </div>
 
+
           <ul
             id="nearTargetList"
             class="alert-list"
@@ -1093,7 +1307,6 @@
           </ul>
 
         </div>
-
 
       </div>
 
@@ -1132,6 +1345,7 @@
 
           </div>
 
+
           <ul
             id="highestKmList"
             class="ranking-list"
@@ -1160,6 +1374,7 @@
 
           </div>
 
+
           <ul
             id="lowestKmList"
             class="ranking-list"
@@ -1172,7 +1387,6 @@
           </ul>
 
         </div>
-
 
       </div>
 
@@ -1192,6 +1406,7 @@
       <p class="section-subtitle">
         แสดง KM ของรถ COCO ตลอดรอบ 26–25
       </p>
+
 
       <div class="distance-chart-wrapper">
 
@@ -1238,6 +1453,10 @@
               </th>
 
               <th>
+                ประเภทรถ
+              </th>
+
+              <th>
                 KM สะสม
               </th>
 
@@ -1247,6 +1466,10 @@
 
               <th>
                 Achievement
+              </th>
+
+              <th>
+                KM คงเหลือ
               </th>
 
               <th>
@@ -1265,12 +1488,13 @@
 
           </thead>
 
+
           <tbody id="carTableBody">
 
             <tr>
 
               <td
-                colspan="9"
+                colspan="11"
                 class="empty-state"
               >
                 กำลังโหลดข้อมูล...
@@ -1287,6 +1511,10 @@
     </section>
 
 
+    <!-- ===================================================
+         PAGE STATUS
+    ==================================================== -->
+
     <div
       id="pageStatus"
       class="page-status"
@@ -1298,6 +1526,10 @@
   </main>
 
 
+  <!-- =====================================================
+       SCRIPTS
+  ====================================================== -->
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script src="kpi-distance.js"></script>
@@ -1306,3 +1538,4 @@
 </body>
 
 </html>
+```
