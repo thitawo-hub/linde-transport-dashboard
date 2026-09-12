@@ -804,6 +804,37 @@ img {
   font-size: 10.5px;
 }
 
+/* ---------- ไล่แสดงจำนวนแยกตามประเภทรถใต้ card-value
+   (เช่น รถ COCO 60 คัน แยกเป็น Trailer / 10W) ----------
+   ใช้แทน .card-status แบบข้อความบรรทัดเดียว เมื่ออยากโชว์
+   breakdown มากกว่า 1 ค่า โดยยังอยู่ในโทนเดียวกับ .card-status */
+
+.card-breakdown {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 4px 12px;
+
+  margin-top: 6px;
+
+  color: var(--text-500);
+
+  font-size: 10.5px;
+}
+
+.card-breakdown strong {
+
+  margin-left: 4px;
+
+  color: var(--text-800);
+
+  font-weight: 700;
+
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- .kpi-card.primary — ตัว modifier จริงในหน้าเว็บ ----------
    เว็บมีการแปะ class "primary" บนการ์ด KPI ที่อยากเน้น (เช่น Driver
    Ratio) อยู่แล้ว จึงใช้ modifier นี้ทำเป็น pill สีเขียวทึบตามภาพ
