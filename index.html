@@ -70,7 +70,7 @@
        ===================================================== -->
 
   <main class="container">
-    
+
 <!-- PAGE TITLE -->
 
 <div class="page-title">
@@ -258,7 +258,15 @@
 
 
 <!-- ===================================================
-     KM KPI
+     KM PERFORMANCE + FORECAST (รวมเป็นเรื่องเดียวกัน)
+     เดิมแยกเป็น 2 section คนละกล่อง (Distance Performance /
+     KM Forecast) ซึ่งพูดเรื่องเดียวกันต่อเนื่องกัน — รวมไว้ใน
+     section เดียว ให้ไล่อ่านจากซ้ายไปขวา บนลงล่างเป็นเรื่อง
+     เดียวไม่ต้องเลื่อนจอไปเทียบ 2 กล่อง
+
+     element id เดิมทั้งหมดยังอยู่ครบ ไม่กระทบ app.js — ตัวที่
+     เนื้อหาซ้ำกับ achievement-box (distanceForecastKm,
+     distanceForecastAchievement) ถูกซ่อนด้วย CSS แทนการลบทิ้ง
      =================================================== -->
 
 <section class="section">
@@ -268,8 +276,12 @@
     <div>
 
       <h2>
-        📍 Distance Performance
+        📍 Distance Performance &amp; Forecast
       </h2>
+
+      <p class="section-subtitle">
+        ผลการวิ่งเทียบเป้าหมาย พร้อมประมาณการเมื่อจบรอบ
+      </p>
 
     </div>
 
@@ -392,9 +404,12 @@
   </div>
 
 
+  <!-- ตัวเลขซ้ำกับ achievement-box ด้านล่าง — คง id ไว้ให้ app.js
+       เขียนค่าได้ตามปกติ แต่ซ่อนไม่ให้แสดงซ้ำ -->
+
   <div
     class="meta"
-    style="margin-top: 10px;"
+    style="display: none;"
   >
 
     <span class="meta-item">
@@ -413,112 +428,64 @@
 
   </div>
 
-</section>
 
+  <!-- FORECAST (achievement-box: main = ตัวเลขเด่น, side = รายละเอียดย่อย) -->
 
-<!-- ===================================================
-     FORECAST
-     =================================================== -->
-
-<section class="section">
-
-  <div class="section-heading">
+  <div
+    class="achievement-box"
+    style="margin-top: 14px; border-top: 1px solid var(--border);"
+  >
 
     <div>
 
-      <h2>
-        🔮 KM Forecast
-      </h2>
-
-      <p class="section-subtitle">
-        ประมาณการผลการวิ่งเมื่อจบรอบปัจจุบัน
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <div class="forecast">
-
-    <div class="forecast-item">
-
-      <div class="forecast-label">
-        KM ปัจจุบัน
+      <div class="achievement-main-label">
+        🔮 Forecast Achievement เมื่อจบรอบ
       </div>
 
       <div
-        class="forecast-value"
-        id="forecastCurrentKm"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="forecast-item">
-
-      <div class="forecast-label">
-        Forecast KM
-      </div>
-
-      <div
-        class="forecast-value"
-        id="forecastKm"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="forecast-item">
-
-      <div class="forecast-label">
-        Target KM
-      </div>
-
-      <div
-        class="forecast-value"
-        id="forecastTargetKm"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="forecast-item">
-
-      <div class="forecast-label">
-        Forecast Achievement
-      </div>
-
-      <div
-        class="forecast-value"
+        class="achievement-main-value"
         id="forecastAchievement"
       >
         -
       </div>
 
+      <div
+        class="achievement-main-note"
+        id="forecastNote"
+      >
+        -
+      </div>
+
     </div>
 
-  </div>
+    <div class="achievement-side">
 
-  <div
-    class="card-status"
-    id="forecastNote"
-    style="margin-top: 12px;"
-  >
-    -
+      <div class="achievement-side-item">
+        <span>KM ปัจจุบัน</span>
+        <strong id="forecastCurrentKm">-</strong>
+      </div>
+
+      <div class="achievement-side-item">
+        <span>Forecast KM</span>
+        <strong id="forecastKm">-</strong>
+      </div>
+
+      <div class="achievement-side-item">
+        <span>Target KM</span>
+        <strong id="forecastTargetKm">-</strong>
+      </div>
+
+    </div>
+
   </div>
 
 </section>
 
 
 <!-- ===================================================
-     DAILY KM CHART
+     KM TRENDS — วางกราฟรายวัน + สะสมคู่กัน แทนการเรียงต่อ
+     เต็มความกว้างทีละอัน (ใช้ .chart-grid ที่มี CSS อยู่แล้ว
+     แต่ของเดิมไม่เคยถูกใช้)
      =================================================== -->
 
 <section class="section">
@@ -528,11 +495,11 @@
     <div>
 
       <h2>
-        📈 KM รายวัน
+        📈 แนวโน้ม KM
       </h2>
 
       <p class="section-subtitle">
-        แนวโน้มระยะทางตามวันที่
+        รายวันและสะสมตลอดช่วงที่เลือก
       </p>
 
     </div>
@@ -540,93 +507,93 @@
   </div>
 
 
-  <div class="chart-summary">
+  <div class="chart-grid">
 
-    <div class="chart-summary-item">
+    <!-- รายวัน -->
 
-      <div class="chart-summary-label">
-        KM รวม
+    <div class="card chart-card-narrow">
+
+      <div class="chart-summary">
+
+        <div class="chart-summary-item">
+
+          <div class="chart-summary-label">
+            KM รวม
+          </div>
+
+          <div
+            class="chart-summary-value"
+            id="chartTotalKm"
+          >
+            -
+          </div>
+
+        </div>
+
+
+        <div class="chart-summary-item">
+
+          <div class="chart-summary-label">
+            ค่าเฉลี่ย / วัน
+          </div>
+
+          <div
+            class="chart-summary-value"
+            id="chartAvgKm"
+          >
+            -
+          </div>
+
+        </div>
+
+
+        <div class="chart-summary-item">
+
+          <div class="chart-summary-label">
+            วันที่วิ่ง
+          </div>
+
+          <div
+            class="chart-summary-value"
+            id="chartRunningDays"
+          >
+            -
+          </div>
+
+        </div>
+
       </div>
+
+
+      <div class="chart-wrapper">
+
+        <canvas id="kmChart"></canvas>
+
+      </div>
+
+    </div>
+
+
+    <!-- สะสม -->
+
+    <div class="card chart-card-narrow">
 
       <div
-        class="chart-summary-value"
-        id="chartTotalKm"
+        class="section-heading"
+        style="min-height: auto; padding: 12px 14px; border-bottom: 1px solid var(--border-2);"
       >
-        -
+        <p style="margin: 0; color: var(--text-600); font-size: 11px; font-weight: 700;">
+          KM สะสมตามรอบ
+        </p>
+      </div>
+
+      <div class="chart-wrapper">
+
+        <canvas id="kmCumulativeChart"></canvas>
+
       </div>
 
     </div>
-
-
-    <div class="chart-summary-item">
-
-      <div class="chart-summary-label">
-        ค่าเฉลี่ย / วัน
-      </div>
-
-      <div
-        class="chart-summary-value"
-        id="chartAvgKm"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="chart-summary-item">
-
-      <div class="chart-summary-label">
-        วันที่วิ่ง
-      </div>
-
-      <div
-        class="chart-summary-value"
-        id="chartRunningDays"
-      >
-        -
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="chart-wrapper">
-
-    <canvas id="kmChart"></canvas>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     CUMULATIVE KM
-     =================================================== -->
-
-<section class="section">
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        📊 KM สะสมตามรอบ
-      </h2>
-
-      <p class="section-subtitle">
-        แนวโน้ม KM สะสมตลอดช่วงที่เลือก
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <div class="chart-wrapper">
-
-    <canvas id="kmCumulativeChart"></canvas>
 
   </div>
 
