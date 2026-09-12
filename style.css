@@ -2078,11 +2078,6 @@ tbody td {
     gap: 12px;
   }
 
-.chart-wrapper,
-.distance-chart-wrapper {
-  height: 140px;
-}
-
   .table-wrapper {
 
     max-height: 300px;
@@ -2100,12 +2095,6 @@ tbody td {
   .distance-main-grid {
 
     grid-template-columns: 1fr;
-  }
-
-  .chart-wrapper,
-  .distance-chart-wrapper {
-
-    height: 210px;
   }
 
   .table-wrapper {
@@ -2305,14 +2294,6 @@ tbody td {
     padding: 9px;
   }
 
-.chart-wrapper,
-.distance-chart-wrapper {
-  height: 140px;
-}
-
-    padding: 8px;
-  }
-
   .chart-summary {
 
     grid-template-columns:
@@ -2369,11 +2350,6 @@ tbody td {
 
     grid-template-columns: 1fr;
   }
-
-.chart-wrapper,
-.distance-chart-wrapper {
-  height: 140px;
-}
 }
 
 
@@ -2763,5 +2739,42 @@ tbody td {
 
   .section-heading + * {
     margin-top: 10px;
+  }
+}
+
+/* ============================================================
+   36. CHART WRAPPER HEIGHT (รวมเป็นก้อนเดียว)
+   ============================================================ */
+
+.chart-wrapper,
+.distance-chart-wrapper {
+  height: 215px;
+}
+
+@media (min-width: 1500px) {
+  .chart-wrapper,
+  .distance-chart-wrapper {
+    height: 150px;
+  }
+}
+
+@media (max-width: 1300px) {
+  .chart-wrapper,
+  .distance-chart-wrapper {
+    height: 140px;
+  }
+}
+
+@media (max-width: 700px) {
+  .chart-wrapper,
+  .distance-chart-wrapper {
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-wrapper,
+  .distance-chart-wrapper {
+    height: 150px;
   }
 }
