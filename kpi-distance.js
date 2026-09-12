@@ -287,6 +287,13 @@ function renderFleetBreakdown(branchFilter) {
   const container = document.getElementById('totalCarsBreakdown');
   if (!container) return;
 
+  // breakdown ตามประเภทรถ (22W/10W) เป็นข้อมูลเฉพาะสาขาระยอง — ถ้าเลือก "ทุกสาขา"
+  // ตัวเลขรวมด้านบนเป็นยอดรวมทุกสาขา จึงไม่ควรโชว์ breakdown ของระยองเดี่ยวๆ ปนอยู่
+  if (!branchFilter) {
+    container.innerHTML = '';
+    return;
+  }
+
   const typedEntries = getFleetCountsForBranchFilter(branchFilter).filter(
     entry => entry.vehicleType
   );
