@@ -532,12 +532,59 @@ function updateMasterKpi(
     branchMaster.drivers;
 
 
+  // ==========================================================
+  // DRIVER RATIO
+  // ==========================================================
+
   const ratio =
     targetCars > 0
-      ? actualDrivers /
-        targetCars
+      ? actualDrivers / targetCars
       : 0;
 
+
+  // ==========================================================
+  // TARGET DRIVER RATIO
+  // ==========================================================
+
+  const targetDriverRatio =
+    getDriverRatioTarget(
+      branch
+    );
+
+
+  // ==========================================================
+  // TARGET DRIVER COUNT
+  //
+  // จำนวน พขร. ที่ควรมีตาม Target Ratio
+  // ==========================================================
+
+  const targetDrivers =
+    targetDriverRatio > 0 &&
+    targetCars > 0
+      ? Math.ceil(
+          targetCars *
+          targetDriverRatio
+        )
+      : 0;
+
+
+  // ==========================================================
+  // GAP
+  //
+  // > 0 = ขาด
+  // < 0 = เกิน
+  // ==========================================================
+
+  const driverGap =
+    targetDrivers > 0
+      ? targetDrivers -
+        actualDrivers
+      : 0;
+
+
+  // ==========================================================
+  // รถ COCO
+  // ==========================================================
 
   setText(
     'cocoCars',
@@ -549,6 +596,10 @@ function updateMasterKpi(
   );
 
 
+  // ==========================================================
+  // พขร.
+  // ==========================================================
+
   setText(
     'cocoDrivers',
     actualDrivers > 0
@@ -559,6 +610,10 @@ function updateMasterKpi(
   );
 
 
+  // ==========================================================
+  // DRIVER RATIO
+  // ==========================================================
+
   setText(
     'driverRatio',
     targetCars > 0
@@ -566,6 +621,65 @@ function updateMasterKpi(
       : '-'
   );
 
+
+  // ==========================================================
+  // DRIVER RATIO DETAIL
+  // ==========================================================
+
+  const ratioDetail =
+    document.getElementById(
+      'driverRatioDetail'
+    );
+
+
+  if (ratioDetail) {
+
+    if (
+      targetDrivers <= 0
+    ) {
+
+      ratioDetail.textContent =
+        '-';
+
+      ratioDetail.className =
+        'card-status';
+
+    } else if (
+      driverGap > 0
+    ) {
+
+      ratioDetail.textContent =
+        `Target ${formatNumber(targetDriverRatio, 3)} | ขาด ${formatNumber(driverGap)} คน`;
+
+      ratioDetail.className =
+        'card-status status-low';
+
+    } else if (
+      driverGap < 0
+    ) {
+
+      ratioDetail.textContent =
+        `Target ${formatNumber(targetDriverRatio, 3)} | เกิน ${formatNumber(Math.abs(driverGap))} คน`;
+
+      ratioDetail.className =
+        'card-status status-high';
+
+    } else {
+
+      ratioDetail.textContent =
+        `Target ${formatNumber(targetDriverRatio, 3)} | ครบตามเป้า`;
+
+      ratioDetail.className =
+        'card-status status-ok';
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // TARGET KM
+  // ==========================================================
 
   const targetKm =
     getTargetKm(
@@ -585,6 +699,199 @@ function updateMasterKpi(
 
 }
 
+
+// ============================================================
+// DRIVER RATIO TARGET
+//
+// Branch:
+//   ใช้ Target Driver Ratio ของสาขานั้น
+//
+// All branches:
+//   คำนวณจาก Target Cars × Target Ratio
+//   ของแต่ละสาขา แล้วรวมจำนวน พขร. ที่ควรมี
+//
+// รองรับ Target Ratio ที่แตกต่างกันแต่ละสาขา
+// ============================================================
+
+function getDriverRatioTarget(
+  branch
+) {
+
+  // ==========================================================
+  // กรณีเลือกสาขา
+  // ==========================================================
+
+  if (branch) {
+
+    const values =
+      dashboardData
+        .filter(
+          row =>
+            normalizeText(
+              row.branch
+            ) ===
+            normalizeText(
+              branch
+            )
+        )
+        .map(
+          row =>
+            Number(
+              row.target_driver_ratio
+            )
+        )
+        .filter(
+          value =>
+            Number.isFinite(
+              value
+            ) &&
+            value > 0
+        );
+
+
+    return values.length
+      ? values[0]
+      : 0;
+
+  }
+
+
+  // ==========================================================
+  // กรณีทุกสาขา
+  //
+  // ต้องคำนวณ Target Driver รวมก่อน
+  // ==========================================================
+
+  const branchMap =
+    new Map();
+
+
+  dashboardData.forEach(
+    row => {
+
+      const branchName =
+        normalizeText(
+          row.branch
+        );
+
+
+      if (
+        !branchName
+      ) {
+
+        return;
+
+      }
+
+
+      const targetCars =
+        Number(
+          row.target_coco_cars
+        );
+
+
+      const targetRatio =
+        Number(
+          row.target_driver_ratio
+        );
+
+
+      if (
+        !Number.isFinite(
+          targetCars
+        ) ||
+        targetCars <= 0
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        !Number.isFinite(
+          targetRatio
+        ) ||
+        targetRatio <= 0
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        !branchMap.has(
+          branchName
+        )
+      ) {
+
+        branchMap.set(
+          branchName,
+          {
+            cars:
+              targetCars,
+
+            ratio:
+              targetRatio
+          }
+        );
+
+      }
+
+    }
+  );
+
+
+  let totalTargetCars =
+    0;
+
+  let totalTargetDrivers =
+    0;
+
+
+  branchMap.forEach(
+    item => {
+
+      totalTargetCars +=
+        Number(
+          item.cars
+        ) || 0;
+
+
+      totalTargetDrivers +=
+        (
+          Number(
+            item.cars
+          ) || 0
+        ) *
+        (
+          Number(
+            item.ratio
+          ) || 0
+        );
+
+    }
+  );
+
+
+  if (
+    totalTargetCars <= 0
+  ) {
+
+    return 0;
+
+  }
+
+
+  // ค่า Ratio รวม = Target พขร.รวม / Target รถรวม
+
+  return (
+    totalTargetDrivers /
+    totalTargetCars
+  );
+
+}
 
 // ============================================================
 // KM KPI
