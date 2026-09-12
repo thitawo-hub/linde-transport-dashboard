@@ -22,9 +22,6 @@ let masterCarData = [];
 let kmChart = null;
 let kmCumulativeChart = null;
 
-let carPerformanceData = [];
-
-
 // ============================================================
 // SUPABASE FETCH
 // รองรับข้อมูลมากกว่า 1,000 rows
@@ -476,13 +473,6 @@ function updateDashboard() {
 
   updatePerformanceStatus(
     rows,
-    startDate,
-    endDate,
-    branch
-  );
-
-
-  updateCarPerformance(
     startDate,
     endDate,
     branch
@@ -1176,7 +1166,15 @@ function updateForecast(
 
 
   setText(
-    'forecastTotalKm',
+    'forecastCurrentKm',
+    formatNumber(
+      totalKm
+    )
+  );
+
+
+  setText(
+    'forecastKm',
     formatNumber(
       forecastTotalKm
     )
@@ -1184,9 +1182,9 @@ function updateForecast(
 
 
   setText(
-    'forecastKmCar',
+    'forecastTargetKm',
     formatNumber(
-      forecastKmCar
+      targetTotalKm
     )
   );
 
@@ -1199,9 +1197,23 @@ function updateForecast(
   );
 
 
-  setAchievementStatus(
-    'forecastAchievementStatus',
-    forecastAchievement
+  // ----------------------------------------------------------
+  // แสดงซ้ำใน section "Distance Performance" ด้วย
+  // ----------------------------------------------------------
+
+  setText(
+    'distanceForecastKm',
+    formatNumber(
+      forecastTotalKm
+    )
+  );
+
+
+  setText(
+    'distanceForecastAchievement',
+    targetTotalKm > 0
+      ? forecastAchievement.toFixed(1) + '%'
+      : '-'
   );
 
 
@@ -1556,6 +1568,12 @@ function updateKmChart(
     );
 
 
+  const workingDays =
+    getWorkingDays(
+      rows
+    );
+
+
   const today =
     formatDateInput(
       new Date()
@@ -1609,7 +1627,7 @@ function updateKmChart(
 
 
   setText(
-    'chartActualKm',
+    'chartTotalKm',
     formatNumber(
       totalKm
     )
@@ -1617,18 +1635,19 @@ function updateKmChart(
 
 
   setText(
-    'chartTargetKm',
+    'chartAvgKm',
     formatNumber(
-      targetTotalKm
+      workingDays > 0
+        ? totalKm / workingDays
+        : 0
     )
   );
 
 
   setText(
-    'chartForecastKm',
+    'chartRunningDays',
     formatNumber(
-      forecast.forecastTotalKm ||
-      0
+      workingDays
     )
   );
 
@@ -1651,7 +1670,7 @@ function updateKmChart(
       context,
       {
 
-        type: 'line',
+        type: 'bar',
 
         data: {
 
@@ -1663,25 +1682,52 @@ function updateKmChart(
           datasets: [
 
             {
+              type:
+                'bar',
+
               label:
-                'Actual KM',
+                'KM รวม',
 
               data:
                 actualData,
 
+              backgroundColor:
+                'rgba(25, 113, 79, 0.85)',
+
+              borderColor:
+                'rgba(25, 113, 79, 1)',
+
               borderWidth:
+                1,
+
+              borderRadius:
+                4,
+
+              order:
                 2,
 
-              tension:
-                0.25
+              maxBarThickness:
+                22
             },
 
             {
+              type:
+                'line',
+
               label:
                 'Daily Target',
 
               data:
                 targetData,
+
+              borderColor:
+                '#b8393a',
+
+              backgroundColor:
+                'transparent',
+
+              pointRadius:
+                0,
 
               borderWidth:
                 2,
@@ -1690,15 +1736,30 @@ function updateKmChart(
                 [6, 6],
 
               tension:
-                0
+                0,
+
+              order:
+                1
             },
 
             {
+              type:
+                'line',
+
               label:
                 'Forecast',
 
               data:
                 forecastData,
+
+              borderColor:
+                '#f97316',
+
+              backgroundColor:
+                'transparent',
+
+              pointRadius:
+                0,
 
               borderWidth:
                 2,
@@ -1707,7 +1768,10 @@ function updateKmChart(
                 [3, 3],
 
               tension:
-                0.25
+                0.25,
+
+              order:
+                0
             }
 
           ]
@@ -1737,7 +1801,21 @@ function updateKmChart(
             legend: {
 
               position:
-                'top'
+                'top',
+
+              labels: {
+
+                boxWidth:
+                  10,
+
+                font: {
+
+                  size:
+                    10
+
+                }
+
+              }
 
             }
 
@@ -1745,10 +1823,36 @@ function updateKmChart(
 
           scales: {
 
+            x: {
+
+              ticks: {
+
+                font: {
+
+                  size:
+                    9
+
+                }
+
+              }
+
+            },
+
             y: {
 
               beginAtZero:
-                true
+                true,
+
+              ticks: {
+
+                font: {
+
+                  size:
+                    9
+
+                }
+
+              }
 
             }
 
@@ -1943,6 +2047,9 @@ function updateCumulativeKmChart(
               borderWidth:
                 2,
 
+              pointRadius:
+                0,
+
               tension:
                 0.25
             },
@@ -1956,6 +2063,9 @@ function updateCumulativeKmChart(
 
               borderWidth:
                 2,
+
+              pointRadius:
+                0,
 
               borderDash:
                 [6, 6],
@@ -1973,6 +2083,9 @@ function updateCumulativeKmChart(
 
               borderWidth:
                 2,
+
+              pointRadius:
+                0,
 
               borderDash:
                 [3, 3],
@@ -2008,7 +2121,21 @@ function updateCumulativeKmChart(
             legend: {
 
               position:
-                'top'
+                'top',
+
+              labels: {
+
+                boxWidth:
+                  10,
+
+                font: {
+
+                  size:
+                    10
+
+                }
+
+              }
 
             }
 
@@ -2016,10 +2143,42 @@ function updateCumulativeKmChart(
 
           scales: {
 
+            x: {
+
+              display:
+                false,
+
+              grid: {
+
+                display:
+                  false
+
+              }
+
+            },
+
             y: {
 
               beginAtZero:
-                true
+                true,
+
+              grid: {
+
+                display:
+                  false
+
+              },
+
+              ticks: {
+
+                font: {
+
+                  size:
+                    9
+
+                }
+
+              }
 
             }
 
@@ -2032,1016 +2191,6 @@ function updateCumulativeKmChart(
 
 }
 
-
-// ============================================================
-// KM PERFORMANCE BY CAR
-//
-// ใช้ Master Car เป็นตัวตั้ง
-// รถที่มีทะเบียนใน Master Car = COCO
-//
-// KM สะสม
-// = SUM(trips.total_distance)
-//
-// KM คาดการณ์
-// = KM สะสม +
-//   ค่าเฉลี่ย KM/วันของรถคันนั้น ×
-//   จำนวนวันทำงานที่คาดว่าจะเหลือ
-// ============================================================
-
-function updateCarPerformance(
-  startDate,
-  endDate,
-  branch
-) {
-
-  const tbody =
-    document.getElementById(
-      'carPerformanceBody'
-    );
-
-  if (!tbody) {
-    return;
-  }
-
-
-  // ==========================================================
-  // MASTER CAR MAP
-  // ==========================================================
-
-  const masterByBranchCar =
-    new Map();
-
-  const masterByCar =
-    new Map();
-
-  const masterByPlate =
-    new Map();
-
-
-  masterCarData.forEach(
-    car => {
-
-      const branchName =
-        normalizeText(
-          car.branch
-        );
-
-      const carNo =
-        normalizeCarNo(
-          car.car_no
-        );
-
-      const plate =
-        normalizePlate(
-          car.license_plate
-        );
-
-
-      if (
-        branchName &&
-        carNo
-      ) {
-
-        masterByBranchCar.set(
-          `${branchName}||${carNo}`,
-          car
-        );
-
-      }
-
-
-      if (carNo) {
-
-        if (
-          !masterByCar.has(
-            carNo
-          )
-        ) {
-
-          masterByCar.set(
-            carNo,
-            car
-          );
-
-        }
-
-      }
-
-
-      if (plate) {
-
-        masterByPlate.set(
-          plate,
-          car
-        );
-
-      }
-
-    }
-  );
-
-
-  // ==========================================================
-  // TARGET KM BY BRANCH
-  // ==========================================================
-
-  const targetKmByBranch =
-    new Map();
-
-
-  dashboardData.forEach(
-    row => {
-
-      const branchName =
-        normalizeText(
-          row.branch
-        );
-
-      const target =
-        Number(
-          row.target_km_per_car
-        );
-
-
-      if (
-        branchName &&
-        Number.isFinite(
-          target
-        ) &&
-        target > 0
-      ) {
-
-        if (
-          !targetKmByBranch.has(
-            branchName
-          )
-        ) {
-
-          targetKmByBranch.set(
-            branchName,
-            target
-          );
-
-        }
-
-      }
-
-    }
-  );
-
-
-  // ==========================================================
-  // INITIALIZE ALL COCO CARS FROM MASTER CAR
-  //
-  // เพื่อให้รถที่ยังไม่มี KM ก็แสดงเป็น 0
-  // ==========================================================
-
-  const carMap =
-    new Map();
-
-
-  masterCarData.forEach(
-    masterCar => {
-
-      const masterPlate =
-        normalizePlate(
-          masterCar.license_plate
-        );
-
-      const masterCarNo =
-        normalizeCarNo(
-          masterCar.car_no
-        );
-
-      const masterBranch =
-        String(
-          masterCar.branch ||
-          ''
-        ).trim();
-
-
-      // ไม่มีทะเบียน = ไม่ถือเป็น COCO
-      if (
-        !masterPlate ||
-        !masterCarNo
-      ) {
-
-        return;
-
-      }
-
-
-      if (
-        branch &&
-        normalizeText(
-          masterBranch
-        ) !==
-        normalizeText(
-          branch
-        )
-      ) {
-
-        return;
-
-      }
-
-
-      const key =
-        `${normalizeText(masterBranch)}||${masterCarNo}`;
-
-
-      if (
-        !carMap.has(
-          key
-        )
-      ) {
-
-        carMap.set(
-          key,
-          {
-
-            branch:
-              masterBranch,
-
-            carNo:
-              masterCarNo,
-
-            plate:
-              String(
-                masterCar.license_plate ||
-                ''
-              ).trim(),
-
-            vehicleType:
-              String(
-                masterCar.vehicle_type ||
-                ''
-              ).trim(),
-
-            km:
-              0,
-
-            workingDays:
-              new Set()
-
-          }
-        );
-
-      }
-
-    }
-  );
-
-
-  // ==========================================================
-  // FILTER TRIPS BY DATE
-  // ==========================================================
-
-  const dateFilteredTrips =
-    tripData.filter(
-      trip => {
-
-        const date =
-          normalizeDate(
-            trip.work_date
-          );
-
-
-        if (!date) {
-          return false;
-        }
-
-
-        if (
-          date < startDate ||
-          date > endDate
-        ) {
-
-          return false;
-
-        }
-
-
-        return true;
-
-      }
-    );
-
-
-  // ==========================================================
-  // MATCH TRIPS TO MASTER CAR
-  // ==========================================================
-
-  let matchedTrips =
-    0;
-
-  let unmatchedTrips =
-    0;
-
-
-  dateFilteredTrips.forEach(
-    trip => {
-
-      const tripBranch =
-        normalizeText(
-          trip.branch
-        );
-
-      const tripCarNo =
-        normalizeCarNo(
-          trip.car_no
-        );
-
-      const tripPlate =
-        normalizePlate(
-          trip.license_plate
-        );
-
-
-      let masterCar =
-        null;
-
-
-      // ------------------------------------------------------
-      // 1. ทะเบียน
-      // ------------------------------------------------------
-
-      if (
-        tripPlate
-      ) {
-
-        masterCar =
-          masterByPlate.get(
-            tripPlate
-          ) || null;
-
-      }
-
-
-      // ------------------------------------------------------
-      // 2. สาขา + เบอร์รถ
-      // ------------------------------------------------------
-
-      if (
-        !masterCar &&
-        tripBranch &&
-        tripCarNo
-      ) {
-
-        masterCar =
-          masterByBranchCar.get(
-            `${tripBranch}||${tripCarNo}`
-          ) || null;
-
-      }
-
-
-      // ------------------------------------------------------
-      // 3. เบอร์รถ
-      // ------------------------------------------------------
-
-      if (
-        !masterCar &&
-        tripCarNo
-      ) {
-
-        masterCar =
-          masterByCar.get(
-            tripCarNo
-          ) || null;
-
-      }
-
-
-      // ------------------------------------------------------
-      // ถ้าไม่เจอ Master Car = LOCO
-      // ------------------------------------------------------
-
-      if (!masterCar) {
-
-        unmatchedTrips++;
-
-        return;
-
-      }
-
-
-      // ------------------------------------------------------
-      // Master Car ไม่มีทะเบียน = ไม่ใช่ COCO
-      // ------------------------------------------------------
-
-      const masterPlate =
-        normalizePlate(
-          masterCar.license_plate
-        );
-
-
-      if (!masterPlate) {
-
-        unmatchedTrips++;
-
-        return;
-
-      }
-
-
-      const finalBranch =
-        String(
-          masterCar.branch ||
-          ''
-        ).trim();
-
-      const finalCarNo =
-        normalizeCarNo(
-          masterCar.car_no
-        );
-
-
-      if (
-        !finalBranch ||
-        !finalCarNo
-      ) {
-
-        unmatchedTrips++;
-
-        return;
-
-      }
-
-
-      if (
-        branch &&
-        normalizeText(
-          finalBranch
-        ) !==
-        normalizeText(
-          branch
-        )
-      ) {
-
-        return;
-
-      }
-
-
-      const key =
-        `${normalizeText(finalBranch)}||${finalCarNo}`;
-
-
-      // ------------------------------------------------------
-      // ถ้ามี Master Car แต่ไม่อยู่ใน initial map
-      // ------------------------------------------------------
-
-      if (
-        !carMap.has(
-          key
-        )
-      ) {
-
-        carMap.set(
-          key,
-          {
-
-            branch:
-              finalBranch,
-
-            carNo:
-              finalCarNo,
-
-            plate:
-              String(
-                masterCar.license_plate ||
-                ''
-              ).trim(),
-
-            vehicleType:
-              String(
-                masterCar.vehicle_type ||
-                ''
-              ).trim(),
-
-            km:
-              0,
-
-            workingDays:
-              new Set()
-
-          }
-        );
-
-      }
-
-
-      const car =
-        carMap.get(
-          key
-        );
-
-
-      const km =
-        Number(
-          trip.total_distance
-        ) || 0;
-
-
-      car.km +=
-        km;
-
-
-      if (
-        km > 0
-      ) {
-
-        const date =
-          normalizeDate(
-            trip.work_date
-          );
-
-
-        if (date) {
-
-          car.workingDays.add(
-            date
-          );
-
-        }
-
-      }
-
-
-      matchedTrips++;
-
-    }
-  );
-
-
-  // ==========================================================
-  // CURRENT DATE / REMAINING DAYS
-  // ==========================================================
-
-  const cycleDays =
-    getInclusiveDays(
-      startDate,
-      endDate
-    );
-
-
-  const today =
-    formatDateInput(
-      new Date()
-    );
-
-
-  let elapsedDays =
-    0;
-
-
-  if (
-    today < startDate
-  ) {
-
-    elapsedDays =
-      0;
-
-  } else if (
-    today > endDate
-  ) {
-
-    elapsedDays =
-      cycleDays;
-
-  } else {
-
-    elapsedDays =
-      getInclusiveDays(
-        startDate,
-        today
-      );
-
-  }
-
-
-  const safeElapsedDays =
-    Math.max(
-      1,
-      elapsedDays
-    );
-
-
-  // ==========================================================
-  // RENDER DATA
-  // ==========================================================
-
-  carPerformanceData =
-    Array.from(
-      carMap.values()
-    )
-    .map(
-      car => {
-
-        const workingDays =
-          car.workingDays.size;
-
-
-        const avgKmDay =
-          workingDays > 0
-            ? car.km /
-              workingDays
-            : 0;
-
-
-        const workingDayRate =
-          Math.min(
-            1,
-            workingDays /
-            safeElapsedDays
-          );
-
-
-        const remainingCalendarDays =
-          Math.max(
-            0,
-            cycleDays -
-            elapsedDays
-          );
-
-
-        const estimatedRemainingWorkingDays =
-          remainingCalendarDays *
-          workingDayRate;
-
-
-        const forecastKm =
-          car.km +
-          (
-            avgKmDay *
-            estimatedRemainingWorkingDays
-          );
-
-
-        const target =
-          Number(
-            targetKmByBranch.get(
-              normalizeText(
-                car.branch
-              )
-            ) || 0
-          );
-
-
-        const achievement =
-          target > 0
-            ? (
-                car.km /
-                target
-              ) *
-              100
-            : 0;
-
-
-        const forecastAchievement =
-          target > 0
-            ? (
-                forecastKm /
-                target
-              ) *
-              100
-            : 0;
-
-
-        return {
-
-          branch:
-            car.branch,
-
-          carNo:
-            car.carNo,
-
-          plate:
-            car.plate,
-
-          vehicleType:
-            car.vehicleType,
-
-          km:
-            car.km,
-
-          target,
-
-          achievement,
-
-          workingDays,
-
-          avgKmDay,
-
-          workingDayRate,
-
-          remainingCalendarDays,
-
-          estimatedRemainingWorkingDays,
-
-          forecastKm,
-
-          forecastAchievement
-
-        };
-
-      }
-    )
-    .sort(
-      (a, b) => {
-
-        const branchCompare =
-          a.branch.localeCompare(
-            b.branch,
-            'th'
-          );
-
-
-        if (
-          branchCompare !== 0
-        ) {
-
-          return branchCompare;
-
-        }
-
-
-        return a.carNo.localeCompare(
-          b.carNo,
-          undefined,
-          {
-            numeric:
-              true
-          }
-        );
-
-      }
-    );
-
-
-  // ==========================================================
-  // DEBUG
-  // ==========================================================
-
-  console.log(
-    '========== CAR PERFORMANCE =========='
-  );
-
-  console.log(
-    'Trips loaded:',
-    tripData.length
-  );
-
-  console.log(
-    'Master Cars:',
-    masterCarData.length
-  );
-
-  console.log(
-    'Trips date filtered:',
-    dateFilteredTrips.length
-  );
-
-  console.log(
-    'Matched Trips:',
-    matchedTrips
-  );
-
-  console.log(
-    'Unmatched Trips:',
-    unmatchedTrips
-  );
-
-  console.log(
-    'COCO Cars:',
-    carPerformanceData.length
-  );
-
-  console.log(
-    'COCO Car Data:',
-    carPerformanceData
-  );
-
-  console.log(
-    '===================================='
-  );
-
-
-  // ==========================================================
-  // NO DATA
-  // ==========================================================
-
-  if (
-    !carPerformanceData.length
-  ) {
-
-    tbody.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="7"
-          class="empty-state"
-        >
-
-          ไม่พบข้อมูลรถ COCO
-
-        </td>
-
-      </tr>
-
-    `;
-
-    return;
-
-  }
-
-
-  // ==========================================================
-  // RENDER TABLE
-  // ==========================================================
-
-  tbody.innerHTML =
-    carPerformanceData
-      .map(
-        car => {
-
-          const achievement =
-            Number(
-              car.achievement
-            ) || 0;
-
-
-          const forecastAchievement =
-            Number(
-              car.forecastAchievement
-            ) || 0;
-
-
-          let statusClass =
-            'status-low';
-
-          let statusText =
-            'ต่ำกว่าเป้า';
-
-
-          if (
-            achievement >= 100
-          ) {
-
-            statusClass =
-              'status-high';
-
-            statusText =
-              'เกินเป้า';
-
-          } else if (
-            achievement >= 90
-          ) {
-
-            statusClass =
-              'status-ok';
-
-            statusText =
-              'ใกล้เป้า';
-
-          }
-
-
-          // --------------------------------------------------
-          // Forecast Status
-          // --------------------------------------------------
-
-          let forecastStatusClass =
-            'status-low';
-
-          let forecastStatusText =
-            'ต่ำกว่าเป้า';
-
-
-          if (
-            forecastAchievement >= 100
-          ) {
-
-            forecastStatusClass =
-              'status-high';
-
-            forecastStatusText =
-              'เกินเป้า';
-
-          } else if (
-            forecastAchievement >= 90
-          ) {
-
-            forecastStatusClass =
-              'status-ok';
-
-            forecastStatusText =
-              'ใกล้เป้า';
-
-          }
-
-
-          return `
-
-            <tr>
-
-              <td>
-                <strong>
-                  ${escapeHtml(
-                    car.carNo
-                  )}
-                </strong>
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  car.plate ||
-                  '-'
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  car.branch ||
-                  '-'
-                )}
-              </td>
-
-              <td>
-                ${formatNumber(
-                  car.km
-                )}
-              </td>
-
-              <td>
-                ${
-                  car.target > 0
-                    ? formatNumber(
-                        car.target
-                      )
-                    : '-'
-                }
-              </td>
-
-              <td>
-
-                ${
-                  car.target > 0
-                    ? `
-                      <strong>
-                        ${formatNumber(
-                          car.forecastKm
-                        )}
-                      </strong>
-                    `
-                    : '-'
-                }
-
-              </td>
-
-              <td>
-
-                ${
-                  car.target > 0
-                    ? `
-                      <span
-                        class="car-status ${forecastStatusClass}"
-                      >
-                        ${forecastAchievement.toFixed(1)}%
-                      </span>
-                    `
-                    : '-'
-                }
-
-              </td>
-
-              <td>
-
-                ${
-                  car.target > 0
-                    ? `
-                      <span
-                        class="car-status ${forecastStatusClass}"
-                      >
-                        ${forecastStatusText}
-                      </span>
-                    `
-                    : '-'
-                }
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      )
-      .join('');
-
-}
 
 
 // ============================================================
@@ -4354,9 +3503,11 @@ function showLoading() {
 
     'kmAchievement',
 
-    'forecastTotalKm',
+    'forecastCurrentKm',
 
-    'forecastKmCar',
+    'forecastKm',
+
+    'forecastTargetKm',
 
     'forecastAchievement'
 
@@ -4370,34 +3521,6 @@ function showLoading() {
         'กำลังโหลด...'
       )
   );
-
-
-  const tbody =
-    document.getElementById(
-      'carPerformanceBody'
-    );
-
-
-  if (tbody) {
-
-    tbody.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="7"
-          class="empty-state"
-        >
-
-          กำลังโหลดข้อมูล...
-
-        </td>
-
-      </tr>
-
-    `;
-
-  }
 
 }
 
