@@ -268,15 +268,11 @@
 
 
 <!-- ===================================================
-     KM PERFORMANCE + FORECAST (รวมเป็นเรื่องเดียวกัน)
-     เดิมแยกเป็น 2 section คนละกล่อง (Distance Performance /
-     KM Forecast) ซึ่งพูดเรื่องเดียวกันต่อเนื่องกัน — รวมไว้ใน
-     section เดียว ให้ไล่อ่านจากซ้ายไปขวา บนลงล่างเป็นเรื่อง
-     เดียวไม่ต้องเลื่อนจอไปเทียบ 2 กล่อง
-
-     element id เดิมทั้งหมดยังอยู่ครบ ไม่กระทบ app.js — ตัวที่
-     เนื้อหาซ้ำกับ achievement-box (distanceForecastKm,
-     distanceForecastAchievement) ถูกซ่อนด้วย CSS แทนการลบทิ้ง
+     KM PERFORMANCE + FORECAST — แถวเดียว 5 การ์ด
+     element id เดิมทั้งหมดยังอยู่ครบ ไม่กระทบ app.js —
+     kmAchievement / forecastAchievement ย้ายมาแสดงเป็น
+     "คิดเป็น X%" ใต้ตัวเลข Target KM / Forecast KM แทน
+     การ์ดแยกและ achievement-box เดิม
      =================================================== -->
 
 <section class="section">
@@ -289,16 +285,12 @@
         📍 Distance Performance &amp; Forecast
       </h2>
 
-      <p class="section-subtitle">
-        ผลการวิ่งเทียบเป้าหมาย พร้อมประมาณการเมื่อจบรอบ
-      </p>
-
     </div>
 
   </div>
 
 
-  <div class="kpi-grid">
+  <div class="kpi-grid cols-5">
 
     <!-- Total KM -->
 
@@ -366,123 +358,45 @@
     </div>
 
 
-    <!-- Achievement -->
+    <!-- Target KM -->
 
     <div class="kpi-card">
 
       <div class="card-title">
-        Achievement
+        Target KM
       </div>
 
       <div
         class="card-value"
-        id="kmAchievement"
+        id="forecastTargetKm"
       >
         -
       </div>
 
-      <div
-        class="card-status"
-        id="kmAchievementStatus"
-      >
-        -
+      <div class="card-status">
+        คิดเป็น <span id="kmAchievement">-</span>
       </div>
 
     </div>
 
-  </div>
 
+    <!-- Forecast KM -->
 
-  <!-- PERFORMANCE STATUS -->
+    <div class="kpi-card">
 
-  <div
-    class="performance-status"
-    id="performanceStatus"
-  >
-
-    <strong>
-      Performance
-    </strong>
-
-    <span
-      class="status"
-      id="performanceStatusBadge"
-    >
-      -
-    </span>
-
-  </div>
-
-
-  <!-- ตัวเลขซ้ำกับ achievement-box ด้านล่าง — คง id ไว้ให้ app.js
-       เขียนค่าได้ตามปกติ แต่ซ่อนไม่ให้แสดงซ้ำ -->
-
-  <div
-    class="meta"
-    style="display: none;"
-  >
-
-    <span class="meta-item">
-      Forecast KM:
-      <strong id="distanceForecastKm">
-        -
-      </strong>
-    </span>
-
-    <span class="meta-item">
-      Forecast Achievement:
-      <strong id="distanceForecastAchievement">
-        -
-      </strong>
-    </span>
-
-  </div>
-
-
-  <!-- FORECAST (achievement-box: main = ตัวเลขเด่น, side = รายละเอียดย่อย) -->
-
-  <div
-    class="achievement-box"
-    style="margin-top: 14px; border-top: 1px solid var(--border);"
-  >
-
-    <div>
-
-      <div class="achievement-main-label">
-        🔮 Forecast Achievement เมื่อจบรอบ
+      <div class="card-title">
+        Forecast KM
       </div>
 
       <div
-        class="achievement-main-value"
-        id="forecastAchievement"
+        class="card-value"
+        id="forecastKm"
       >
         -
       </div>
 
-      <div
-        class="achievement-main-note"
-        id="forecastNote"
-      >
-        -
-      </div>
-
-    </div>
-
-    <div class="achievement-side">
-
-      <div class="achievement-side-item">
-        <span>KM ปัจจุบัน</span>
-        <strong id="forecastCurrentKm">-</strong>
-      </div>
-
-      <div class="achievement-side-item">
-        <span>Forecast KM</span>
-        <strong id="forecastKm">-</strong>
-      </div>
-
-      <div class="achievement-side-item">
-        <span>Target KM</span>
-        <strong id="forecastTargetKm">-</strong>
+      <div class="card-status">
+        คิดเป็น <span id="forecastAchievement">-</span>
       </div>
 
     </div>
