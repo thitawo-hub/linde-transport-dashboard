@@ -2963,6 +2963,13 @@ function updateCarPerformance(
               </td>
 
               <td>
+                ${escapeHtml(
+                  car.branch ||
+                  '-'
+                )}
+              </td>
+
+              <td>
                 ${formatNumber(
                   car.km
                 )}
