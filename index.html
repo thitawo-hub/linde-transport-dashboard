@@ -1,78 +1,71 @@
 <!DOCTYPE html>
+
 <html lang="th">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LINDE TRANSPORT OVERVIEW</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
-
 
   <!-- =====================================================
        HEADER
        ===================================================== -->
 
-  <header class="header">
-
+  <header>
     <div class="header-content">
 
-      <div>
+```
+  <div class="header-brand">
 
-        <h1>
-          LINDE TRANSPORT OVERVIEW
-        </h1>
-
-        <p>
-          Transport Performance & Operational Monitoring
-        </p>
-
-      </div>
-
-
-      <!-- =================================================
-           PAGE NAVIGATION
-           ================================================= -->
-
-      <nav class="page-nav">
-
-        <a
-          href="index.html"
-          class="active"
-        >
-          📊 ภาพรวม
-        </a>
-
-        <a
-          href="daily-report.html"
-        >
-          📅 รายงานประจำวัน
-        </a>
-
-        <a
-          href="kpi-distance.html"
-        >
-          📍 KPI ระยะทาง
-        </a>
-
-      </nav>
-
+    <div class="brand-mark">
+      LT
     </div>
 
+    <div class="brand-text">
+      <h1 class="brand-title">
+        LINDE TRANSPORT
+      </h1>
+
+      <p class="brand-subtitle">
+        Transport Performance &amp; Operational Monitoring
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="page-nav">
+
+    <a href="index.html" class="active">
+      📊 ภาพรวม
+    </a>
+
+    <a href="daily-report.html">
+      📅 รายงานประจำวัน
+    </a>
+
+    <a href="kpi-distance.html">
+      📍 KPI ระยะทาง
+    </a>
+
+  </nav>
+
+</div>
+```
+
   </header>
-
-
 
   <!-- =====================================================
        MAIN
@@ -80,654 +73,650 @@
 
   <main class="container">
 
+```
+<!-- PAGE TITLE -->
 
-    <!-- ===================================================
-         FILTER
-         =================================================== -->
+<div class="page-title">
 
-    <section class="filters">
+  <h1>
+    ภาพรวมการขนส่ง
+  </h1>
 
-      <div>
+  <p>
+    Transport Performance &amp; Operational Monitoring
+  </p>
 
-        <label for="startDate">
-          วันที่เริ่ม
-        </label>
+</div>
 
-        <input
-          type="date"
-          id="startDate"
-        >
 
-      </div>
+<!-- ===================================================
+     FILTER
+     =================================================== -->
 
+<section class="filters">
 
-      <div>
+  <div class="filter-group">
 
-        <label for="endDate">
-          วันที่สิ้นสุด
-        </label>
+    <label for="startDate">
+      วันที่เริ่มต้น
+    </label>
 
-        <input
-          type="date"
-          id="endDate"
-        >
-
-      </div>
-
-
-      <div>
-
-        <label for="branchFilter">
-          สาขา
-        </label>
-
-        <select id="branchFilter">
-
-          <option value="">
-            ทุกสาขา
-          </option>
-
-        </select>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         MASTER KPI
-         =================================================== -->
-
-    <section>
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            ภาพรวมทรัพยากร
-          </h2>
-
-          <p class="section-subtitle">
-            จำนวนรถ พขร. และเป้าหมายการดำเนินงาน
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="cards">
-
-
-        <!-- รถ COCO -->
-
-        <div class="card">
-
-          <div class="card-title">
-            🚚 รถ COCO
-          </div>
-
-          <div
-            class="card-value"
-            id="cocoCars"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- พขร. -->
-
-        <div class="card">
-
-          <div class="card-title">
-            👨‍✈️ พขร.
-          </div>
-
-          <div
-            class="card-value"
-            id="cocoDrivers"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- Driver Ratio -->
-
-        <div class="card">
-
-          <div class="card-title">
-            📊 Driver Ratio
-          </div>
-
-          <div
-            class="card-value"
-            id="driverRatio"
-          >
-            -
-          </div>
-
-          <div
-            class="card-status"
-            id="driverRatioDetail"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- Target -->
-
-        <div class="card">
-
-          <div class="card-title">
-            🎯 Target KM/คัน/เดือน
-          </div>
-
-          <div
-            class="card-value"
-            id="targetKm"
-          >
-            -
-          </div>
-
-        </div>
-
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         KM KPI
-         =================================================== -->
-
-    <section>
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            ระยะทางการวิ่งงาน
-          </h2>
-
-          <p class="section-subtitle">
-            สรุปผลการวิ่งงานในช่วงวันที่ที่เลือก
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="cards">
-
-
-        <!-- Total KM -->
-
-        <div class="card">
-
-          <div class="card-title">
-            🚚 KM วิ่งงานสะสม
-          </div>
-
-          <div
-            class="card-value"
-            id="totalKm"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- Average / Day -->
-
-        <div class="card">
-
-          <div class="card-title">
-            📅 KM เฉลี่ย/วัน
-          </div>
-
-          <div
-            class="card-value"
-            id="avgKmDay"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- KM / Car -->
-
-        <div class="card">
-
-          <div class="card-title">
-            🚛 KM/คัน
-          </div>
-
-          <div
-            class="card-value"
-            id="avgKmCar"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- Achievement -->
-
-        <div class="card">
-
-          <div class="card-title">
-            🎯 Achievement
-          </div>
-
-          <div
-            class="card-value"
-            id="kmAchievement"
-          >
-            -
-          </div>
-
-          <div
-            class="card-status"
-            id="kmAchievementStatus"
-          >
-            -
-          </div>
-
-        </div>
-
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         PERFORMANCE STATUS
-         =================================================== -->
-
-    <section
-      class="performance-status"
-      id="performanceStatus"
+    <input
+      type="date"
+      id="startDate"
     >
 
-      <div class="performance-status-main">
+  </div>
 
-        <span class="status-label">
-          สถานะการวิ่งงาน
-        </span>
 
-        <strong id="performanceStatusText">
-          -
-        </strong>
+  <div class="filter-group">
 
-        <p id="performanceStatusDetail">
-          -
-        </p>
+    <label for="endDate">
+      วันที่สิ้นสุด
+    </label>
 
+    <input
+      type="date"
+      id="endDate"
+    >
+
+  </div>
+
+
+  <div class="filter-group">
+
+    <label for="branchFilter">
+      สาขา
+    </label>
+
+    <select id="branchFilter">
+      <option value="ทั้งหมด">
+        ทั้งหมด
+      </option>
+    </select>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     MASTER KPI
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        👥 Fleet &amp; Driver Overview
+      </h2>
+
+      <p class="section-subtitle">
+        จำนวนรถและ พขร. จากข้อมูล Master
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="kpi-grid">
+
+    <!-- รถ COCO -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        🚛 รถ COCO
       </div>
-
-
-      <div class="performance-status-achievement">
-
-        <span>
-          Forecast Achievement
-        </span>
-
-        <strong id="performanceStatusAchievement">
-          -
-        </strong>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         FORECAST
-         =================================================== -->
-
-    <section class="section forecast-section">
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            🔮 ประมาณการเมื่อจบรอบบิล
-          </h2>
-
-          <p class="section-subtitle">
-            ประมาณการผลการวิ่งงานเมื่อสิ้นสุดรอบวันที่ 26–25
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="forecast-grid">
-
-
-        <!-- Forecast Total -->
-
-        <div class="forecast-item">
-
-          <div class="forecast-label">
-            KM รวมประมาณการ
-          </div>
-
-          <div
-            class="forecast-value"
-            id="forecastTotalKm"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- Forecast / Car -->
-
-        <div class="forecast-item">
-
-          <div class="forecast-label">
-            KM/คันประมาณการ
-          </div>
-
-          <div
-            class="forecast-value"
-            id="forecastKmCar"
-          >
-            -
-          </div>
-
-        </div>
-
-
-        <!-- Forecast Achievement -->
-
-        <div class="forecast-item">
-
-          <div class="forecast-label">
-            🔮 Forecast Achievement
-          </div>
-
-          <div
-            class="forecast-value"
-            id="forecastAchievement"
-          >
-            -
-          </div>
-
-          <div
-            class="card-status"
-            id="forecastAchievementStatus"
-          >
-            -
-          </div>
-
-        </div>
-
-
-      </div>
-
 
       <div
-        class="forecast-note"
-        id="forecastNote"
+        class="card-value"
+        id="cocoCars"
       >
+        -
       </div>
 
-
-    </section>
-
-
-
-    <!-- ===================================================
-         KM PERFORMANCE
-         =================================================== -->
-
-    <section class="section">
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            📈 KM Performance
-          </h2>
-
-          <p class="section-subtitle">
-            Actual vs Target และแนวโน้มประมาณการ รอบวันที่ 26–25
-          </p>
-
-        </div>
-
+      <div class="card-status">
+        จาก Master Car
       </div>
 
-
-      <div class="chart-summary">
-
-
-        <!-- Actual -->
-
-        <div class="chart-summary-card actual">
-
-          <span>
-            Actual KM
-          </span>
-
-          <strong id="chartActualKm">
-            -
-          </strong>
-
-          <small>
-            KM ที่วิ่งแล้ว
-          </small>
-
-        </div>
+    </div>
 
 
-        <!-- Target -->
+    <!-- พขร. -->
 
-        <div class="chart-summary-card target">
+    <div class="kpi-card">
 
-          <span>
-            Target KM
-          </span>
-
-          <strong id="chartTargetKm">
-            -
-          </strong>
-
-          <small>
-            เป้าหมายทั้งรอบ
-          </small>
-
-        </div>
-
-
-        <!-- Forecast -->
-
-        <div class="chart-summary-card forecast">
-
-          <span>
-            Forecast KM
-          </span>
-
-          <strong id="chartForecastKm">
-            -
-          </strong>
-
-          <small>
-            ประมาณการสิ้นรอบ
-          </small>
-
-        </div>
-
-
+      <div class="card-title">
+        👨‍✈️ พขร.
       </div>
 
-
-      <div class="chart-wrapper">
-
-        <canvas id="kmChart"></canvas>
-
+      <div
+        class="card-value"
+        id="cocoDrivers"
+      >
+        -
       </div>
 
-    </section>
-
-
-
-    <!-- ===================================================
-         CUMULATIVE KM
-         =================================================== -->
-
-    <section class="section">
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            📊 Cumulative KM Performance
-          </h2>
-
-          <p class="section-subtitle">
-            KM สะสมจริงเทียบกับเป้าหมายตลอดรอบ 26–25
-          </p>
-
-        </div>
-
+      <div class="card-status">
+        จาก Master Person
       </div>
 
+    </div>
 
-      <div class="chart-wrapper">
 
-        <canvas id="kmCumulativeChart"></canvas>
+    <!-- Driver Ratio -->
 
+    <div class="kpi-card primary">
+
+      <div class="card-title">
+        📊 Driver Ratio
       </div>
 
-    </section>
-
-
-
-    <!-- ===================================================
-         KM PERFORMANCE BY CAR
-         =================================================== -->
-
-    <section class="section">
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            🚛 KM Performance by Car
-          </h2>
-
-          <p class="section-subtitle">
-            KM สะสมแยกรถ เทียบกับ Target ของแต่ละสาขา
-          </p>
-
-        </div>
-
+      <div
+        class="card-value"
+        id="driverRatio"
+      >
+        -
       </div>
 
-
-      <div class="car-performance-wrapper">
-
-        <table class="car-performance-table">
-
-          <thead>
-
-            <tr>
-
-              <th>
-                รถ
-              </th>
-
-              <th>
-                ทะเบียน
-              </th>
-
-              <th>
-                KM สะสม
-              </th>
-
-              <th>
-                Target
-              </th>
-
-              <th>
-                🔮 KM คาดการณ์
-              </th>
-
-              <th>
-                Forecast Achievement
-              </th>
-
-              <th>
-                สถานะ
-              </th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody id="carPerformanceBody">
-
-            <tr>
-
-              <td
-                colspan="7"
-                class="empty-state"
-              >
-                กำลังโหลดข้อมูล...
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
+      <div
+        class="card-status"
+        id="driverRatioDetail"
+      >
+        -
       </div>
 
-    </section>
+    </div>
 
+
+    <!-- Target KM -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        🎯 Target KM / รถ
+      </div>
+
+      <div
+        class="card-value"
+        id="targetKm"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        KM / คัน / เดือน
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     KM KPI
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        📍 Distance Performance
+      </h2>
+
+      <p class="section-subtitle">
+        ผลการวิ่งระยะทางของรถ COCO
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="kpi-grid">
+
+    <!-- Total KM -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        KM สะสม
+      </div>
+
+      <div
+        class="card-value"
+        id="totalKm"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        ระยะทางรวม
+      </div>
+
+    </div>
+
+
+    <!-- Average / Day -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        KM / วัน
+      </div>
+
+      <div
+        class="card-value"
+        id="avgKmDay"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        ค่าเฉลี่ยต่อวัน
+      </div>
+
+    </div>
+
+
+    <!-- Average / Car -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        KM / รถ
+      </div>
+
+      <div
+        class="card-value"
+        id="avgKmCar"
+      >
+        -
+      </div>
+
+      <div class="card-status">
+        ค่าเฉลี่ยต่อคัน
+      </div>
+
+    </div>
+
+
+    <!-- Achievement -->
+
+    <div class="kpi-card">
+
+      <div class="card-title">
+        Achievement
+      </div>
+
+      <div
+        class="card-value"
+        id="kmAchievement"
+      >
+        -
+      </div>
+
+      <div
+        class="card-status"
+        id="kmAchievementStatus"
+      >
+        -
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- PERFORMANCE STATUS -->
+
+  <div
+    class="performance-status"
+    id="performanceStatus"
+  >
+
+    <strong>
+      Performance
+    </strong>
+
+    <span
+      class="status"
+      id="performanceStatusBadge"
+    >
+      -
+    </span>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     FORECAST
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        🔮 KM Forecast
+      </h2>
+
+      <p class="section-subtitle">
+        ประมาณการผลการวิ่งเมื่อจบรอบปัจจุบัน
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="forecast">
+
+    <div class="forecast-item">
+
+      <div class="forecast-label">
+        KM ปัจจุบัน
+      </div>
+
+      <div
+        class="forecast-value"
+        id="forecastCurrentKm"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <div class="forecast-item">
+
+      <div class="forecast-label">
+        Forecast KM
+      </div>
+
+      <div
+        class="forecast-value"
+        id="forecastKm"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <div class="forecast-item">
+
+      <div class="forecast-label">
+        Target KM
+      </div>
+
+      <div
+        class="forecast-value"
+        id="forecastTargetKm"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <div class="forecast-item">
+
+      <div class="forecast-label">
+        Forecast Achievement
+      </div>
+
+      <div
+        class="forecast-value"
+        id="forecastAchievement"
+      >
+        -
+      </div>
+
+    </div>
+
+  </div>
+
+  <div
+    class="card-status"
+    id="forecastNote"
+    style="margin-top: 12px;"
+  >
+    -
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     DAILY KM CHART
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        📈 KM รายวัน
+      </h2>
+
+      <p class="section-subtitle">
+        แนวโน้มระยะทางตามวันที่
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="chart-summary">
+
+    <div class="chart-summary-item">
+
+      <div class="chart-summary-label">
+        KM รวม
+      </div>
+
+      <div
+        class="chart-summary-value"
+        id="chartTotalKm"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <div class="chart-summary-item">
+
+      <div class="chart-summary-label">
+        ค่าเฉลี่ย / วัน
+      </div>
+
+      <div
+        class="chart-summary-value"
+        id="chartAvgKm"
+      >
+        -
+      </div>
+
+    </div>
+
+
+    <div class="chart-summary-item">
+
+      <div class="chart-summary-label">
+        วันที่วิ่ง
+      </div>
+
+      <div
+        class="chart-summary-value"
+        id="chartRunningDays"
+      >
+        -
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="chart-wrapper">
+
+    <canvas id="kmChart"></canvas>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     CUMULATIVE KM
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        📊 KM สะสมตามรอบ
+      </h2>
+
+      <p class="section-subtitle">
+        แนวโน้ม KM สะสมตลอดช่วงที่เลือก
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="chart-wrapper">
+
+    <canvas id="kmCumulativeChart"></canvas>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     CAR PERFORMANCE
+     =================================================== -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+
+      <h2>
+        🚛 Performance รายคัน
+      </h2>
+
+      <p class="section-subtitle">
+        เปรียบเทียบผลการวิ่งของรถแต่ละคัน
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrapper">
+
+    <table class="data-table car-performance-table">
+
+      <thead>
+
+        <tr>
+
+          <th>
+            เบอร์รถ
+          </th>
+
+          <th>
+            ทะเบียน
+          </th>
+
+          <th>
+            สาขา
+          </th>
+
+          <th class="number">
+            KM สะสม
+          </th>
+
+          <th class="number">
+            Target
+          </th>
+
+          <th class="number">
+            Achievement
+          </th>
+
+          <th class="center">
+            สถานะ
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="carPerformanceBody">
+
+        <tr>
+
+          <td
+            colspan="7"
+            class="text-center text-muted"
+          >
+            กำลังโหลดข้อมูล...
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+```
 
   </main>
 
-
-
   <!-- =====================================================
-       SCRIPTS
+       LIBRARIES
        ===================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- =====================================================
+       APPLICATION
+       ===================================================== -->
+
   <script src="app.js"></script>
 
-
 </body>
-
 </html>
