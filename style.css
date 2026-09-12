@@ -21,7 +21,6 @@
   --text-400: #93a19a;
 
   /* ---------- Surface ---------- */
-  /* พื้นหลังโทนครีมอมเขียวอ่อนๆ แบบภาพตัวอย่าง แทนเทาเรียบ */
   --bg:       #f4f7f2;
   --surface:  #ffffff;
   --surface-2:#f8faf6;
@@ -47,9 +46,6 @@
   --neutral:       #626d67;
   --neutral-bg:    #eef1ef;
 
-  /* ---------- Pill palette (จำกัดแค่เฉดเขียว 3 ระดับ) ----------
-     ใช้กับ KPI แบบ pill สีทึบ ให้ความรู้สึกสดใสแบบภาพตัวอย่าง
-     แต่ไม่แตกสีออกไปนอกโทนเขียวของแบรนด์ */
   --pill-1-bg: linear-gradient(135deg, var(--brand-800), var(--brand-900));
   --pill-1-fg: #ffffff;
   --pill-1-sub: rgba(255, 255, 255, 0.72);
@@ -62,8 +58,6 @@
   --pill-3-fg: var(--brand-900);
   --pill-3-sub: rgba(14, 72, 53, 0.62);
 
-  /* ---------- Shadow ---------- */
-  /* เงานุ่ม ฟุ้งกว้าง แบบการ์ดลอยตัวในภาพตัวอย่าง */
   --shadow-xs:
     0 1px 2px rgba(20, 45, 34, 0.04);
 
@@ -75,14 +69,10 @@
     0 4px 10px rgba(20, 45, 34, 0.05),
     0 18px 44px rgba(20, 45, 34, 0.09);
 
-  /* ---------- Radius ---------- */
-  /* โค้งมนขึ้นชัดเจนตามภาพตัวอย่าง ให้ความรู้สึกนุ่มนวล เป็นมิตร
-     มากกว่าเครื่องมือ ERP แบบเหลี่ยม */
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 22px;
 
-  /* ---------- Spacing ---------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -91,2755 +81,451 @@
   --space-6: 24px;
   --space-7: 32px;
 
-  /* ---------- Layout ---------- */
   --content-width: 1920px;
 
-  /* ---------- Typography ---------- */
-  --font-body:
-    "IBM Plex Sans Thai",
-    "Noto Sans Thai",
-    "Sarabun",
-    Arial,
-    sans-serif;
-
-  --font-mono:
-    "IBM Plex Mono",
-    "Roboto Mono",
-    ui-monospace,
-    monospace;
+  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", "Sarabun", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", "Roboto Mono", ui-monospace, monospace;
 }
 
-
-/* ============================================================
-   02. RESET
-   ============================================================ */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-}
-
+*, *::before, *::after { box-sizing: border-box; }
+html { margin: 0; padding: 0; min-height: 100%; }
 body {
-  margin: 0;
-  padding: 0;
-
-  min-height: 100vh;
-
-  background: var(--bg);
-  color: var(--text-900);
-
-  font-family: var(--font-body);
-
-  font-size: 14px;
-  line-height: 1.5;
-
+  margin: 0; padding: 0; min-height: 100vh;
+  background: var(--bg); color: var(--text-900);
+  font-family: var(--font-body); font-size: 14px; line-height: 1.5;
   font-feature-settings: "tnum" 1, "lnum" 1;
   font-variant-numeric: tabular-nums lining-nums;
-
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-table {
-  border-collapse: collapse;
-}
-
-img {
-  max-width: 100%;
-}
-
-:focus-visible {
-  outline: 2px solid var(--brand-500);
-  outline-offset: 2px;
-}
-
-
-/* ============================================================
-   03. GLOBAL HEADER
-   ============================================================ */
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+table { border-collapse: collapse; }
+img { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
 
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-
-  width: 100%;
-
+  position: sticky; top: 0; z-index: 100; width: 100%;
   background: rgba(255, 255, 255, 0.97);
-
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-xs);
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-
 .header::after {
-  content: "";
-  display: block;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    var(--brand-700) 0%,
-    var(--brand-500) 45%,
-    transparent 100%
-  );
+  content: ""; display: block; height: 2px;
+  background: linear-gradient(90deg, var(--brand-700) 0%, var(--brand-500) 45%, transparent 100%);
 }
-
-
-/* ---------- Header inner ---------- */
-
 .header-content {
-  width: min(
-    calc(100% - 36px),
-    var(--content-width)
-  );
-
-  min-height: 66px;
-
-  margin: 0 auto;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 24px;
+  width: min(calc(100% - 36px), var(--content-width));
+  min-height: 66px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
-
-
-/* ---------- Brand ---------- */
-/* โครงสร้างจริงบนเว็บ: .header-brand > .brand-mark (โลโก้ตัวย่อ)
-   + .brand-text > .brand-title / .brand-subtitle */
-
-.header-brand {
-  min-width: 0;
-
-  display: flex;
-  align-items: center;
-
-  gap: 12px;
-}
-
+.header-brand { min-width: 0; display: flex; align-items: center; gap: 12px; }
 .brand-mark {
-  flex: 0 0 auto;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 40px;
-  height: 40px;
-
-  background: linear-gradient(
-    135deg,
-    var(--brand-600),
-    var(--brand-800)
-  );
-
-  border-radius: var(--radius-md);
-
-  color: #ffffff;
-
-  font-size: 13px;
-  font-weight: 800;
-
-  letter-spacing: 0.02em;
-
-  box-shadow: var(--shadow-sm);
+  flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--brand-600), var(--brand-800));
+  border-radius: var(--radius-md); color: #ffffff; font-size: 13px; font-weight: 800;
+  letter-spacing: 0.02em; box-shadow: var(--shadow-sm);
 }
-
-.brand-text {
-  min-width: 0;
-}
-
-.brand-title {
-  margin: 0;
-
-  color: var(--text-950);
-
-  font-size: 18px;
-  font-weight: 700;
-
-  letter-spacing: -0.01em;
-}
-
-.brand-subtitle {
-  margin-top: 1px;
-
-  color: var(--text-500);
-
-  font-size: 11px;
-}
-
-.header-brand .eyebrow,
-.eyebrow {
-  margin-bottom: 2px;
-
-  color: var(--brand-700);
-
-  font-size: 10px;
-  font-weight: 700;
-
-  letter-spacing: 0.08em;
-}
-
-.header-brand .title,
-.title {
-  margin: 0;
-
-  color: var(--text-950);
-
-  font-size: 18px;
-  font-weight: 700;
-
-  letter-spacing: -0.01em;
-}
-
-.header-brand .subtitle,
-.subtitle {
-  margin-top: 1px;
-
-  color: var(--text-500);
-
-  font-size: 11px;
-}
-
-
-/* ============================================================
-   04. LEGACY TOPBAR SUPPORT
-   ============================================================ */
+.brand-text { min-width: 0; }
+.brand-title { margin: 0; color: var(--text-950); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.brand-subtitle { margin-top: 1px; color: var(--text-500); font-size: 11px; }
+.header-brand .eyebrow, .eyebrow { margin-bottom: 2px; color: var(--brand-700); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; }
+.header-brand .title, .title { margin: 0; color: var(--text-950); font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.header-brand .subtitle, .subtitle { margin-top: 1px; color: var(--text-500); font-size: 11px; }
 
 .topbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  position: sticky; top: 0; z-index: 100; min-height: 62px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 0 24px; background: #ffffff; border-bottom: 1px solid var(--border); box-shadow: var(--shadow-xs);
+}
+.topbar .brand { color: var(--text-950); font-size: 15px; font-weight: 700; letter-spacing: 0.01em; }
+.topbar-inner { width: min(calc(100% - 36px), var(--content-width)); min-height: 62px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 
-  min-height: 62px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 24px;
-
-  padding: 0 24px;
-
-  background: #ffffff;
-
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-xs);
+.nav, .page-nav, .topbar-actions { display: flex; align-items: center; gap: 4px; }
+.nav button, .page-nav a, .navlink, .back-link {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent;
+  color: var(--text-600); font-size: 12px; font-weight: 600;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.nav button:hover, .page-nav a:hover, .navlink:hover, .back-link:hover { background: var(--surface-3); color: var(--brand-800); }
+.nav button.active, .page-nav a.active, .navlink.active { background: var(--brand-800); color: #ffffff; }
+.nav button.active::after, .page-nav a.active::after, .navlink.active::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: transparent; border-radius: 2px;
 }
 
-.topbar .brand {
-  color: var(--text-950);
+.container, .wrap { width: min(calc(100% - 36px), var(--content-width)); margin: 0 auto; padding-top: 18px; padding-bottom: 22px; }
 
-  font-size: 15px;
-  font-weight: 700;
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
+.page-header h1 { margin: 0; color: var(--text-950); font-size: 22px; font-weight: 700; letter-spacing: -0.015em; }
+.page-header p { margin: 3px 0 0; color: var(--text-500); font-size: 12px; }
+.page-title { margin: 0 0 3px; color: var(--text-950); font-size: 22px; font-weight: 700; letter-spacing: -0.015em; }
+.page-title h1 { margin: 0 0 3px; color: var(--text-950); font-size: 22px; font-weight: 700; letter-spacing: -0.015em; }
+.page-title p { margin: 0; color: var(--text-500); font-size: 12px; }
 
-  letter-spacing: 0.01em;
+.filters, .filter-bar {
+  display: flex; align-items: flex-end; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+  padding: 12px 14px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
 }
-
-.topbar-inner {
-  width: min(
-    calc(100% - 36px),
-    var(--content-width)
-  );
-
-  min-height: 62px;
-
-  margin: auto;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 24px;
+.filters > div, .filter-item, .filter-group { min-width: 145px; }
+.filters label, .filter-item label, .filter-group label {
+  display: block; margin-bottom: 5px; color: var(--text-600); font-size: 10px; font-weight: 700; letter-spacing: 0.01em;
 }
-
-
-/* ============================================================
-   05. NAVIGATION
-   ============================================================ */
-
-.nav,
-.page-nav,
-.topbar-actions {
-  display: flex;
-  align-items: center;
-
-  gap: 4px;
+.filters input, .filters select, .filter-bar input, .filter-bar select {
+  width: 100%; height: 34px; padding: 0 12px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 999px; color: var(--text-800); font-size: 12px;
+  outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-
-.nav button,
-.page-nav a,
-.navlink,
-.back-link {
-
-  position: relative;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 36px;
-
-  padding: 0 14px;
-
-  border: 0;
-  border-radius: 999px;
-
-  background: transparent;
-
-  color: var(--text-600);
-
-  font-size: 12px;
-  font-weight: 600;
-
-  transition:
-    background 0.16s ease,
-    color 0.16s ease;
+.filters input:focus, .filters select:focus, .filter-bar input:focus, .filter-bar select:focus {
+  border-color: var(--brand-500); box-shadow: 0 0 0 3px rgba(19, 92, 65, 0.10);
 }
-
-.nav button:hover,
-.page-nav a:hover,
-.navlink:hover,
-.back-link:hover {
-
-  background: var(--surface-3);
-  color: var(--brand-800);
-}
-
-.nav button.active,
-.page-nav a.active,
-.navlink.active {
-
-  background: var(--brand-800);
-  color: #ffffff;
-}
-
-/* pill แบบ tab จึงไม่ต้องมีขีดเส้นใต้ซ้ำซ้อน — ปิดเส้นใต้เดิม
-   ของ active state (ยังคง rule ไว้ แค่ปรับให้โปร่งใส) */
-.nav button.active::after,
-.page-nav a.active::after,
-.navlink.active::after {
-
-  content: "";
-
-  position: absolute;
-
-  left: 12px;
-  right: 12px;
-  bottom: 0;
-
-  height: 2px;
-
-  background: transparent;
-
-  border-radius: 2px;
-}
-
-
-/* ============================================================
-   06. MAIN CONTAINER
-   ============================================================ */
-
-.container,
-.wrap {
-
-  width: min(
-    calc(100% - 36px),
-    var(--content-width)
-  );
-
-  margin: 0 auto;
-
-  padding-top: 18px;
-  padding-bottom: 22px;
-}
-
-
-/* ============================================================
-   07. PAGE HEADER
-   ============================================================ */
-
-.page-header {
-
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  margin-bottom: 14px;
-}
-
-.page-header h1 {
-
-  margin: 0;
-
-  color: var(--text-950);
-
-  font-size: 22px;
-  font-weight: 700;
-
-  letter-spacing: -0.015em;
-}
-
-.page-header p {
-
-  margin: 3px 0 0;
-
-  color: var(--text-500);
-
-  font-size: 12px;
-}
-
-.page-title {
-
-  margin: 0 0 3px;
-
-  color: var(--text-950);
-
-  font-size: 22px;
-  font-weight: 700;
-
-  letter-spacing: -0.015em;
-}
-
-/* โครงสร้างจริง: .page-title เป็น <div> ครอบ <h1>/<p> ข้างใน
-   ไม่ใช่ class ที่แปะตรง <h1> จึงต้องเจาะจงลูกด้วย */
-
-.page-title h1 {
-
-  margin: 0 0 3px;
-
-  color: var(--text-950);
-
-  font-size: 22px;
-  font-weight: 700;
-
-  letter-spacing: -0.015em;
-}
-
-.page-title p {
-
-  margin: 0;
-
-  color: var(--text-500);
-
-  font-size: 12px;
-}
-
-
-/* ============================================================
-   08. FILTER BAR
-   ============================================================ */
-
-.filters,
-.filter-bar {
-
-  display: flex;
-  align-items: flex-end;
-
-  flex-wrap: wrap;
-
-  gap: 10px;
-
-  margin-bottom: 14px;
-
-  padding: 12px 14px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.filters > div,
-.filter-item,
-.filter-group {
-
-  min-width: 145px;
-}
-
-.filters label,
-.filter-item label,
-.filter-group label {
-
-  display: block;
-
-  margin-bottom: 5px;
-
-  color: var(--text-600);
-
-  font-size: 10px;
-  font-weight: 700;
-
-  letter-spacing: 0.01em;
-}
-
-.filters input,
-.filters select,
-.filter-bar input,
-.filter-bar select {
-
-  width: 100%;
-
-  height: 34px;
-
-  padding: 0 12px;
-
-  background: var(--surface-2);
-
-  border: 1px solid var(--border);
-  border-radius: 999px;
-
-  color: var(--text-800);
-
-  font-size: 12px;
-
-  outline: none;
-
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.filters input:focus,
-.filters select:focus,
-.filter-bar input:focus,
-.filter-bar select:focus {
-
-  border-color: var(--brand-500);
-
-  box-shadow:
-    0 0 0 3px
-    rgba(19, 92, 65, 0.10);
-}
-
-
-/* ---------- Cycle ---------- */
-
 .filter-cycle-text {
-
-  display: flex;
-  align-items: center;
-
-  min-height: 34px;
-
-  padding: 0 12px;
-
-  background: var(--surface-3);
-
-  border: 1px solid var(--border);
-  border-radius: 999px;
-
-  color: var(--text-700);
-
-  font-size: 11px;
-  font-weight: 600;
+  display: flex; align-items: center; min-height: 34px; padding: 0 12px; background: var(--surface-3);
+  border: 1px solid var(--border); border-radius: 999px; color: var(--text-700); font-size: 11px; font-weight: 600;
 }
 
+.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+/* .cards (used by daily-report.html) uses auto-fit instead of a fixed 4
+   columns, since its rows hold different counts (3, 4, then 7 cards) —
+   this way every row's cards stretch evenly to fill the width instead of
+   leaving a short, uneven last row. */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.kpi-grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.kpi-grid.cols-5 .card-value { font-size: 21px; }
+@media (max-width: 1300px) { .kpi-grid.cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .kpi-grid.cols-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-/* ============================================================
-   09. KPI CARDS
-   ============================================================ */
-
-.kpi-grid,
-.cards {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  gap: 12px;
-
-  margin-bottom: 14px;
+.kpi, .kpi-card {
+  position: relative; min-width: 0; padding: 15px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  overflow: hidden; transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
-
-/* ---------- .kpi-grid.cols-5 ----------
-   สำหรับแถวที่ต้องการ 5 การ์ดในบรรทัดเดียว (เช่น Distance
-   Performance & Forecast) — ตัวเลขแคบกว่าปกติ จึงลดขนาด
-   card-value ลงเล็กน้อยเพื่อไม่ให้ตัวเลขหลักหมื่น/แสนตัดบรรทัด */
-
-.kpi-grid.cols-5 {
-
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
+.kpi:hover, .kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.kpi::before, .kpi-card::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--brand-500), var(--brand-700));
 }
+.kpi-title, .kpi-label { margin-bottom: 6px; color: var(--text-500); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+.kpi-value { color: var(--text-950); font-size: 26px; line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.kpi-sub { margin-top: 6px; color: var(--text-400); font-size: 10.5px; }
 
-.kpi-grid.cols-5 .card-value {
+.card-title { margin-bottom: 6px; color: var(--text-500); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+.card-value { color: var(--text-950); font-size: 26px; line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.card-status { margin-top: 6px; color: var(--text-400); font-size: 10.5px; }
+.card-breakdown { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; color: var(--text-500); font-size: 10.5px; }
+.card-breakdown strong { margin-left: 4px; color: var(--text-800); font-weight: 700; font-variant-numeric: tabular-nums; }
 
-  font-size: 21px;
+.kpi-card.primary, .kpi.primary {
+  background: linear-gradient(135deg, var(--brand-700), var(--brand-900)); border-color: transparent;
 }
-
-@media (max-width: 1300px) {
-
-  .kpi-grid.cols-5 {
-
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 700px) {
-
-  .kpi-grid.cols-5 {
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-}
-
-.kpi,
-.kpi-card {
-
-  position: relative;
-
-  min-width: 0;
-
-  padding: 15px 16px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-
-  overflow: hidden;
-
-  transition: box-shadow 0.18s ease, transform 0.18s ease;
-}
-
-.kpi:hover,
-.kpi-card:hover {
-
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.kpi::before,
-.kpi-card::before {
-
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  top: 0;
-  bottom: 0;
-
-  width: 3px;
-
-  background: linear-gradient(
-    180deg,
-    var(--brand-500),
-    var(--brand-700)
-  );
-}
-
-.kpi-title,
-.kpi-label {
-
-  margin-bottom: 6px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-  font-weight: 600;
-
-  letter-spacing: 0.01em;
-}
-
-.kpi-value {
-
-  color: var(--text-950);
-
-  font-size: 26px;
-  line-height: 1.05;
-
-  font-weight: 700;
-
-  letter-spacing: -0.02em;
-
-  font-variant-numeric: tabular-nums;
-}
-
-.kpi-sub {
-
-  margin-top: 6px;
-
-  color: var(--text-400);
-
-  font-size: 10.5px;
-}
-
-/* ---------- โครงสร้างจริงบนเว็บ: .card-title / .card-value / .card-status ----------
-   หน้า index.html ใช้ชื่อ class ชุดนี้แทน .kpi-title/.kpi-value/.kpi-sub
-   จึงเพิ่ม selector ที่ตรงกับของจริง โดยดีไซน์เดียวกันทุกอย่าง */
-
-.card-title {
-
-  margin-bottom: 6px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-  font-weight: 600;
-
-  letter-spacing: 0.01em;
-}
-
-.card-value {
-
-  color: var(--text-950);
-
-  font-size: 26px;
-  line-height: 1.05;
-
-  font-weight: 700;
-
-  letter-spacing: -0.02em;
-
-  font-variant-numeric: tabular-nums;
-}
-
-.card-status {
-
-  margin-top: 6px;
-
-  color: var(--text-400);
-
-  font-size: 10.5px;
-}
-
-/* ---------- ไล่แสดงจำนวนแยกตามประเภทรถใต้ card-value
-   (เช่น รถ COCO 60 คัน แยกเป็น Trailer / 10W) ----------
-   ใช้แทน .card-status แบบข้อความบรรทัดเดียว เมื่ออยากโชว์
-   breakdown มากกว่า 1 ค่า โดยยังอยู่ในโทนเดียวกับ .card-status */
-
-.card-breakdown {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 4px 12px;
-
-  margin-top: 6px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-}
-
-.card-breakdown strong {
-
-  margin-left: 4px;
-
-  color: var(--text-800);
-
-  font-weight: 700;
-
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- .kpi-card.primary — ตัว modifier จริงในหน้าเว็บ ----------
-   เว็บมีการแปะ class "primary" บนการ์ด KPI ที่อยากเน้น (เช่น Driver
-   Ratio) อยู่แล้ว จึงใช้ modifier นี้ทำเป็น pill สีเขียวทึบตามภาพ
-   ตัวอย่าง Comvi แทนการเดาไล่สีทุกใบ — เด่นเฉพาะใบที่สำคัญจริงๆ
-   และยังคงจำกัดอยู่แค่โทนเขียวเดียว ไม่แตกสีออกไปไหน */
-
-.kpi-card.primary,
-.kpi.primary {
-
-  background: linear-gradient(
-    135deg,
-    var(--brand-700),
-    var(--brand-900)
-  );
-
-  border-color: transparent;
-}
-
-.kpi-card.primary::before,
-.kpi.primary::before {
-  display: none;
-}
-
-.kpi-card.primary .card-title,
-.kpi-card.primary .card-status,
-.kpi-card.primary .kpi-title,
-.kpi-card.primary .kpi-label,
-.kpi-card.primary .kpi-sub,
-.kpi.primary .card-title,
-.kpi.primary .card-status,
-.kpi.primary .kpi-title,
-.kpi.primary .kpi-label,
-.kpi.primary .kpi-sub {
+.kpi-card.primary::before, .kpi.primary::before { display: none; }
+.kpi-card.primary .card-title, .kpi-card.primary .card-status, .kpi-card.primary .kpi-title,
+.kpi-card.primary .kpi-label, .kpi-card.primary .kpi-sub, .kpi.primary .card-title,
+.kpi.primary .card-status, .kpi.primary .kpi-title, .kpi.primary .kpi-label, .kpi.primary .kpi-sub {
   color: rgba(255, 255, 255, 0.72);
 }
-
-.kpi-card.primary .card-value,
-.kpi-card.primary .kpi-value,
-.kpi.primary .card-value,
-.kpi.primary .kpi-value {
-  color: #ffffff;
-}
-
-
-/* ============================================================
-   10. GENERIC SECTIONS
-   ============================================================ */
-
-.section,
-.card {
-
-  min-width: 0;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-
-  overflow: hidden;
-}
-
-.section {
-
-  margin-bottom: 14px;
-}
-
-.section-heading {
-
-  min-height: 46px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 12px;
-
-  padding: 12px 16px;
-
-  background: var(--surface);
-
-  border-bottom: 1px solid var(--border-2);
-}
-
-.section-heading h2,
-.section-heading h3 {
-
-  margin: 0;
-
-  color: var(--text-900);
-
-  font-size: 13.5px;
-  font-weight: 700;
-
-  letter-spacing: -0.005em;
-}
-
-.section-heading p {
-
-  margin: 1px 0 0;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-}
-
-.section-body {
-
-  padding: 15px;
-}
-
-
-/* ============================================================
-   11. DASHBOARD GRID
-   ============================================================ */
-
-.overview-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1.55fr)
-    minmax(300px, 0.75fr);
-
-  gap: 12px;
-
-  margin-bottom: 14px;
-}
-
-.distance-main-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1.45fr)
-    minmax(320px, 0.75fr);
-
-  gap: 12px;
-
-  margin-bottom: 14px;
-}
-
-.chart-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
-
-  gap: 12px;
-
-  margin-bottom: 14px;
-}
-
-.two-column {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 12px;
-}
-
-.three-column {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 12px;
-}
-
-
-/* ============================================================
-   12. CHARTS
-   ============================================================ */
-
-.chart-wrapper,
-.distance-chart-wrapper {
-
-  position: relative;
-
-  width: 100%;
-
-  height: 215px;
-
-  padding: 12px 14px;
-
-  background: var(--surface);
-}
-
-.chart-wrapper canvas,
-.distance-chart-wrapper canvas {
-
-  max-width: 100% !important;
-  max-height: 100% !important;
-}
-
-
-/* ---------- Narrow chart ---------- */
-
-.chart-card-narrow {
-
-  width: 100%;
-}
-
-.chart-card-narrow .chart-wrapper {
-
-  height: 205px;
-}
-
-
-/* ---------- Chart summary ---------- */
-
-.chart-summary {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 8px;
-
-  padding: 10px 14px;
-
-  border-bottom: 1px solid var(--border-2);
-
-  background: var(--surface-2);
-}
-
-.chart-summary-item {
-
-  min-width: 0;
-
-  padding: 9px 10px;
-
-  background: #ffffff;
-
-  border: 1px solid var(--border-2);
-  border-radius: var(--radius-sm);
-}
-
-.chart-summary-label {
-
-  display: block;
-
-  margin-bottom: 2px;
-
-  color: var(--text-500);
-
-  font-size: 9.5px;
-}
-
-.chart-summary-value {
-
-  display: block;
-
-  color: var(--text-900);
-
-  font-size: 14px;
-
-  font-weight: 700;
-
-  font-variant-numeric: tabular-nums;
-}
-
-
-/* ============================================================
-   13. FORECAST
-   ============================================================ */
+.kpi-card.primary .card-value, .kpi-card.primary .kpi-value, .kpi.primary .card-value, .kpi.primary .kpi-value { color: #ffffff; }
+
+.section, .card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.section { margin-bottom: 14px; }
+.section-heading { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border-2); }
+.section-heading h2, .section-heading h3 { margin: 0; color: var(--text-900); font-size: 13.5px; font-weight: 700; letter-spacing: -0.005em; }
+.section-heading p { margin: 1px 0 0; color: var(--text-500); font-size: 10.5px; }
+.section-body { padding: 15px; }
+
+.overview-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.75fr); gap: 12px; margin-bottom: 14px; }
+.distance-main-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr); gap: 12px; margin-bottom: 14px; }
+.chart-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 14px; }
+.two-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.three-column { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+
+.chart-wrapper, .distance-chart-wrapper { position: relative; width: 100%; padding: 12px 14px; background: var(--surface); }
+.chart-wrapper canvas, .distance-chart-wrapper canvas { max-width: 100% !important; max-height: 100% !important; }
+.chart-card-narrow { width: 100%; }
+.chart-card-narrow .chart-wrapper { height: 205px; }
+
+.chart-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border-2); background: var(--surface-2); }
+.chart-summary-item { min-width: 0; padding: 9px 10px; background: #ffffff; border: 1px solid var(--border-2); border-radius: var(--radius-sm); }
+.chart-summary-label { display: block; margin-bottom: 2px; color: var(--text-500); font-size: 9.5px; }
+.chart-summary-value { display: block; color: var(--text-900); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
 .forecast {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(230px, 0.65fr);
-
-  gap: 0;
-
-  margin-bottom: 14px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-
-  overflow: hidden;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-bottom: 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;
 }
-
-.forecast-main {
-
-  padding: 16px 18px;
-}
-
-.forecast-title {
-
-  margin-bottom: 5px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-  font-weight: 700;
-}
-
-.forecast-value {
-
-  color: var(--text-950);
-
-  font-size: 26px;
-  font-weight: 700;
-
-  font-variant-numeric: tabular-nums;
-}
-
-.forecast-note {
-
-  margin-top: 4px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-}
-
-.forecast-side {
-
-  padding: 16px 18px;
-
-  background: var(--brand-50);
-
-  border-left: 1px solid var(--border);
-}
-
-.forecast-side-title {
-
-  margin-bottom: 4px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-}
-
-.forecast-side-value {
-
-  color: var(--brand-800);
-
-  font-size: 20px;
-  font-weight: 700;
-
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- โครงสร้างจริงบนเว็บ ----------
-   หน้า index.html ไม่ได้แบ่ง main/side แต่ใส่ .forecast-item
-   เรียงกัน 4 ช่องเท่าๆ กันแทน (KM ปัจจุบัน / Forecast KM /
-   Target KM / Forecast Achievement) จึงปรับจำนวนคอลัมน์ของ
-   .forecast ให้เป็น 4 ช่อง และเพิ่ม .forecast-item/.forecast-label
-   ให้ตรงกับ class จริง (ไฟล์เดิมมีแค่ .forecast-title ซึ่งไม่มีใช้
-   จริงในหน้านี้ — ยังคงไว้เผื่อหน้าอื่นเรียกใช้) */
-
-.forecast {
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-}
-
-.forecast-item {
-
-  padding: 16px 18px;
-
-  border-right: 1px solid var(--border);
-}
-
-.forecast-item:last-child {
-
-  border-right: 0;
-}
-
-.forecast-label {
-
-  margin-bottom: 5px;
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-  font-weight: 700;
-}
-
-
-/* ============================================================
-   14. PERFORMANCE STATUS
-   ============================================================ */
+.forecast-main { padding: 16px 18px; }
+.forecast-title { margin-bottom: 5px; color: var(--text-500); font-size: 10.5px; font-weight: 700; }
+.forecast-value { color: var(--text-950); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.forecast-note { margin-top: 4px; color: var(--text-500); font-size: 10.5px; }
+.forecast-side { padding: 16px 18px; background: var(--brand-50); border-left: 1px solid var(--border); }
+.forecast-side-title { margin-bottom: 4px; color: var(--text-500); font-size: 10.5px; }
+.forecast-side-value { color: var(--brand-800); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.forecast-item { padding: 16px 18px; border-right: 1px solid var(--border); }
+.forecast-item:last-child { border-right: 0; }
+.forecast-label { margin-bottom: 5px; color: var(--text-500); font-size: 10.5px; font-weight: 700; }
 
 .performance-status {
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 14px;
-
-  min-height: 48px;
-
-  margin-bottom: 14px;
-
-  padding: 12px 16px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xs);
-}
-
-.performance-status-title {
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-  font-weight: 600;
-}
-
-.performance-status-value {
-
-  color: var(--text-900);
-
-  font-size: 14px;
-  font-weight: 700;
-
-  font-variant-numeric: tabular-nums;
-}
-
-/* โครงสร้างจริง: ข้อความ "Performance" เป็น <strong> เปล่าๆ
-   ไม่มี class แยก จึงเจาะจงลูกของ .performance-status แทน */
-
-.performance-status strong {
-
-  color: var(--text-700);
-
-  font-size: 12px;
-  font-weight: 700;
-}
-
-
-/* ============================================================
-   15. STATUS BADGES
-   ============================================================ */
-
-.status,
-.distance-status,
-.driver-status {
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 22px;
-
-  padding: 2px 10px;
-
-  border-radius: 999px;
-
-  font-size: 10px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-
-/* ---------- Generic ---------- */
-
-.status-job,
-.driver-work {
-
-  background: var(--success-bg);
-  color: var(--success);
-}
-
-.status-no-job,
-.driver-unknown {
-
-  background: var(--neutral-bg);
-  color: var(--neutral);
-}
-
-.driver-off {
-
-  background: var(--warning-bg);
-  color: var(--warning);
-}
-
-.driver-leave {
-
-  background: var(--info-bg);
-  color: var(--info);
-}
-
-.driver-standby {
-
-  background: #fbf0dc;
-  color: #96631c;
-}
-
-
-/* ---------- Distance ---------- */
-
-.distance-status.normal {
-
-  background: var(--success-bg);
-  color: var(--success);
-}
-
-.distance-status.near {
-
-  background: var(--warning-bg);
-  color: var(--warning);
-}
-
-.distance-status.forecast {
-
-  background: var(--danger-bg);
-  color: var(--danger);
-}
-
-.distance-status.over {
-
-  background: var(--info-bg);
-  color: var(--info);
-}
-
-.distance-status.no-target {
-
-  background: var(--neutral-bg);
-  color: var(--neutral);
-}
-
-
-/* ============================================================
-   16. ALERTS
-   ============================================================ */
-
-.alert-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 10px;
-
-  margin-bottom: 14px;
-}
-
-.alert-card {
-
-  min-width: 0;
-
-  padding: 13px 14px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--warning);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-}
-
-.alert-card.danger {
-
-  border-left-color: var(--danger);
-}
-
-.alert-card.success {
-
-  border-left-color: var(--success);
-}
-
-.alert-title {
-
-  margin-bottom: 3px;
-
-  color: var(--text-900);
-
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.alert-description {
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-}
-
-
-/* ============================================================
-   17. WATCHLIST / RANKING
-   ============================================================ */
-
-.watchlist,
-.ranking-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 10px;
-
-  margin-bottom: 14px;
-}
-
-.watchlist-card,
-.ranking-card {
-
-  min-width: 0;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-
-  overflow: hidden;
-}
-
-.watchlist-header,
-.ranking-header {
-
-  min-height: 39px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 8px 12px;
-
-  background: var(--surface-2);
-
-  border-bottom: 1px solid var(--border-2);
-
-  color: var(--text-800);
-
-  font-size: 11px;
-  font-weight: 700;
-}
-
-
-/* ============================================================
-   18. TABLE SYSTEM
-   ============================================================ */
-
-.table-wrapper {
-
-  width: 100%;
-
-  overflow: auto;
-
-  max-height: 285px;
-
-  background: var(--surface);
-}
-
-.table-wrapper table {
-
-  width: 100%;
-
-  min-width: 700px;
-
-  font-size: 11px;
-}
-
-.table-wrapper thead {
-
-  position: sticky;
-  top: 0;
-
-  z-index: 5;
-}
-
-.table-wrapper th {
-
-  height: 34px;
-
-  padding: 7px 10px;
-
-  background: var(--surface-3);
-
-  border-bottom: 1px solid var(--border);
-
-  color: var(--text-600);
-
-  font-size: 9.5px;
-  font-weight: 700;
-
-  letter-spacing: 0.01em;
-
-  text-align: left;
-
-  white-space: nowrap;
-}
-
-.table-wrapper td {
-
-  height: 34px;
-
-  padding: 6px 10px;
-
-  border-bottom: 1px solid var(--border-2);
-
-  color: var(--text-700);
-
-  font-size: 10.5px;
-
-  white-space: nowrap;
-}
-
-.table-wrapper tbody tr:nth-child(even) td {
-
-  background: var(--surface-2);
-}
-
-.table-wrapper tbody tr:hover td {
-
-  background: var(--brand-50);
-}
-
-.table-wrapper tbody tr:last-child td {
-
-  border-bottom: 0;
-}
-
-.table-wrapper .num,
-.table-wrapper td.num,
-.table-wrapper th.num {
-
-  text-align: right;
-
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-.table-wrapper td strong {
-
-  color: var(--text-900);
-  font-weight: 700;
-}
-
-/* ---------- โครงสร้างจริงบนเว็บ ----------
-   ตารางจริงใช้ <table class="data-table car-performance-table">
-   และ helper class ชื่อ "number" / "center" / "text-center" /
-   "text-muted" แทน ".num" ของไฟล์เดิม จึงเพิ่ม selector ที่ตรง
-   ของจริงไว้คู่กัน (ดีไซน์เดียวกันทุกอย่าง) */
-
-.data-table,
-.car-performance-table {
-
-  width: 100%;
-}
-
-.table-wrapper .number,
-.table-wrapper td.number,
-.table-wrapper th.number {
-
-  text-align: right;
-
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
-.table-wrapper .center,
-.table-wrapper td.center,
-.table-wrapper th.center,
-.table-wrapper .text-center {
-
-  text-align: center;
-}
-
-.table-wrapper .text-muted {
-
-  color: var(--text-400);
-}
-
-
-/* ============================================================
-   19. GENERAL TABLE
-   ============================================================ */
-
-table {
-
-  width: 100%;
-}
-
-thead th {
-
-  color: var(--text-600);
-
-  font-size: 10px;
-  font-weight: 700;
-}
-
-tbody td {
-
-  color: var(--text-700);
-
-  font-size: 11px;
-}
-
-
-/* ============================================================
-   20. CAR PERFORMANCE
-   ============================================================ */
-
-.car-performance {
-
-  width: 100%;
-
-  overflow: hidden;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-}
-
-.car-performance table {
-
-  width: 100%;
-
-  min-width: 800px;
-}
-
-.car-performance thead th {
-
-  position: sticky;
-  top: 0;
-  z-index: 3;
-
-  padding: 8px 10px;
-
-  background: var(--surface-3);
-
-  border-bottom: 1px solid var(--border);
-
-  text-align: left;
-}
-
-.car-performance tbody td {
-
-  padding: 7px 10px;
-
-  border-bottom: 1px solid var(--border-2);
-}
-
-.car-performance tbody tr:hover {
-
-  background: var(--brand-50);
-}
-
-
-/* ============================================================
-   21. VEHICLE TYPE SUMMARY
-   ============================================================ */
-
-.vehicle-type-summary {
-
-  width: 100%;
-
-  overflow: hidden;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-}
-
-.vehicle-type-summary table {
-
-  width: 100%;
-}
-
-.vehicle-type-summary th {
-
-  padding: 8px 10px;
-
-  background: var(--surface-3);
-
-  border-bottom: 1px solid var(--border);
-
-  color: var(--text-600);
-
-  font-size: 9.5px;
-
-  text-align: left;
-}
-
-.vehicle-type-summary td {
-
-  padding: 7px 10px;
-
-  border-bottom: 1px solid var(--border-2);
-
-  color: var(--text-700);
-
-  font-size: 10.5px;
-}
-
-
-/* ============================================================
-   22. DAILY REPORT
-   ============================================================ */
-
-.report-header {
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  margin-bottom: 14px;
-}
-
-.report-header h1 {
-
-  margin: 0;
-
-  color: var(--text-950);
-
-  font-size: 21px;
-  font-weight: 700;
-}
-
-.report-header .sub {
-
-  margin-top: 2px;
-
-  color: var(--text-500);
-
-  font-size: 11px;
-}
-
-.report-section {
-
-  margin-bottom: 14px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-
-  overflow: hidden;
-}
-
-
-/* ============================================================
-   23. DAILY REPORT KPI
-   ============================================================ */
-
-.report-kpi-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  gap: 12px;
-
-  margin-bottom: 14px;
-}
-
-.report-kpi {
-
-  position: relative;
-
-  padding: 14px 15px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-
-  overflow: hidden;
-}
-
-.report-kpi-label {
-
-  color: var(--text-500);
-
-  font-size: 10.5px;
-  font-weight: 600;
-}
-
-.report-kpi-value {
-
-  margin-top: 4px;
-
-  color: var(--text-950);
-
-  font-size: 23px;
-  font-weight: 700;
-
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- Comvi-style pill cycle สำหรับ Daily report KPI ด้วย ---------- */
-
-.report-kpi-grid .report-kpi:nth-child(3n+1) {
-  background: var(--pill-1-bg);
-  border-color: transparent;
-}
-
-.report-kpi-grid .report-kpi:nth-child(3n+2) {
-  background: var(--pill-2-bg);
-  border-color: transparent;
-}
-
-.report-kpi-grid .report-kpi:nth-child(3n+3) {
-  background: var(--pill-3-bg);
-  border-color: transparent;
-}
-
-.report-kpi-grid .report-kpi:nth-child(3n+1) .report-kpi-label,
-.report-kpi-grid .report-kpi:nth-child(3n+2) .report-kpi-label {
-  color: var(--pill-1-sub);
-}
-
-.report-kpi-grid .report-kpi:nth-child(3n+1) .report-kpi-value,
-.report-kpi-grid .report-kpi:nth-child(3n+2) .report-kpi-value {
-  color: var(--pill-1-fg);
-}
-
-.report-kpi-grid .report-kpi:nth-child(3n+3) .report-kpi-label {
-  color: var(--pill-3-sub);
-}
-
-.report-kpi-grid .report-kpi:nth-child(3n+3) .report-kpi-value {
-  color: var(--pill-3-fg);
-}
-
-
-/* ============================================================
-   24. SYSTEM STATUS
-   ============================================================ */
-
-.page-status,
-#pageStatus {
-
-  margin-top: 8px;
-
-  color: var(--text-400);
-
-  font-size: 9.5px;
-}
-
-#errorMessage {
-
-  margin-bottom: 10px;
-}
-
-#errorMessage:not(:empty) {
-
-  padding: 10px 12px;
-
-  background: var(--danger-bg);
-
-  border: 1px solid #f2caca;
-  border-left: 3px solid var(--danger);
-  border-radius: var(--radius-sm);
-
-  color: var(--danger);
-
-  font-size: 11px;
-}
-
-
-/* ============================================================
-   25. LOADING
-   ============================================================ */
-
-.loading {
-
-  padding: 30px 15px !important;
-
-  color: var(--text-400) !important;
-
-  text-align: center;
-
-  font-size: 11px !important;
-}
-
-
-/* ============================================================
-   26. BUTTONS
-   ============================================================ */
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 48px;
+  margin-bottom: 14px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-xs);
+}
+.performance-status-title { color: var(--text-500); font-size: 10.5px; font-weight: 600; }
+.performance-status-value { color: var(--text-900); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.performance-status strong { color: var(--text-700); font-size: 12px; font-weight: 700; }
+
+.status, .distance-status, .driver-status {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 22px; padding: 2px 10px;
+  border-radius: 999px; font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.status-job, .driver-work { background: var(--success-bg); color: var(--success); }
+.status-no-job, .driver-unknown { background: var(--neutral-bg); color: var(--neutral); }
+.driver-off { background: var(--warning-bg); color: var(--warning); }
+.driver-leave { background: var(--info-bg); color: var(--info); }
+.driver-standby { background: #fbf0dc; color: #96631c; }
+.distance-status.normal { background: var(--success-bg); color: var(--success); }
+.distance-status.near { background: var(--warning-bg); color: var(--warning); }
+.distance-status.forecast { background: var(--danger-bg); color: var(--danger); }
+.distance-status.over { background: var(--info-bg); color: var(--info); }
+.distance-status.no-target { background: var(--neutral-bg); color: var(--neutral); }
+
+.alert-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.alert-card { min-width: 0; padding: 13px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); }
+.alert-card.danger { border-left-color: var(--danger); }
+.alert-card.success { border-left-color: var(--success); }
+.alert-title { margin-bottom: 3px; color: var(--text-900); font-size: 12px; font-weight: 700; }
+.alert-description { color: var(--text-500); font-size: 10.5px; }
+
+.watchlist, .ranking-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.watchlist-card, .ranking-card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); overflow: hidden; }
+.watchlist-header, .ranking-header { min-height: 39px; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border-2); color: var(--text-800); font-size: 11px; font-weight: 700; }
+
+.table-wrapper { width: 100%; overflow: auto; max-height: 285px; background: var(--surface); }
+.table-wrapper table { width: 100%; min-width: 700px; font-size: 11px; }
+.table-wrapper thead { position: sticky; top: 0; z-index: 5; }
+.table-wrapper th { height: 34px; padding: 7px 10px; background: var(--surface-3); border-bottom: 1px solid var(--border); color: var(--text-600); font-size: 9.5px; font-weight: 700; letter-spacing: 0.01em; text-align: left; white-space: nowrap; }
+.table-wrapper td { height: 34px; padding: 6px 10px; border-bottom: 1px solid var(--border-2); color: var(--text-700); font-size: 10.5px; white-space: nowrap; }
+.table-wrapper tbody tr:nth-child(even) td { background: var(--surface-2); }
+.table-wrapper tbody tr:hover td { background: var(--brand-50); }
+.table-wrapper tbody tr:last-child td { border-bottom: 0; }
+.table-wrapper .num, .table-wrapper td.num, .table-wrapper th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.table-wrapper td strong { color: var(--text-900); font-weight: 700; }
+.data-table, .car-performance-table { width: 100%; }
+.table-wrapper .number, .table-wrapper td.number, .table-wrapper th.number { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.table-wrapper .center, .table-wrapper td.center, .table-wrapper th.center, .table-wrapper .text-center { text-align: center; }
+.table-wrapper .text-muted { color: var(--text-400); }
+
+table { width: 100%; }
+thead th { color: var(--text-600); font-size: 10px; font-weight: 700; }
+tbody td { color: var(--text-700); font-size: 11px; }
+
+.car-performance { width: 100%; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); }
+.car-performance table { width: 100%; min-width: 800px; }
+.car-performance thead th { position: sticky; top: 0; z-index: 3; padding: 8px 10px; background: var(--surface-3); border-bottom: 1px solid var(--border); text-align: left; }
+.car-performance tbody td { padding: 7px 10px; border-bottom: 1px solid var(--border-2); }
+.car-performance tbody tr:hover { background: var(--brand-50); }
+
+.vehicle-type-summary { width: 100%; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); }
+.vehicle-type-summary table { width: 100%; }
+.vehicle-type-summary th { padding: 8px 10px; background: var(--surface-3); border-bottom: 1px solid var(--border); color: var(--text-600); font-size: 9.5px; text-align: left; }
+.vehicle-type-summary td { padding: 7px 10px; border-bottom: 1px solid var(--border-2); color: var(--text-700); font-size: 10.5px; }
+
+.report-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
+.report-header h1 { margin: 0; color: var(--text-950); font-size: 21px; font-weight: 700; }
+.report-header .sub { margin-top: 2px; color: var(--text-500); font-size: 11px; }
+.report-section { margin-bottom: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+
+.report-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+.report-kpi { position: relative; padding: 14px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.report-kpi-label { color: var(--text-500); font-size: 10.5px; font-weight: 600; }
+.report-kpi-value { margin-top: 4px; color: var(--text-950); font-size: 23px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.report-kpi-grid .report-kpi:nth-child(3n+1) { background: var(--pill-1-bg); border-color: transparent; }
+.report-kpi-grid .report-kpi:nth-child(3n+2) { background: var(--pill-2-bg); border-color: transparent; }
+.report-kpi-grid .report-kpi:nth-child(3n+3) { background: var(--pill-3-bg); border-color: transparent; }
+.report-kpi-grid .report-kpi:nth-child(3n+1) .report-kpi-label, .report-kpi-grid .report-kpi:nth-child(3n+2) .report-kpi-label { color: var(--pill-1-sub); }
+.report-kpi-grid .report-kpi:nth-child(3n+1) .report-kpi-value, .report-kpi-grid .report-kpi:nth-child(3n+2) .report-kpi-value { color: var(--pill-1-fg); }
+.report-kpi-grid .report-kpi:nth-child(3n+3) .report-kpi-label { color: var(--pill-3-sub); }
+.report-kpi-grid .report-kpi:nth-child(3n+3) .report-kpi-value { color: var(--pill-3-fg); }
+
+.page-status, #pageStatus { margin-top: 8px; color: var(--text-400); font-size: 9.5px; }
+#errorMessage { margin-bottom: 10px; }
+#errorMessage:not(:empty) { padding: 10px 12px; background: var(--danger-bg); border: 1px solid #f2caca; border-left: 3px solid var(--danger); border-radius: var(--radius-sm); color: var(--danger); font-size: 11px; }
+
+.loading { padding: 30px 15px !important; color: var(--text-400) !important; text-align: center; font-size: 11px !important; }
 
 .btn {
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 34px;
-
-  padding: 0 16px;
-
-  background: var(--brand-700);
-
-  border: 1px solid var(--brand-700);
-  border-radius: 999px;
-
-  color: #ffffff;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    transform 0.1s ease;
+  display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 0 16px;
+  background: var(--brand-700); border: 1px solid var(--brand-700); border-radius: 999px; color: #ffffff;
+  font-size: 11px; font-weight: 700; transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
+.btn:hover { background: var(--brand-800); border-color: var(--brand-800); }
+.btn:active { transform: translateY(1px); }
+.btn-secondary { background: #ffffff; border-color: var(--border); color: var(--text-700); }
+.btn-secondary:hover { background: var(--surface-3); border-color: var(--border); }
 
-.btn:hover {
+.meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--text-500); font-size: 10px; }
+.meta-item { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 9px; background: var(--surface-3); border: 1px solid var(--border-2); border-radius: 999px; }
 
-  background: var(--brand-800);
-  border-color: var(--brand-800);
-}
+.empty-state { display: flex; align-items: center; justify-content: center; min-height: 120px; padding: 20px; color: var(--text-400); font-size: 11px; text-align: center; }
 
-.btn:active {
-
-  transform: translateY(1px);
-}
-
-.btn-secondary {
-
-  background: #ffffff;
-
-  border-color: var(--border);
-
-  color: var(--text-700);
-}
-
-.btn-secondary:hover {
-
-  background: var(--surface-3);
-  border-color: var(--border);
-}
-
-
-/* ============================================================
-   27. SMALL META / INFO
-   ============================================================ */
-
-.meta {
-
-  display: flex;
-  align-items: center;
-
-  flex-wrap: wrap;
-
-  gap: 8px;
-
-  color: var(--text-500);
-
-  font-size: 10px;
-}
-
-.meta-item {
-
-  display: inline-flex;
-  align-items: center;
-
-  min-height: 22px;
-
-  padding: 2px 9px;
-
-  background: var(--surface-3);
-
-  border: 1px solid var(--border-2);
-  border-radius: 999px;
-}
-
-
-/* ============================================================
-   28. EMPTY STATES
-   ============================================================ */
-
-.empty-state {
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 120px;
-
-  padding: 20px;
-
-  color: var(--text-400);
-
-  font-size: 11px;
-
-  text-align: center;
-}
-
-
-/* ============================================================
-   29. SCROLLBAR
-   ============================================================ */
-
-* {
-
-  scrollbar-width: thin;
-
-  scrollbar-color:
-    #c6d2cb
-    transparent;
-}
-
-::-webkit-scrollbar {
-
-  width: 7px;
-  height: 7px;
-}
-
-::-webkit-scrollbar-track {
-
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-
-  background: #c6d2cb;
-
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-
-  background: #a7b6ae;
-}
-
-
-/* ============================================================
-   30. DESKTOP LARGE
-   ============================================================ */
+* { scrollbar-width: thin; scrollbar-color: #c6d2cb transparent; }
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c6d2cb; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #a7b6ae; }
 
 @media (min-width: 1500px) {
-
-  .container,
-  .wrap {
-
-    width: min(
-      calc(100% - 48px),
-      var(--content-width)
-    );
-
-    padding-top: 16px;
-  }
-
-  .kpi-grid,
-  .cards {
-
-    gap: 12px;
-  }
-
-  .table-wrapper {
-
-    max-height: 300px;
-  }
+  .container, .wrap { width: min(calc(100% - 48px), var(--content-width)); padding-top: 16px; }
+  .kpi-grid, .cards { gap: 12px; }
+  .table-wrapper { max-height: 300px; }
 }
-
-
-/* ============================================================
-   31. DESKTOP
-   ============================================================ */
-
 @media (max-width: 1300px) {
-
-  .overview-grid,
-  .distance-main-grid {
-
-    grid-template-columns: 1fr;
-  }
-
-  .table-wrapper {
-
-    max-height: 270px;
-  }
+  .overview-grid, .distance-main-grid { grid-template-columns: 1fr; }
+  .table-wrapper { max-height: 270px; }
 }
-
-
-/* ============================================================
-   32. TABLET / SMALL DESKTOP
-   ============================================================ */
-
 @media (max-width: 1100px) {
-
-  .header-content,
-  .topbar-inner {
-
-    width: calc(100% - 28px);
-  }
-
-  .container,
-  .wrap {
-
-    width: calc(100% - 28px);
-  }
-
-  .kpi-grid,
-  .cards {
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .report-kpi-grid {
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .three-column {
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .alert-grid,
-  .watchlist,
-  .ranking-grid {
-
-    grid-template-columns: 1fr;
-  }
-
-  .forecast {
-
-    grid-template-columns: 1fr;
-  }
-
-  .forecast-side {
-
-    border-left: 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .forecast-item {
-
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .forecast-item:last-child {
-
-    border-bottom: 0;
-  }
-
-  .chart-grid,
-  .two-column {
-
-    grid-template-columns: 1fr;
-  }
+  .header-content, .topbar-inner { width: calc(100% - 28px); }
+  .container, .wrap { width: calc(100% - 28px); }
+  .kpi-grid, .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .three-column { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .alert-grid, .watchlist, .ranking-grid { grid-template-columns: 1fr; }
+  .forecast { grid-template-columns: 1fr; }
+  .forecast-side { border-left: 0; border-top: 1px solid var(--border); }
+  .forecast-item { border-right: 0; border-bottom: 1px solid var(--border); }
+  .forecast-item:last-child { border-bottom: 0; }
+  .chart-grid, .two-column { grid-template-columns: 1fr; }
 }
-
-
-/* ============================================================
-   33. MOBILE
-   ============================================================ */
-
 @media (max-width: 700px) {
-
-  .header-content,
-  .topbar-inner {
-
-    width: calc(100% - 20px);
-
-    min-height: 58px;
-
-    gap: 10px;
-  }
-
-  .topbar {
-
-    padding: 0 10px;
-  }
-
-  .nav,
-  .page-nav,
-  .topbar-actions {
-
-    overflow-x: auto;
-
-    max-width: 100%;
-
-    scrollbar-width: none;
-  }
-
-  .nav::-webkit-scrollbar,
-  .page-nav::-webkit-scrollbar,
-  .topbar-actions::-webkit-scrollbar {
-
-    display: none;
-  }
-
-  .nav button,
-  .page-nav a,
-  .navlink {
-
-    flex: 0 0 auto;
-
-    padding: 0 9px;
-
-    font-size: 10px;
-  }
-
-  .container,
-  .wrap {
-
-    width: calc(100% - 20px);
-
-    padding-top: 10px;
-  }
-
-  .page-header {
-
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 6px;
-  }
-
-  .page-header h1,
-  .page-title {
-
-    font-size: 19px;
-  }
-
-  .filters,
-  .filter-bar {
-
-    align-items: stretch;
-
-    flex-direction: column;
-
-    gap: 8px;
-  }
-
-  .filters > div,
-  .filter-item,
-  .filter-group {
-
-    width: 100%;
-  }
-
-  .kpi-grid,
-  .cards,
-  .report-kpi-grid {
-
-    grid-template-columns: 1fr;
-
-    gap: 8px;
-  }
-
-  .three-column {
-
-    grid-template-columns: 1fr;
-  }
-
-  .section-heading {
-
-    min-height: 40px;
-
-    padding: 8px 10px;
-  }
-
-  .section-body {
-
-    padding: 9px;
-  }
-
-  .chart-summary {
-
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .performance-status {
-
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 5px;
-  }
+  .header-content, .topbar-inner { width: calc(100% - 20px); min-height: 58px; gap: 10px; }
+  .topbar { padding: 0 10px; }
+  .nav, .page-nav, .topbar-actions { overflow-x: auto; max-width: 100%; scrollbar-width: none; }
+  .nav::-webkit-scrollbar, .page-nav::-webkit-scrollbar, .topbar-actions::-webkit-scrollbar { display: none; }
+  .nav button, .page-nav a, .navlink { flex: 0 0 auto; padding: 0 9px; font-size: 10px; }
+  .container, .wrap { width: calc(100% - 20px); padding-top: 10px; }
+  .page-header { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .page-header h1, .page-title { font-size: 19px; }
+  .filters, .filter-bar { align-items: stretch; flex-direction: column; gap: 8px; }
+  .filters > div, .filter-item, .filter-group { width: 100%; }
+  .kpi-grid, .cards, .report-kpi-grid { grid-template-columns: 1fr; gap: 8px; }
+  .three-column { grid-template-columns: 1fr; }
+  .section-heading { min-height: 40px; padding: 8px 10px; }
+  .section-body { padding: 9px; }
+  .chart-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .performance-status { align-items: flex-start; flex-direction: column; gap: 5px; }
 }
-
-
-/* ============================================================
-   34. VERY SMALL MOBILE
-   ============================================================ */
-
 @media (max-width: 480px) {
-
-  .header-brand .title,
-  .title {
-
-    font-size: 15px;
-  }
-
-  .header-brand .subtitle,
-  .subtitle {
-
-    display: none;
-  }
-
-  .kpi,
-  .kpi-card,
-  .report-kpi {
-
-    padding: 12px 13px;
-  }
-
-  .kpi-value {
-
-    font-size: 23px;
-  }
-
-  .report-kpi-value {
-
-    font-size: 21px;
-  }
-
-  .chart-summary {
-
-    grid-template-columns: 1fr;
-  }
+  .header-brand .title, .title { font-size: 15px; }
+  .header-brand .subtitle, .subtitle { display: none; }
+  .kpi, .kpi-card, .report-kpi { padding: 12px 13px; }
+  .kpi-value { font-size: 23px; }
+  .report-kpi-value { font-size: 21px; }
+  .chart-summary { grid-template-columns: 1fr; }
 }
-
-
-/* ============================================================
-   35. PRINT
-   ============================================================ */
-
 @media print {
-
-  .header,
-  .topbar,
-  .nav,
-  .page-nav,
-  .filters,
-  .filter-bar,
-  .btn {
-
-    display: none !important;
-  }
-
-  body {
-
-    background: #ffffff;
-  }
-
-  .container,
-  .wrap {
-
-    width: 100%;
-
-    padding: 0;
-  }
-
-  .section,
-  .card,
-  .kpi,
-  .kpi-card {
-
-    box-shadow: none;
-  }
-}
-/* ============================================================
-   ADD-ON: แก้ให้ตรงกับ class จริงในหน้า kpi-distance.html
-   (แปะต่อท้ายไฟล์ style.css เดิม — ไม่ต้องแก้ HTML)
-   ============================================================ */
-
-
-/* ----------------------------------------------------------
-   รอบการทำงาน (.cycle-info)
-   ---------------------------------------------------------- */
-
-.cycle-info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-
-  padding: 14px 16px;
+  .header, .topbar, .nav, .page-nav, .filters, .filter-bar, .btn { display: none !important; }
+  body { background: #ffffff; }
+  .container, .wrap { width: 100%; padding: 0; }
+  .section, .card, .kpi, .kpi-card { box-shadow: none; }
 }
 
-.cycle-info-label {
-  margin-bottom: 4px;
-  color: var(--text-500);
-  font-size: 10.5px;
-  font-weight: 700;
-}
+.cycle-info { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 14px 16px; }
+.cycle-info-label { margin-bottom: 4px; color: var(--text-500); font-size: 10.5px; font-weight: 700; }
+.cycle-info-value { color: var(--text-950); font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cycle-info-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+.cycle-meta-item { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 4px 12px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 999px; color: var(--text-600); font-size: 11px; }
+.cycle-meta-item strong { color: var(--text-900); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-.cycle-info-value {
-  color: var(--text-950);
-  font-size: 20px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.cycle-info-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.cycle-meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  min-height: 30px;
-  padding: 4px 12px;
-
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: 999px;
-
-  color: var(--text-600);
-  font-size: 11px;
-}
-
-.cycle-meta-item strong {
-  color: var(--text-900);
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-
-/* ----------------------------------------------------------
-   ภาพรวมการทำ KM (.achievement-box)
-   ---------------------------------------------------------- */
-
-.achievement-box {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(230px, 0.65fr);
-}
-
-.achievement-box > div:first-child {
-  padding: 16px 18px;
-}
-
-.achievement-main-label {
-  margin-bottom: 5px;
-  color: var(--text-500);
-  font-size: 10.5px;
-  font-weight: 700;
-}
-
-.achievement-main-value {
-  color: var(--text-950);
-  font-size: 26px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.achievement-main-note {
-  margin-top: 4px;
-  color: var(--text-500);
-  font-size: 10.5px;
-}
-
-.achievement-side {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-
-  padding: 16px 18px;
-
-  background: var(--brand-50);
-  border-left: 1px solid var(--border);
-}
-
-.achievement-side-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.achievement-side-item span {
-  color: var(--text-500);
-  font-size: 10.5px;
-}
-
-.achievement-side-item strong {
-  color: var(--brand-800);
-  font-size: 14px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
+.achievement-box { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, 0.65fr); }
+.achievement-box > div:first-child { padding: 16px 18px; }
+.achievement-main-label { margin-bottom: 5px; color: var(--text-500); font-size: 10.5px; font-weight: 700; }
+.achievement-main-value { color: var(--text-950); font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.achievement-main-note { margin-top: 4px; color: var(--text-500); font-size: 10.5px; }
+.achievement-side { display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 16px 18px; background: var(--brand-50); border-left: 1px solid var(--border); }
+.achievement-side-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.achievement-side-item span { color: var(--text-500); font-size: 10.5px; }
+.achievement-side-item strong { color: var(--brand-800); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
 @media (max-width: 1100px) {
-  .achievement-box {
-    grid-template-columns: 1fr;
-  }
-
-  .achievement-side {
-    border-left: 0;
-    border-top: 1px solid var(--border);
-  }
+  .achievement-box { grid-template-columns: 1fr; }
+  .achievement-side { border-left: 0; border-top: 1px solid var(--border); }
 }
 
+.alert-box { min-width: 0; padding: 13px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); }
+.alert-box.alert-danger { border-left-color: var(--danger); }
+.alert-box.alert-warning { border-left-color: var(--warning); }
+.alert-box-header h3 { margin: 0 0 3px; color: var(--text-900); font-size: 12px; font-weight: 700; }
+.alert-box-header p { margin: 0 0 10px; color: var(--text-500); font-size: 10.5px; }
+.alert-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.alert-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 9px 11px; background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--radius-sm); color: var(--text-700); font-size: 11px; }
+.alert-list li.empty-alert { justify-content: center; padding: 16px; background: transparent; border: 0; color: var(--text-400); }
 
-/* ----------------------------------------------------------
-   รถที่ต้องระวัง (.alert-box)
-   ---------------------------------------------------------- */
+.ranking-box { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); overflow: hidden; }
+.ranking-list { list-style: none; margin: 0; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+.ranking-list li { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 7px 10px; border-radius: var(--radius-sm); color: var(--text-700); font-size: 11px; }
+.ranking-list li:nth-child(even) { background: var(--surface-2); }
+.ranking-list li.empty-alert { justify-content: center; color: var(--text-400); }
 
-.alert-box {
-  min-width: 0;
-
-  padding: 13px 14px;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--warning);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-}
-
-.alert-box.alert-danger {
-  border-left-color: var(--danger);
-}
-
-.alert-box.alert-warning {
-  border-left-color: var(--warning);
-}
-
-.alert-box-header h3 {
-  margin: 0 0 3px;
-  color: var(--text-900);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.alert-box-header p {
-  margin: 0 0 10px;
-  color: var(--text-500);
-  font-size: 10.5px;
-}
-
-.alert-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.alert-list li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 12px;
-
-  padding: 9px 11px;
-
-  background: var(--surface-2);
-  border: 1px solid var(--border-2);
-  border-radius: var(--radius-sm);
-
-  color: var(--text-700);
-  font-size: 11px;
-}
-
-.alert-list li.empty-alert {
-  justify-content: center;
-
-  padding: 16px;
-
-  background: transparent;
-  border: 0;
-
-  color: var(--text-400);
-}
-
-
-/* ----------------------------------------------------------
-   Ranking รถ (.ranking-box)
-   ---------------------------------------------------------- */
-
-.ranking-box {
-  min-width: 0;
-
-  background: var(--surface);
-
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-xs);
-
-  overflow: hidden;
-}
-
-.ranking-list {
-  list-style: none;
-  margin: 0;
-  padding: 8px 10px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.ranking-list li {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-
-  padding: 7px 10px;
-
-  border-radius: var(--radius-sm);
-
-  color: var(--text-700);
-  font-size: 11px;
-}
-
-.ranking-list li:nth-child(even) {
-  background: var(--surface-2);
-}
-
-.ranking-list li.empty-alert {
-  justify-content: center;
-  color: var(--text-400);
-}
-
-
-/* ----------------------------------------------------------
-   KPI card modifiers ที่ยังไม่มีสี (.warning / .danger)
-   ---------------------------------------------------------- */
-
-.kpi-card.warning,
-.kpi-card.danger {
-  border-color: transparent;
-}
-
-.kpi-card.warning {
-  background: var(--warning-bg);
-}
-
-.kpi-card.warning::before {
-  background: var(--warning);
-}
-
-.kpi-card.warning .card-title,
-.kpi-card.warning .card-status {
-  color: var(--warning);
-}
-
-.kpi-card.danger {
-  background: var(--danger-bg);
-}
-
-.kpi-card.danger::before {
-  background: var(--danger);
-}
-
-.kpi-card.danger .card-title,
-.kpi-card.danger .card-status {
-  color: var(--danger);
-}
+.kpi-card.warning, .kpi-card.danger { border-color: transparent; }
+.kpi-card.warning { background: var(--warning-bg); }
+.kpi-card.warning::before { background: var(--warning); }
+.kpi-card.warning .card-title, .kpi-card.warning .card-status { color: var(--warning); }
+.kpi-card.danger { background: var(--danger-bg); }
+.kpi-card.danger::before { background: var(--danger); }
+.kpi-card.danger .card-title, .kpi-card.danger .card-status { color: var(--danger); }
 
 /* ============================================================
-   ADD-ON: แก้ปัญหาข้อมูลในแต่ละหน้า "ล่น" ไม่มีระยะหายใจ
+   ADD-ON: bridge classes for daily-report.html
    ------------------------------------------------------------
-   สาเหตุ: .section-heading, .kpi-grid, .forecast, .table-wrapper,
-   .performance-status ฯลฯ เป็น direct child ของ .section ตรงๆ
-   โดยไม่มี .section-body ห่ออยู่ (ในเว็บจริงไม่ได้ใช้ .section-body
-   เลย) ทำให้เนื้อหาชิดขอบซ้าย/ขวา/บน ของ section ไม่มี gutter
-
-   วิธีแก้: ให้ .section เป็นตัว "จ่าย" padding ซ้าย-ขวา-ล่างแทน
-   แล้วให้ .section-heading ใช้ negative margin ดึงตัวเองกลับไป
-   เต็มขอบเหมือนเดิม (full-bleed header, padded body) — ไม่ต้อง
-   แก้ HTML หรือ JS แม้แต่บรรทัดเดียว ใช้ได้กับทุกหน้าที่มี .section
+   That page's KPI cards use `.card` + `.card-label/.card-note` and a
+   colour modifier (`.card-green/.card-gray/.card-orange/.card-red`)
+   rather than `.kpi-card` + `.card-title/.card-status`. Same visual
+   language, different names — mapped here rather than renamed in the
+   markup, so no HTML edits were needed.
    ============================================================ */
 
-.section {
-  padding: 0 16px 16px;
+.card-label { margin-bottom: 6px; color: var(--text-500); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+.card-note { margin-top: 6px; color: var(--text-400); font-size: 10.5px; }
+
+/* Same tinted-background pattern as .kpi-card.warning/.danger elsewhere
+   in this file, applied to the four status colours used on daily-report.html. */
+.card-green, .card-gray, .card-orange, .card-red { border-color: transparent; }
+.card-green { background: var(--success-bg); }
+.card-green .card-label { color: var(--success); }
+.card-gray { background: var(--neutral-bg); }
+.card-gray .card-label { color: var(--neutral); }
+.card-orange { background: var(--warning-bg); }
+.card-orange .card-label { color: var(--warning); }
+.card-red { background: var(--danger-bg); }
+.card-red .card-label { color: var(--danger); }
+
+.filter-action { display: flex; align-items: flex-end; }
+.btn-primary { background: var(--brand-700); border-color: var(--brand-700); color: #ffffff; }
+.btn-primary:hover { background: var(--brand-800); border-color: var(--brand-800); }
+
+.section-subtitle { margin: 1px 0 0; color: var(--text-500); font-size: 10.5px; }
+.section-actions { display: flex; align-items: center; gap: 8px; }
+
+.error-message:empty { display: none; }
+.error-message:not(:empty) {
+  margin-bottom: 10px; padding: 10px 12px; background: var(--danger-bg);
+  border: 1px solid #f2caca; border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm); color: var(--danger); font-size: 11px;
 }
 
-.section-heading {
-  margin: 0 -16px;
-}
-
-.section-heading + * {
-  margin-top: 16px;
-}
-
-/* ---------- page-title กับ filter bar ชิดกันเกินไป ---------- */
-
-.page-title {
-  margin-bottom: 14px;
-}
-
-/* ---------- responsive: ให้ padding เท่ากับ .section-heading ที่ปรับไว้ตาม breakpoint เดิม ---------- */
-
+.section { padding: 0 16px 16px; }
+.section-heading { margin: 0 -16px; }
+.section-heading + * { margin-top: 16px; }
+.page-title { margin-bottom: 14px; }
 @media (max-width: 700px) {
-
-  .section {
-    padding: 0 10px 10px;
-  }
-
-  .section-heading {
-    margin: 0 -10px;
-  }
-
-  .section-heading + * {
-    margin-top: 10px;
-  }
+  .section { padding: 0 10px 10px; }
+  .section-heading { margin: 0 -10px; }
+  .section-heading + * { margin-top: 10px; }
 }
 
-/* ============================================================
-   36. CHART WRAPPER HEIGHT (รวมเป็นก้อนเดียว)
-   ============================================================ */
-
-.chart-wrapper,
-.distance-chart-wrapper {
-  height: 215px;
-}
-
-@media (min-width: 1500px) {
-  .chart-wrapper,
-  .distance-chart-wrapper {
-    height: 150px;
-  }
-}
-
-@media (max-width: 1300px) {
-  .chart-wrapper,
-  .distance-chart-wrapper {
-    height: 140px;
-  }
-}
-
-@media (max-width: 700px) {
-  .chart-wrapper,
-  .distance-chart-wrapper {
-    height: 160px;
-  }
-}
-
-@media (max-width: 480px) {
-  .chart-wrapper,
-  .distance-chart-wrapper {
-    height: 150px;
-  }
-}
+.chart-wrapper, .distance-chart-wrapper { height: 215px; }
+@media (min-width: 1500px) { .chart-wrapper, .distance-chart-wrapper { height: 150px; } }
+@media (max-width: 1300px) { .chart-wrapper, .distance-chart-wrapper { height: 140px; } }
+@media (max-width: 700px) { .chart-wrapper, .distance-chart-wrapper { height: 160px; } }
+@media (max-width: 480px) { .chart-wrapper, .distance-chart-wrapper { height: 150px; } }
