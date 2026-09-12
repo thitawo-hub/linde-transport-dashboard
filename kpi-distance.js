@@ -26,6 +26,31 @@ const EXCLUDED_BRANCHES = ['linde oil'];
 
 const BRANCH_ORDER = ['ระยอง', 'ท่าลาน', 'บางปะอิน', 'หาดใหญ่'];
 
+// จำนวนรถ COCO ต่อสาขา/ประเภท — ตรึงค่าตายตัว ไม่อิงจำนวนแถวที่ได้จาก Supabase
+// (เพราะ view v_kpi_distance_car อาจไม่มีข้อมูลรถบางประเภท เช่น 10W ครบ)
+// vehicleType: null หมายถึงยังไม่แยกประเภท ให้รวมทุกประเภทของสาขานั้นเป็นแถวเดียว
+const FLEET_COUNTS = [
+  { branch: 'ระยอง', vehicleType: '22W', count: 35 },
+  { branch: 'ระยอง', vehicleType: '10W', count: 3 },
+  { branch: 'ท่าลาน', vehicleType: null, count: 14 },
+  { branch: 'บางปะอิน', vehicleType: null, count: 7 },
+  { branch: 'หาดใหญ่', vehicleType: null, count: 2 }
+];
+
+function getFleetCount(branch) {
+  const normalized = normalizeText(branch);
+  return FLEET_COUNTS.filter(entry => normalizeText(entry.branch) === normalized).reduce(
+    (sum, entry) => sum + entry.count,
+    0
+  );
+}
+
+function getFleetCountsForBranchFilter(branchFilter) {
+  if (!branchFilter) return FLEET_COUNTS;
+  const normalized = normalizeText(branchFilter);
+  return FLEET_COUNTS.filter(entry => normalizeText(entry.branch) === normalized);
+}
+
 // ============================================================
 // SUPABASE FETCH
 // ============================================================
@@ -159,9 +184,14 @@ function render() {
     return normalizeText(row.branch) === normalizeText(branch);
   });
 
-  renderSummary(filteredCars);
+  const fixedTotalCars = getFleetCountsForBranchFilter(branch).reduce(
+    (sum, entry) => sum + entry.count,
+    0
+  );
+
+  renderSummary(filteredCars, fixedTotalCars);
   renderCycle();
-  renderVehicleTypeSummary(filteredCars);
+  renderVehicleTypeSummary(filteredCars, branch);
   renderAlerts(filteredCars);
   renderRankings(filteredCars);
   renderChart(filteredDaily);
@@ -172,8 +202,8 @@ function render() {
 // SUMMARY
 // ============================================================
 
-function renderSummary(cars) {
-  const totalCars = cars.length;
+function renderSummary(cars, fixedTotalCars) {
+  const totalCars = fixedTotalCars;
 
   const targetCars = cars.filter(car => toNumber(car.target_km) > 0);
   const runningCars = cars.filter(car => toNumber(car.total_km) > 0);
@@ -214,41 +244,36 @@ function renderSummary(cars) {
 // VEHICLE TYPE SUMMARY
 // ============================================================
 
-function renderVehicleTypeSummary(cars) {
+function renderVehicleTypeSummary(cars, branchFilter) {
   const tbody = document.getElementById('vehicleTypeSummaryBody');
   if (!tbody) return;
 
-  if (!cars.length) {
+  const entries = getFleetCountsForBranchFilter(branchFilter);
+
+  if (!entries.length) {
     tbody.innerHTML = `<tr><td colspan="10" class="empty-state">ไม่พบข้อมูลรถ</td></tr>`;
     return;
   }
 
-  const groups = new Map();
-
-  cars.forEach(car => {
-    const branch = String(car.branch || '-').trim();
-    const vehicleType = normalizeVehicleType(car.vehicle_type);
-    const key = `${normalizeText(branch)}|||${normalizeText(vehicleType)}`;
-
-    if (!groups.has(key)) {
-      groups.set(key, { branch, vehicleType, cars: [] });
-    }
-
-    groups.get(key).cars.push(car);
-  });
-
-  const rows = [...groups.values()].sort((a, b) => {
+  const rows = [...entries].sort((a, b) => {
     const branchDiff = getBranchOrder(a.branch) - getBranchOrder(b.branch);
     if (branchDiff !== 0) return branchDiff;
-    return a.vehicleType.localeCompare(b.vehicleType, 'th');
+    return String(a.vehicleType || '').localeCompare(String(b.vehicleType || ''), 'th');
   });
 
   tbody.innerHTML = rows
-    .map(group => {
-      const carsInGroup = group.cars;
-      const totalCars = carsInGroup.length;
+    .map(entry => {
+      // ดึงเฉพาะรถจริงที่ตรงกับสาขา (และประเภทรถ ถ้าระบุ) มาคำนวณ KM/Target
+      // ส่วนจำนวนคัน ("จำนวนรถ") ใช้ค่าคงที่จาก FLEET_COUNTS เสมอ
+      const matchedCars = cars.filter(car => {
+        if (normalizeText(car.branch) !== normalizeText(entry.branch)) return false;
+        if (entry.vehicleType && normalizeText(normalizeVehicleType(car.vehicle_type)) !== normalizeText(entry.vehicleType)) {
+          return false;
+        }
+        return true;
+      });
 
-      const targetCars = carsInGroup.filter(car => toNumber(car.target_km) > 0);
+      const targetCars = matchedCars.filter(car => toNumber(car.target_km) > 0);
       const targetTotal = targetCars.reduce((sum, car) => sum + toNumber(car.target_km), 0);
       const totalKm = targetCars.reduce((sum, car) => sum + toNumber(car.total_km), 0);
       const forecastTotal = targetCars.reduce((sum, car) => sum + toNumber(car.forecast_km), 0);
@@ -259,12 +284,13 @@ function renderVehicleTypeSummary(cars) {
       const forecastOver = forecastTotal - targetTotal;
 
       const status = getGroupStatus(achievement, forecastAchievement, targetTotal);
+      const vehicleTypeLabel = entry.vehicleType || 'ทุกประเภท';
 
       return `
         <tr>
-          <td><strong>${escapeHtml(group.branch)}</strong></td>
-          <td><span class="vehicle-type-badge">${escapeHtml(group.vehicleType)}</span></td>
-          <td class="num">${formatNumber(totalCars)}</td>
+          <td><strong>${escapeHtml(entry.branch)}</strong></td>
+          <td><span class="vehicle-type-badge">${escapeHtml(vehicleTypeLabel)}</span></td>
+          <td class="num">${formatNumber(entry.count)}</td>
           <td class="num target-value">${avgTarget !== null ? formatNumber(avgTarget) : '-'}</td>
           <td class="num target-value">${targetTotal > 0 ? formatNumber(targetTotal) : '-'}</td>
           <td class="num">${formatNumber(totalKm)}</td>
