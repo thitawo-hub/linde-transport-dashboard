@@ -1,722 +1,2145 @@
-* {
+```css
+/* =========================================================
+   LINDE TRANSPORT
+   GLOBAL DESIGN SYSTEM
+   ========================================================= */
+
+
+/* =========================================================
+   01. VARIABLES
+   ========================================================= */
+
+:root {
+
+  /* ---------- Background ---------- */
+
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f8fafc;
+
+
+  /* ---------- Border ---------- */
+
+  --color-border: #e5e7eb;
+  --color-border-soft: #f1f5f9;
+
+
+  /* ---------- Text ---------- */
+
+  --color-text: #1f2937;
+  --color-text-dark: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --color-text-light: #9ca3af;
+
+
+  /* ---------- Brand ---------- */
+
+  --color-primary: #111827;
+  --color-primary-soft: #f3f4f6;
+
+
+  /* ---------- Status ---------- */
+
+  --color-success: #16a34a;
+  --color-success-bg: #dcfce7;
+
+  --color-warning: #d97706;
+  --color-warning-bg: #fef3c7;
+
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+
+  --color-info: #2563eb;
+  --color-info-bg: #dbeafe;
+
+
+  /* ---------- Radius ---------- */
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+
+
+  /* ---------- Shadow ---------- */
+
+  --shadow-sm:
+    0 1px 2px rgba(15, 23, 42, 0.04);
+
+  --shadow-md:
+    0 4px 12px rgba(15, 23, 42, 0.06);
+
+
+  /* ---------- Spacing ---------- */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+
+
+  /* ---------- Typography ---------- */
+
+  --font-main:
+    Arial,
+    sans-serif;
+
+  --font-mono:
+    'IBM Plex Mono',
+    monospace;
+
+}
+
+
+/* =========================================================
+   02. RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+
+html {
+  margin: 0;
+  padding: 0;
 }
 
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f7fa;
-  color: #1f2937;
+  padding: 0;
+
+  font-family: var(--font-main);
+
+  background:
+    var(--color-bg);
+
+  color:
+    var(--color-text);
+
+  line-height: 1.5;
+
+  -webkit-font-smoothing:
+    antialiased;
 }
 
 
-/* =========================
-   HEADER
-========================= */
+/* =========================================================
+   03. GLOBAL ELEMENTS
+   ========================================================= */
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+
+button {
+  cursor: pointer;
+}
+
+
+img {
+  max-width: 100%;
+}
+
+
+a {
+  color: inherit;
+}
+
+
+/* =========================================================
+   04. HEADER
+   ========================================================= */
 
 .header {
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 24px 32px;
+
+  background:
+    var(--color-surface);
+
+  border-bottom:
+    1px solid var(--color-border);
+
+  padding:
+    24px 32px;
+
 }
 
 
 .header h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
+
+  margin:
+    0;
+
+  font-size:
+    28px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
 }
 
 
 .header p {
-  margin: 6px 0 0;
-  color: #6b7280;
+
+  margin:
+    6px 0 0;
+
+  font-size:
+    14px;
+
+  color:
+    var(--color-text-muted);
+
 }
 
 
-/* =========================
-   CONTAINER
-========================= */
+/* =========================================================
+   05. TOP NAVIGATION
+   ========================================================= */
+
+.topbar {
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    24px;
+
+  min-height:
+    64px;
+
+  padding:
+    0 32px;
+
+  background:
+    var(--color-surface);
+
+  border-bottom:
+    1px solid var(--color-border);
+
+}
+
+
+.brand {
+
+  font-size:
+    16px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.3px;
+
+  color:
+    var(--color-text-dark);
+
+  white-space:
+    nowrap;
+
+}
+
+
+.nav {
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    4px;
+
+}
+
+
+.nav button,
+.nav a {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  min-height:
+    38px;
+
+  padding:
+    8px 14px;
+
+  border:
+    0;
+
+  border-radius:
+    var(--radius-sm);
+
+  background:
+    transparent;
+
+  color:
+    var(--color-text-muted);
+
+  font-size:
+    13px;
+
+  font-weight:
+    600;
+
+  text-decoration:
+    none;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+}
+
+
+.nav button:hover,
+.nav a:hover {
+
+  background:
+    var(--color-primary-soft);
+
+  color:
+    var(--color-text-dark);
+
+}
+
+
+.nav button.active,
+.nav a.active {
+
+  background:
+    var(--color-primary);
+
+  color:
+    #ffffff;
+
+}
+
+
+/* =========================================================
+   06. PAGE / CONTAINER
+   ========================================================= */
 
 .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 32px;
+
+  width:
+    100%;
+
+  max-width:
+    1400px;
+
+  margin:
+    0 auto;
+
+  padding:
+    24px 32px 40px;
+
 }
 
 
-/* =========================
-   FILTER
-========================= */
+/* =========================================================
+   07. PAGE TITLE
+   ========================================================= */
+
+.page-title {
+
+  margin:
+    0 0 20px;
+
+}
+
+
+.page-title h1 {
+
+  margin:
+    0;
+
+  font-size:
+    26px;
+
+  line-height:
+    1.25;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
+}
+
+
+.page-title p {
+
+  margin:
+    6px 0 0;
+
+  font-size:
+    13px;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+/* =========================================================
+   08. FILTER
+   ========================================================= */
 
 .filters {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding: 18px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-end;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    16px;
+
+  margin-bottom:
+    24px;
+
+  padding:
+    18px;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-lg);
+
+  box-shadow:
+    var(--shadow-sm);
+
 }
 
 
 .filters > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    6px;
+
 }
 
 
 .filters label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #4b5563;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-secondary);
+
 }
 
 
 .filters input,
 .filters select {
-  height: 40px;
-  min-width: 180px;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #1f2937;
-  font-size: 14px;
-  outline: none;
+
+  height:
+    40px;
+
+  min-width:
+    180px;
+
+  padding:
+    8px 12px;
+
+  border:
+    1px solid #d1d5db;
+
+  border-radius:
+    var(--radius-sm);
+
+  background:
+    var(--color-surface);
+
+  color:
+    var(--color-text);
+
+  font-size:
+    14px;
+
+  outline:
+    none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
 }
 
 
-/* =========================
-   CARDS
-========================= */
+.filters input:focus,
+.filters select:focus {
+
+  border-color:
+    #9ca3af;
+
+  box-shadow:
+    0 0 0 3px rgba(17, 24, 39, 0.06);
+
+}
+
+
+/* =========================================================
+   09. KPI CARDS
+   ========================================================= */
 
 .cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 16px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap:
+    16px;
+
+  margin-bottom:
+    16px;
+
 }
 
 
 .card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
+
+  min-width:
+    0;
+
+  padding:
+    20px;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-lg);
+
+  box-shadow:
+    var(--shadow-sm);
+
 }
 
 
 .card-title {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 8px;
+
+  margin-bottom:
+    8px;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    600;
+
+  color:
+    var(--color-text-muted);
+
 }
 
 
 .card-value {
-  font-size: 28px;
-  font-weight: 700;
+
+  font-size:
+    28px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
 }
 
 
-/* =========================
-   SECTION
-========================= */
+/* =========================================================
+   10. SECTION
+   ========================================================= */
 
 .section {
-  margin-top: 24px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
+
+  margin-top:
+    24px;
+
+  padding:
+    20px;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-lg);
+
+  box-shadow:
+    var(--shadow-sm);
+
 }
 
 
 .section h2 {
-  margin-top: 0;
-  font-size: 18px;
+
+  margin:
+    0 0 16px;
+
+  font-size:
+    18px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
 }
 
 
-/* =========================
-   FORECAST
-========================= */
+.section-subtitle {
+
+  margin:
+    -8px 0 20px;
+
+  font-size:
+    13px;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+/* =========================================================
+   11. FORECAST
+   ========================================================= */
 
 .forecast-section {
-  margin-top: 24px;
+
+  margin-top:
+    24px;
+
 }
 
 
 .forecast-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap:
+    16px;
+
 }
 
 
 .forecast-item {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 18px;
+
+  padding:
+    18px;
+
+  background:
+    var(--color-surface-soft);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-md);
+
 }
 
 
 .forecast-label {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 8px;
+
+  margin-bottom:
+    8px;
+
+  font-size:
+    12px;
+
+  color:
+    var(--color-text-muted);
+
 }
 
 
 .forecast-value {
-  font-size: 26px;
-  font-weight: 700;
+
+  font-size:
+    26px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
 }
 
 
 .forecast-note {
-  margin-top: 16px;
-  font-size: 13px;
-  color: #6b7280;
+
+  margin-top:
+    16px;
+
+  font-size:
+    13px;
+
+  color:
+    var(--color-text-muted);
+
 }
 
 
-/* =========================
-   CAR BREAKDOWN
-========================= */
+/* =========================================================
+   12. BREAKDOWN
+   ========================================================= */
 
 .breakdown {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap:
+    12px;
+
 }
 
 
 .breakdown-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    12px;
+
+  padding:
+    14px 16px;
+
+  background:
+    var(--color-surface-soft);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-md);
+
 }
 
 
 .breakdown-name {
-  font-size: 14px;
-  color: #4b5563;
+
+  font-size:
+    14px;
+
+  color:
+    var(--color-text-secondary);
+
 }
 
 
 .breakdown-value {
-  font-size: 20px;
-  font-weight: 700;
+
+  font-size:
+    20px;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
 }
 
 
-/* =========================
-   STATUS
-========================= */
+/* =========================================================
+   13. CHART SUMMARY
+   ========================================================= */
 
-#status {
-  color: #6b7280;
+.chart-summary {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap:
+    14px;
+
+  margin-bottom:
+    20px;
+
 }
 
 
-/* =========================
-   RESPONSIVE
-========================= */
+.chart-summary-card {
+
+  padding:
+    16px 18px;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-lg);
+
+}
+
+
+.chart-summary-card span {
+
+  display:
+    block;
+
+  margin-bottom:
+    6px;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    600;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+.chart-summary-card strong {
+
+  display:
+    block;
+
+  font-size:
+    24px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
+}
+
+
+.chart-summary-card small {
+
+  display:
+    block;
+
+  margin-top:
+    6px;
+
+  font-size:
+    11px;
+
+  color:
+    var(--color-text-light);
+
+}
+
+
+/* =========================================================
+   14. CHART SUMMARY STATUS
+   ========================================================= */
+
+.chart-summary-card.actual {
+
+  border-left:
+    4px solid var(--color-primary);
+
+}
+
+
+.chart-summary-card.target {
+
+  border-left:
+    4px solid var(--color-info);
+
+}
+
+
+.chart-summary-card.forecast {
+
+  border-left:
+    4px solid #f59e0b;
+
+}
+
+
+/* =========================================================
+   15. CHART WRAPPER
+   ========================================================= */
+
+.chart-wrapper {
+
+  position:
+    relative;
+
+  width:
+    100%;
+
+  height:
+    380px;
+
+  padding:
+    18px;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-lg);
+
+}
+
+
+#kmCumulativeChart {
+
+  width:
+    100% !important;
+
+  height:
+    100% !important;
+
+}
+
+
+/* =========================================================
+   16. PERFORMANCE STATUS
+   ========================================================= */
+
+.performance-status {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr) 260px;
+
+  gap:
+    20px;
+
+  align-items:
+    center;
+
+  margin:
+    20px 0;
+
+  padding:
+    22px 24px;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-xl);
+
+}
+
+
+.performance-status-main {
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    5px;
+
+}
+
+
+.status-label {
+
+  font-size:
+    12px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    600;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+.performance-status-main strong {
+
+  font-size:
+    28px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    800;
+
+}
+
+
+.performance-status-main p {
+
+  margin:
+    0;
+
+  font-size:
+    13px;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+.performance-status-achievement {
+
+  padding-left:
+    20px;
+
+  border-left:
+    1px solid var(--color-border);
+
+}
+
+
+.performance-status-achievement span {
+
+  display:
+    block;
+
+  margin-bottom:
+    5px;
+
+  font-size:
+    12px;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+.performance-status-achievement strong {
+
+  font-size:
+    26px;
+
+  line-height:
+    1.2;
+
+}
+
+
+/* =========================================================
+   17. PERFORMANCE STATUS COLORS
+   ========================================================= */
+
+.status-on-track {
+
+  border-left:
+    5px solid var(--color-success);
+
+}
+
+
+.status-on-track
+.performance-status-main strong {
+
+  color:
+    var(--color-success);
+
+}
+
+
+.status-at-risk {
+
+  border-left:
+    5px solid #f59e0b;
+
+}
+
+
+.status-at-risk
+.performance-status-main strong {
+
+  color:
+    var(--color-warning);
+
+}
+
+
+.status-below-target {
+
+  border-left:
+    5px solid var(--color-danger);
+
+}
+
+
+.status-below-target
+.performance-status-main strong {
+
+  color:
+    var(--color-danger);
+
+}
+
+
+/* =========================================================
+   18. STATUS TEXT
+   ========================================================= */
+
+.status-low {
+
+  color:
+    var(--color-danger) !important;
+
+}
+
+
+.status-ok {
+
+  color:
+    var(--color-success) !important;
+
+}
+
+
+.status-high {
+
+  color:
+    var(--color-info) !important;
+
+}
+
+
+/* =========================================================
+   19. STATUS BADGE
+   ========================================================= */
+
+.distance-status,
+.car-status {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    5px;
+
+  min-height:
+    28px;
+
+  padding:
+    5px 10px;
+
+  border-radius:
+    999px;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.2;
+
+  font-weight:
+    700;
+
+  white-space:
+    nowrap;
+
+}
+
+
+/* ---------- Normal ---------- */
+
+.distance-status.normal,
+.car-status.status-ok {
+
+  color:
+    #15803d;
+
+  background:
+    var(--color-success-bg);
+
+}
+
+
+/* ---------- Near ---------- */
+
+.distance-status.near {
+
+  color:
+    #b45309;
+
+  background:
+    var(--color-warning-bg);
+
+}
+
+
+/* ---------- Forecast ---------- */
+
+.distance-status.forecast {
+
+  color:
+    #b45309;
+
+  background:
+    #ffedd5;
+
+}
+
+
+/* ---------- Over ---------- */
+
+.distance-status.over,
+.car-status.status-low {
+
+  color:
+    #b91c1c;
+
+  background:
+    var(--color-danger-bg);
+
+}
+
+
+/* ---------- No Target ---------- */
+
+.distance-status.no-target {
+
+  color:
+    var(--color-text-muted);
+
+  background:
+    var(--color-primary-soft);
+
+}
+
+
+/* ---------- High ---------- */
+
+.car-status.status-high {
+
+  color:
+    #1d4ed8;
+
+  background:
+    var(--color-info-bg);
+
+}
+
+
+/* =========================================================
+   20. CAR PERFORMANCE TABLE
+   ========================================================= */
+
+.car-performance-wrapper {
+
+  width:
+    100%;
+
+  overflow-x:
+    auto;
+
+  background:
+    var(--color-surface);
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    var(--radius-xl);
+
+}
+
+
+.car-performance-table {
+
+  width:
+    100%;
+
+  min-width:
+    900px;
+
+  border-collapse:
+    collapse;
+
+}
+
+
+.car-performance-table th {
+
+  padding:
+    13px 16px;
+
+  text-align:
+    left;
+
+  font-size:
+    12px;
+
+  line-height:
+    1.3;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-secondary);
+
+  background:
+    var(--color-surface-soft);
+
+  border-bottom:
+    1px solid var(--color-border);
+
+  white-space:
+    nowrap;
+
+}
+
+
+.car-performance-table td {
+
+  padding:
+    13px 16px;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.4;
+
+  color:
+    var(--color-text-secondary);
+
+  border-bottom:
+    1px solid var(--color-border-soft);
+
+  white-space:
+    nowrap;
+
+}
+
+
+.car-performance-table tbody tr:last-child td {
+
+  border-bottom:
+    none;
+
+}
+
+
+.car-performance-table tbody tr:hover {
+
+  background:
+    #fafafa;
+
+}
+
+
+.car-performance-table td:nth-child(4),
+.car-performance-table td:nth-child(5),
+.car-performance-table td:nth-child(6),
+.car-performance-table td:nth-child(7),
+.car-performance-table td:nth-child(8),
+.car-performance-table td:nth-child(9),
+.car-performance-table td:nth-child(10) {
+
+  font-family:
+    var(--font-mono);
+
+  font-weight:
+    600;
+
+}
+
+
+/* =========================================================
+   21. VEHICLE TYPE
+   ========================================================= */
+
+.vehicle-type-badge {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  min-height:
+    26px;
+
+  padding:
+    4px 9px;
+
+  border:
+    1px solid var(--color-border);
+
+  border-radius:
+    999px;
+
+  background:
+    var(--color-surface-soft);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+}
+
+
+.vehicle-type-cell {
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-secondary);
+
+}
+
+
+/* =========================================================
+   22. ACHIEVEMENT COLORS
+   ========================================================= */
+
+.achievement-good {
+
+  color:
+    var(--color-success) !important;
+
+}
+
+
+.achievement-warning {
+
+  color:
+    var(--color-warning) !important;
+
+}
+
+
+.achievement-danger {
+
+  color:
+    var(--color-danger) !important;
+
+}
+
+
+/* =========================================================
+   23. ALERT / RANKING
+   ========================================================= */
+
+.alert-item,
+.ranking-item {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr) auto auto;
+
+  align-items:
+    center;
+
+  gap:
+    16px;
+
+  padding:
+    12px 0;
+
+  border-bottom:
+    1px solid var(--color-border-soft);
+
+}
+
+
+.alert-item:last-child,
+.ranking-item:last-child {
+
+  border-bottom:
+    none;
+
+}
+
+
+.alert-car,
+.ranking-car {
+
+  font-size:
+    14px;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-dark);
+
+}
+
+
+.alert-plate,
+.ranking-car small {
+
+  display:
+    block;
+
+  margin-top:
+    2px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    400;
+
+  color:
+    var(--color-text-muted);
+
+}
+
+
+.alert-type {
+
+  display:
+    block;
+
+  margin-top:
+    3px;
+
+  font-size:
+    11px;
+
+  color:
+    var(--color-text-light);
+
+}
+
+
+.alert-km,
+.ranking-value {
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+  color:
+    var(--color-text-secondary);
+
+  text-align:
+    right;
+
+}
+
+
+.alert-percent {
+
+  font-family:
+    var(--font-mono);
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+  text-align:
+    right;
+
+}
+
+
+.ranking-number {
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  width:
+    32px;
+
+  height:
+    32px;
+
+  border-radius:
+    50%;
+
+  background:
+    var(--color-primary-soft);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size:
+    11px;
+
+  font-weight:
+    700;
+
+}
+
+
+.empty-alert {
+
+  padding:
+    20px;
+
+  text-align:
+    center;
+
+  color:
+    var(--color-text-light);
+
+  list-style:
+    none;
+
+}
+
+
+/* =========================================================
+   24. EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+
+  padding:
+    30px !important;
+
+  text-align:
+    center !important;
+
+  color:
+    var(--color-text-light) !important;
+
+}
+
+
+/* =========================================================
+   25. PAGE STATUS
+   ========================================================= */
+
+#status,
+#pageStatus {
+
+  color:
+    var(--color-text-muted);
+
+  font-size:
+    12px;
+
+}
+
+
+/* =========================================================
+   26. TABLE GENERAL
+   ========================================================= */
+
+table {
+
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+
+}
+
+
+table th {
+
+  padding:
+    13px 16px;
+
+  background:
+    var(--color-surface-soft);
+
+  border-bottom:
+    1px solid var(--color-border);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  text-align:
+    left;
+
+  white-space:
+    nowrap;
+
+}
+
+
+table td {
+
+  padding:
+    13px 16px;
+
+  border-bottom:
+    1px solid var(--color-border-soft);
+
+  color:
+    var(--color-text-secondary);
+
+  font-size:
+    13px;
+
+}
+
+
+table tbody tr:hover {
+
+  background:
+    #fafafa;
+
+}
+
+
+/* =========================================================
+   27. MONOSPACE NUMBERS
+   ========================================================= */
+
+.num {
+
+  font-family:
+    var(--font-mono);
+
+  font-weight:
+    600;
+
+  text-align:
+    right;
+
+}
+
+
+/* =========================================================
+   28. TARGET VALUE
+   ========================================================= */
+
+.target-value {
+
+  color:
+    var(--color-info) !important;
+
+  font-weight:
+    700;
+
+}
+
+
+/* =========================================================
+   29. RESPONSIVE — TABLET
+   ========================================================= */
 
 @media (max-width: 1000px) {
 
   .cards {
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
   }
+
 
   .forecast-grid {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
 
+
   .breakdown {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .topbar {
+
+    padding:
+      0 20px;
+
+  }
+
+
+  .container {
+
+    padding:
+      20px;
+
   }
 
 }
 
 
-@media (max-width: 600px) {
+/* =========================================================
+   30. RESPONSIVE — MOBILE
+   ========================================================= */
 
-  .container {
-    padding: 16px;
+@media (max-width: 700px) {
+
+  .topbar {
+
+    min-height:
+      auto;
+
+    padding:
+      14px 16px;
+
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    gap:
+      10px;
+
+  }
+
+
+  .nav {
+
+    width:
+      100%;
+
+    overflow-x:
+      auto;
+
+  }
+
+
+  .nav button,
+  .nav a {
+
+    flex:
+      0 0 auto;
+
   }
 
 
   .header {
-    padding: 20px 16px;
+
+    padding:
+      20px 16px;
+
+  }
+
+
+  .header h1 {
+
+    font-size:
+      24px;
+
+  }
+
+
+  .container {
+
+    padding:
+      16px;
+
+  }
+
+
+  .page-title h1 {
+
+    font-size:
+      22px;
+
   }
 
 
   .cards {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
 
 
   .filters {
-    flex-direction: column;
-    align-items: stretch;
+
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+
+    gap:
+      12px;
+
+  }
+
+
+  .filters > div {
+
+    width:
+      100%;
+
   }
 
 
   .filters input,
   .filters select {
-    width: 100%;
-    min-width: 0;
+
+    width:
+      100%;
+
+    min-width:
+      0;
+
   }
 
-}
-
-/* =========================
-   KM CHART
-========================= */
-
-.chart-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.chart-summary > div {
-  padding: 14px 16px;
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-}
-
-.chart-summary span {
-  display: block;
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 5px;
-}
-
-.chart-summary strong {
-  font-size: 20px;
-}
-
-.chart-wrapper {
-  position: relative;
-  width: 100%;
-  height: 350px;
-}
-
-@media (max-width: 600px) {
 
   .chart-summary {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
+
 
   .chart-wrapper {
-    height: 280px;
+
+    height:
+      300px;
+
+    padding:
+      10px;
+
   }
 
-}
-
-/* =========================================================
-   KM PERFORMANCE
-   ========================================================= */
-
-.section-subtitle {
-  margin: -8px 0 20px;
-  color: #6b7280;
-  font-size: 13px;
-}
-
-
-/* Chart Summary */
-
-.chart-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.chart-summary-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.chart-summary-card span {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  margin-bottom: 6px;
-}
-
-.chart-summary-card strong {
-  display: block;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.chart-summary-card small {
-  display: block;
-  margin-top: 6px;
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-
-/* Actual */
-
-.chart-summary-card.actual {
-  border-left: 4px solid #111827;
-}
-
-
-/* Target */
-
-.chart-summary-card.target {
-  border-left: 4px solid #2563eb;
-}
-
-
-/* Forecast */
-
-.chart-summary-card.forecast {
-  border-left: 4px solid #f59e0b;
-}
-
-
-/* Chart */
-
-.chart-wrapper {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 18px;
-  box-sizing: border-box;
-}
-
-
-/* Mobile */
-
-@media (max-width: 700px) {
-
-  .chart-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .chart-wrapper {
-    height: 300px;
-    padding: 10px;
-  }
-
-}
-
-/* =========================================================
-   KM PERFORMANCE
-   ========================================================= */
-
-.section-subtitle {
-  margin: -8px 0 20px;
-  color: #6b7280;
-  font-size: 13px;
-}
-
-
-/* Chart Summary */
-
-.chart-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.chart-summary-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.chart-summary-card span {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  margin-bottom: 6px;
-}
-
-.chart-summary-card strong {
-  display: block;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.chart-summary-card small {
-  display: block;
-  margin-top: 6px;
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-
-/* Actual */
-
-.chart-summary-card.actual {
-  border-left: 4px solid #111827;
-}
-
-
-/* Target */
-
-.chart-summary-card.target {
-  border-left: 4px solid #2563eb;
-}
-
-
-/* Forecast */
-
-.chart-summary-card.forecast {
-  border-left: 4px solid #f59e0b;
-}
-
-
-/* Chart */
-
-.chart-wrapper {
-  position: relative;
-  width: 100%;
-  height: 380px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 18px;
-  box-sizing: border-box;
-}
-
-
-/* Mobile */
-
-@media (max-width: 700px) {
-
-  .chart-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .chart-wrapper {
-    height: 300px;
-    padding: 10px;
-  }
-
-}
-
-.status-low {
-  color: #dc2626 !important;
-}
-
-.status-ok {
-  color: #16a34a !important;
-}
-
-.status-high {
-  color: #2563eb !important;
-}
-
-#kmCumulativeChart {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.performance-status {
-  display: grid;
-  grid-template-columns: 1fr 260px;
-  gap: 20px;
-  align-items: center;
-
-  margin: 20px 0;
-  padding: 22px 24px;
-
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-}
-
-.performance-status-main {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.status-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-}
-
-.performance-status-main strong {
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.performance-status-main p {
-  margin: 0;
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.performance-status-achievement {
-  padding-left: 20px;
-  border-left: 1px solid #e5e7eb;
-}
-
-.performance-status-achievement span {
-  display: block;
-  font-size: 12px;
-  color: #6b7280;
-  margin-bottom: 5px;
-}
-
-.performance-status-achievement strong {
-  font-size: 26px;
-}
-
-
-/* Status Colors */
-
-.status-on-track {
-  border-left: 5px solid #16a34a;
-}
-
-.status-on-track
-.performance-status-main strong {
-  color: #16a34a;
-}
-
-.status-at-risk {
-  border-left: 5px solid #f59e0b;
-}
-
-.status-at-risk
-.performance-status-main strong {
-  color: #d97706;
-}
-
-.status-below-target {
-  border-left: 5px solid #dc2626;
-}
-
-.status-below-target
-.performance-status-main strong {
-  color: #dc2626;
-}
-
-
-@media (max-width: 700px) {
 
   .performance-status {
-    grid-template-columns: 1fr;
+
+    grid-template-columns:
+      1fr;
+
   }
+
 
   .performance-status-achievement {
-    padding-left: 0;
-    padding-top: 15px;
-    border-left: none;
-    border-top: 1px solid #e5e7eb;
+
+    padding-left:
+      0;
+
+    padding-top:
+      15px;
+
+    border-left:
+      none;
+
+    border-top:
+      1px solid var(--color-border);
+
+  }
+
+
+  .alert-item,
+  .ranking-item {
+
+    grid-template-columns:
+      1fr auto;
+
+  }
+
+
+  .alert-percent {
+
+    grid-column:
+      2;
+
   }
 
 }
 
-/* ==================== KM PERFORMANCE BY CAR ==================== */
 
-.car-performance-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  background: #fff;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-}
+/* =========================================================
+   31. VERY SMALL SCREEN
+   ========================================================= */
 
-.car-performance-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 760px;
-}
+@media (max-width: 480px) {
 
-.car-performance-table th {
-  padding: 14px 16px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: 700;
-  color: #374151;
-  background: #f8fafc;
-  border-bottom: 1px solid #e5e7eb;
-  white-space: nowrap;
-}
+  .card {
 
-.car-performance-table td {
-  padding: 14px 16px;
-  font-size: 14px;
-  color: #374151;
-  border-bottom: 1px solid #f1f5f9;
-  white-space: nowrap;
-}
+    padding:
+      16px;
 
-.car-performance-table tbody tr:hover {
-  background: #f8fafc;
-}
+  }
 
-.car-performance-table td:nth-child(3),
-.car-performance-table td:nth-child(4),
-.car-performance-table td:nth-child(5) {
-  font-family: 'IBM Plex Mono', monospace;
-  font-weight: 600;
-}
 
-.car-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-}
+  .card-value {
 
-.car-status.status-low {
-  color: #b91c1c;
-  background: #fee2e2;
-}
+    font-size:
+      24px;
 
-.car-status.status-ok {
-  color: #15803d;
-  background: #dcfce7;
-}
+  }
 
-.car-status.status-high {
-  color: #1d4ed8;
-  background: #dbeafe;
-}
 
-.empty-state {
-  text-align: center !important;
-  color: #9ca3af !important;
-  padding: 30px !important;
+  .section {
+
+    padding:
+      16px;
+
+  }
+
+
+  .forecast-item {
+
+    padding:
+      14px;
+
+  }
+
+
+  .performance-status {
+
+    padding:
+      18px;
+
+  }
+
 }
+```
