@@ -342,7 +342,7 @@ img { max-width: 100%; }
   background-position: 0 0, 100% 0, 0 0, 100% 0;
   background-attachment: local, local, scroll, scroll;
 }
-.table-wrapper table { width: 100%; min-width: 700px; font-size: 11px; border-collapse: separate; border-spacing: 0; }
+.table-wrapper table { width: 100%; min-width: 700px; font-size: 11px; }
 .table-wrapper thead { position: sticky; top: 0; z-index: 5; }
 .table-wrapper th { height: 34px; padding: 7px 10px; background: var(--surface-3); border-bottom: 1px solid var(--border); color: var(--text-600); font-size: 9.5px; font-weight: 700; letter-spacing: 0.01em; text-align: left; white-space: nowrap; }
 .table-wrapper td { height: 34px; padding: 6px 10px; border-bottom: 1px solid var(--border-2); color: var(--text-700); font-size: 10.5px; white-space: nowrap; }
@@ -352,16 +352,6 @@ img { max-width: 100%; }
 .table-wrapper .num, .table-wrapper td.num, .table-wrapper th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .table-wrapper td strong { color: var(--text-900); font-weight: 700; }
 .data-table, .car-performance-table { width: 100%; }
-
-/* First column stays put while the rest of a wide row scrolls sideways,
-   so you always know which vehicle/driver you're looking at. */
-.table-wrapper th:first-child, .table-wrapper td:first-child {
-  position: sticky; left: 0; z-index: 2;
-}
-.table-wrapper th:first-child { z-index: 6; background: var(--surface-3); box-shadow: 1px 0 0 var(--border); }
-.table-wrapper td:first-child { background: var(--surface); box-shadow: 1px 0 0 var(--border-2); }
-.table-wrapper tbody tr:nth-child(even) td:first-child { background: var(--surface-2); }
-.table-wrapper tbody tr:hover td:first-child { background: var(--brand-50); }
 
 .table-wrapper .number, .table-wrapper td.number, .table-wrapper th.number { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .table-wrapper .center, .table-wrapper td.center, .table-wrapper th.center, .table-wrapper .text-center { text-align: center; }
