@@ -31,19 +31,19 @@
   --border-2: #edf2ea;
 
   /* ---------- Status ---------- */
-  --success:       #1a7a52;
+  --success:       #178a54;
   --success-bg:    #e6f5ec;
 
-  --warning:       #a3721b;
+  --warning:       #b5730e;
   --warning-bg:    #fbf3dc;
 
-  --danger:        #b8393a;
+  --danger:        #c23b3c;
   --danger-bg:     #fbebec;
 
   --info:          #2a5fc4;
   --info-bg:       #eaf0fd;
 
-  --neutral:       #626d67;
+  --neutral:       #5b665f;
   --neutral-bg:    #eef1ef;
 
   --pill-1-bg: linear-gradient(135deg, var(--brand-800), var(--brand-900));
@@ -58,20 +58,13 @@
   --pill-3-fg: var(--brand-900);
   --pill-3-sub: rgba(14, 72, 53, 0.62);
 
-  --shadow-xs:
-    0 1px 2px rgba(20, 45, 34, 0.04);
+  --shadow-xs: 0 1px 2px rgba(15, 30, 24, 0.05);
+  --shadow-sm: 0 1px 2px rgba(15, 30, 24, 0.05), 0 6px 16px rgba(15, 30, 24, 0.06);
+  --shadow-md: 0 2px 6px rgba(15, 30, 24, 0.07), 0 14px 30px rgba(15, 30, 24, 0.10);
 
-  --shadow-sm:
-    0 1px 2px rgba(20, 45, 34, 0.03),
-    0 10px 24px rgba(20, 45, 34, 0.06);
-
-  --shadow-md:
-    0 4px 10px rgba(20, 45, 34, 0.05),
-    0 18px 44px rgba(20, 45, 34, 0.09);
-
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -231,6 +224,36 @@ img { max-width: 100%; }
 
 .section, .card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
 .section { margin-bottom: 14px; }
+
+/* .card as a KPI tile (daily-report.html): compact padding so the number
+   is the dominant thing on the tile, not surrounded by dead air. */
+.card {
+  padding: 12px 14px;
+  transition: box-shadow 0.15s ease;
+}
+.card-title, .card-label { margin-bottom: 4px; color: var(--text-500); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
+.card-value { color: var(--text-950); font-size: 22px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+.card-status, .card-note { margin-top: 4px; color: var(--text-400); font-size: 10px; }
+.card-breakdown { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; color: var(--text-500); font-size: 10.5px; }
+.card-breakdown strong { margin-left: 4px; color: var(--text-800); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* Status tiles read as solid, saturated colour rather than a pale tint —
+   the four states are meant to be told apart at a glance, so give them
+   real contrast instead of a wash. The neutral "total" tile stays plain
+   white so it reads as the reference point the coloured ones sit against. */
+.card-green, .card-gray, .card-orange, .card-red { border-color: transparent; }
+.card-green { background: var(--success); }
+.card-green .card-label, .card-green .card-note { color: rgba(255, 255, 255, 0.78); }
+.card-green .card-value { color: #ffffff; }
+.card-orange { background: var(--warning); }
+.card-orange .card-label, .card-orange .card-note { color: rgba(255, 255, 255, 0.8); }
+.card-orange .card-value { color: #ffffff; }
+.card-red { background: var(--danger); }
+.card-red .card-label, .card-red .card-note { color: rgba(255, 255, 255, 0.8); }
+.card-red .card-value { color: #ffffff; }
+.card-gray { background: var(--neutral); }
+.card-gray .card-label, .card-gray .card-note { color: rgba(255, 255, 255, 0.75); }
+.card-gray .card-value { color: #ffffff; }
 .section-heading { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border-2); }
 .section-heading h2, .section-heading h3 { margin: 0; color: var(--text-900); font-size: 13.5px; font-weight: 700; letter-spacing: -0.005em; }
 .section-heading p { margin: 1px 0 0; color: var(--text-500); font-size: 10.5px; }
@@ -302,8 +325,24 @@ img { max-width: 100%; }
 .watchlist-card, .ranking-card { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); overflow: hidden; }
 .watchlist-header, .ranking-header { min-height: 39px; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border-2); color: var(--text-800); font-size: 11px; font-weight: 700; }
 
-.table-wrapper { width: 100%; overflow: auto; max-height: 285px; background: var(--surface); }
-.table-wrapper table { width: 100%; min-width: 700px; font-size: 11px; }
+.table-wrapper {
+  width: 100%; overflow: auto; max-height: 285px; background: var(--surface);
+  position: relative;
+  /* Scroll-shadow cue: a soft edge fade that only shows while there's
+     more table to the left/right — scrolls with the content (`local`)
+     while the shadow layers stay pinned to the viewport (`scroll`), the
+     classic no-markup way to signal "there's more, swipe/scroll". */
+  background-image:
+    linear-gradient(to right, var(--surface) 30%, rgba(255, 255, 255, 0)),
+    linear-gradient(to right, rgba(255, 255, 255, 0), var(--surface) 70%),
+    linear-gradient(to right, rgba(20, 32, 27, 0.10), rgba(20, 32, 27, 0)),
+    linear-gradient(to left, rgba(20, 32, 27, 0.10), rgba(20, 32, 27, 0));
+  background-repeat: no-repeat;
+  background-size: 24px 100%, 24px 100%, 10px 100%, 10px 100%;
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-attachment: local, local, scroll, scroll;
+}
+.table-wrapper table { width: 100%; min-width: 700px; font-size: 11px; border-collapse: separate; border-spacing: 0; }
 .table-wrapper thead { position: sticky; top: 0; z-index: 5; }
 .table-wrapper th { height: 34px; padding: 7px 10px; background: var(--surface-3); border-bottom: 1px solid var(--border); color: var(--text-600); font-size: 9.5px; font-weight: 700; letter-spacing: 0.01em; text-align: left; white-space: nowrap; }
 .table-wrapper td { height: 34px; padding: 6px 10px; border-bottom: 1px solid var(--border-2); color: var(--text-700); font-size: 10.5px; white-space: nowrap; }
@@ -313,6 +352,17 @@ img { max-width: 100%; }
 .table-wrapper .num, .table-wrapper td.num, .table-wrapper th.num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .table-wrapper td strong { color: var(--text-900); font-weight: 700; }
 .data-table, .car-performance-table { width: 100%; }
+
+/* First column stays put while the rest of a wide row scrolls sideways,
+   so you always know which vehicle/driver you're looking at. */
+.table-wrapper th:first-child, .table-wrapper td:first-child {
+  position: sticky; left: 0; z-index: 2;
+}
+.table-wrapper th:first-child { z-index: 6; background: var(--surface-3); box-shadow: 1px 0 0 var(--border); }
+.table-wrapper td:first-child { background: var(--surface); box-shadow: 1px 0 0 var(--border-2); }
+.table-wrapper tbody tr:nth-child(even) td:first-child { background: var(--surface-2); }
+.table-wrapper tbody tr:hover td:first-child { background: var(--brand-50); }
+
 .table-wrapper .number, .table-wrapper td.number, .table-wrapper th.number { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .table-wrapper .center, .table-wrapper td.center, .table-wrapper th.center, .table-wrapper .text-center { text-align: center; }
 .table-wrapper .text-muted { color: var(--text-400); }
@@ -480,25 +530,11 @@ tbody td { color: var(--text-700); font-size: 11px; }
    ------------------------------------------------------------
    That page's KPI cards use `.card` + `.card-label/.card-note` and a
    colour modifier (`.card-green/.card-gray/.card-orange/.card-red`)
-   rather than `.kpi-card` + `.card-title/.card-status`. Same visual
-   language, different names — mapped here rather than renamed in the
-   markup, so no HTML edits were needed.
+   rather than `.kpi-card` + `.card-title/.card-status`. Handled above
+   alongside the rest of the `.card` component — nothing further needed
+   here, kept as a marker for where that mapping lives.
    ============================================================ */
 
-.card-label { margin-bottom: 6px; color: var(--text-500); font-size: 10.5px; font-weight: 600; letter-spacing: 0.01em; }
-.card-note { margin-top: 6px; color: var(--text-400); font-size: 10.5px; }
-
-/* Same tinted-background pattern as .kpi-card.warning/.danger elsewhere
-   in this file, applied to the four status colours used on daily-report.html. */
-.card-green, .card-gray, .card-orange, .card-red { border-color: transparent; }
-.card-green { background: var(--success-bg); }
-.card-green .card-label { color: var(--success); }
-.card-gray { background: var(--neutral-bg); }
-.card-gray .card-label { color: var(--neutral); }
-.card-orange { background: var(--warning-bg); }
-.card-orange .card-label { color: var(--warning); }
-.card-red { background: var(--danger-bg); }
-.card-red .card-label { color: var(--danger); }
 
 .filter-action { display: flex; align-items: flex-end; }
 .btn-primary { background: var(--brand-700); border-color: var(--brand-700); color: #ffffff; }
