@@ -314,6 +314,33 @@ img { max-width: 100%; }
 .distance-status.over { background: var(--info-bg); color: var(--info); }
 .distance-status.no-target { background: var(--neutral-bg); color: var(--neutral); }
 
+/* ============================================================
+   ADD-ON: status-badge / chips (daily-report.js)
+   ------------------------------------------------------------
+   daily-report.js renders `<span class="status-badge status-green|
+   status-orange|status-red|status-gray">` for job/work/shift status,
+   and `<span class="driver-chip">` / `<span class="car-chip">` for
+   the driver and vehicle lists — none of these classes existed in
+   this file before, so every one of those spans was rendering as
+   plain unstyled text. Same pill-badge look as `.status` above.
+   ============================================================ */
+
+.status-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 22px; padding: 2px 10px; border-radius: 999px;
+  font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.status-badge.status-green { background: var(--success-bg); color: var(--success); }
+.status-badge.status-orange { background: var(--warning-bg); color: var(--warning); }
+.status-badge.status-red { background: var(--danger-bg); color: var(--danger); }
+.status-badge.status-gray { background: var(--neutral-bg); color: var(--neutral); }
+
+.driver-chip, .car-chip {
+  display: inline-block; margin: 1px 3px 1px 0; padding: 2px 8px;
+  background: var(--surface-3); border: 1px solid var(--border-2);
+  border-radius: 999px; color: var(--text-700); font-size: 10px; white-space: nowrap;
+}
+
 .alert-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
 .alert-card { min-width: 0; padding: 13px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); }
 .alert-card.danger { border-left-color: var(--danger); }
