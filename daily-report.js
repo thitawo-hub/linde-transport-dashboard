@@ -1374,6 +1374,12 @@ function renderVehicleSection() {
         tr.innerHTML = `
 
           <td>
+            ${escapeHtml(
+              car.branch || '-'
+            )}
+          </td>
+
+          <td>
             <strong>
               ${escapeHtml(
                 car.car_no || '-'
@@ -2115,6 +2121,12 @@ function renderDriverSection() {
 
 
         tr.innerHTML = `
+
+          <td>
+            ${escapeHtml(
+              driver.branch || '-'
+            )}
+          </td>
 
           <td>
             <strong>
