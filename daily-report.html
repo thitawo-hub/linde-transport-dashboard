@@ -1,770 +1,201 @@
 <!DOCTYPE html>
-
 <html lang="th">
-
 <head>
-
   <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-
->
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LINDE TRANSPORT DAILY REPORT</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
-
-  <link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-
 </head>
-
 <body>
 
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
-
   <header>
+    <div class="header-content">
+      <div class="header-brand">
+        <div class="brand-mark">LT</div>
+        <div class="brand-text">
+          <h1 class="brand-title">LINDE TRANSPORT</h1>
+          <p class="brand-subtitle">Transport Performance &amp; Operational Monitoring</p>
+        </div>
+      </div>
 
-<div class="header-content">
-
-
-  <!-- BRAND -->
-
-  <div class="header-brand">
-
-    <div class="brand-mark">
-      LT
+      <nav class="page-nav">
+        <a href="index.html">📊 ภาพรวม</a>
+        <a href="daily-report.html" class="active">📅 รายงานประจำวัน</a>
+        <a href="kpi-distance.html">📍 KPI ระยะทาง</a>
+      </nav>
     </div>
-
-    <div class="brand-text">
-
-      <h1 class="brand-title">
-        LINDE TRANSPORT
-      </h1>
-
-      <p class="brand-subtitle">
-        Transport Performance &amp; Operational Monitoring
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <!-- NAVIGATION -->
-
-  <nav class="page-nav">
-
-    <a href="index.html">
-      📊 ภาพรวม
-    </a>
-
-    <a
-      href="daily-report.html"
-      class="active"
-    >
-      📅 รายงานประจำวัน
-    </a>
-
-    <a href="kpi-distance.html">
-      📍 KPI ระยะทาง
-    </a>
-
-  </nav>
-
-</div>
-
   </header>
-
-  <!-- =====================================================
-       MAIN
-       ===================================================== -->
 
   <main class="container">
 
-<!-- PAGE TITLE -->
-
-<div class="page-title">
-
-  <h1>
-    📅 รายงานประจำวัน
-  </h1>
-
-  <p>
-    Daily Transport Operations Report
-  </p>
-
-  <div
-    id="reportInfo"
-    class="card-status"
-  >
-    -
-  </div>
-
-</div>
-
-
-<!-- ===================================================
-     ERROR
-     =================================================== -->
-
-<div
-  id="errorMessage"
-  class="error-message"
-></div>
-
-
-<!-- ===================================================
-     FILTER
-     =================================================== -->
-
-<section class="filters">
-
-  <div class="filter-group">
-
-    <label for="dateFilter">
-      วันที่
-    </label>
-
-    <input
-      type="date"
-      id="dateFilter"
-      onchange="loadReport()"
-    >
-
-  </div>
-
-
-  <div class="filter-group">
-
-    <label for="branchFilter">
-      สาขา
-    </label>
-
-    <select
-      id="branchFilter"
-    >
-
-      <option value="">
-        ทั้งหมด
-      </option>
-
-    </select>
-
-  </div>
-
-
-  <div class="filter-action">
-
-    <button
-      class="btn btn-primary"
-      type="button"
-      onclick="refreshReport()"
-    >
-      ↻ รีเฟรช
-    </button>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     VEHICLE STATUS
-     =================================================== -->
-
-<section class="section">
-
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        🚛 สถานะรถ
-      </h2>
-
-      <p class="section-subtitle">
-        ข้อมูลรถจาก Master Car และการจัดงานจากตารางจัดรถ
-      </p>
-
+    <div class="page-title">
+      <h1>📅 รายงานประจำวัน</h1>
+      <p>Daily Transport Operations Report</p>
+      <div id="reportInfo" class="card-status">-</div>
     </div>
 
+    <div id="errorMessage" class="error-message"></div>
 
-    <div class="section-actions">
+    <section class="filters">
+      <div class="filter-group">
+        <label for="dateFilter">วันที่</label>
+        <input type="date" id="dateFilter" onchange="loadReport()">
+      </div>
+      <div class="filter-group">
+        <label for="branchFilter">สาขา</label>
+        <select id="branchFilter">
+          <option value="">ทั้งหมด</option>
+        </select>
+      </div>
+      <div class="filter-action">
+        <button class="btn btn-primary" type="button" onclick="refreshReport()">↻ รีเฟรช</button>
+      </div>
+    </section>
 
-      <button
-        class="btn btn-secondary"
-        id="vehicleTableToggle"
-        type="button"
-        onclick="
-          toggleTable(
-            'vehicleTableWrapper',
-            'vehicleTableToggle'
-          )
-        "
-      >
-        ซ่อนตาราง
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- VEHICLE KPI -->
-
-  <div class="cards">
-
-
-    <div class="card">
-
-      <div class="card-label">
-        รถทั้งหมด
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>🚛 สถานะรถ</h2>
+          <p class="section-subtitle">ข้อมูลรถจาก Master Car และการจัดงานจากตารางจัดรถ</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn btn-secondary" id="vehicleTableToggle" type="button" onclick="toggleTable('vehicleTableWrapper','vehicleTableToggle')">ซ่อนตาราง</button>
+        </div>
       </div>
 
-      <div
-        class="card-value"
-        id="vehicleTotal"
-      >
-        -
+      <div class="cards">
+        <div class="card">
+          <div class="card-label">รถทั้งหมด</div>
+          <div class="card-value" id="vehicleTotal">-</div>
+          <div class="card-note">จาก Master Car</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">🟢 มีงาน</div>
+          <div class="card-value" id="vehicleWorking">-</div>
+          <div class="card-note">มีการจัดงาน</div>
+        </div>
+        <div class="card card-gray">
+          <div class="card-label">⚪ ไม่มีงาน</div>
+          <div class="card-value" id="vehicleNoJob">-</div>
+          <div class="card-note">ไม่มีการจัดงาน</div>
+        </div>
       </div>
 
-      <div class="card-note">
-        จาก Master Car
+      <div class="table-wrapper" id="vehicleTableWrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>สาขา</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>ประเภทรถ</th>
+              <th>สถานะงาน</th><th>สถานะรถ</th><th>วางแผน</th><th>LTS</th>
+              <th>พขร.</th><th>ช่วงเวลา</th><th>หนัก/เบา</th><th>จำนวนงาน</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>👨‍✈️ การจัดงาน พขร.</h2>
+          <p class="section-subtitle">พขร.จาก Master Person เทียบกับรถที่จัดงาน</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn btn-secondary" id="driverTableToggle" type="button" onclick="toggleTable('driverTableWrapper','driverTableToggle')">ซ่อนตาราง</button>
+        </div>
       </div>
 
-    </div>
-
-
-    <div class="card card-green">
-
-      <div class="card-label">
-        🟢 มีงาน
+      <div class="cards driver-cards">
+        <div class="card">
+          <div class="card-label">พขร.ทั้งหมด</div>
+          <div class="card-value" id="driverTotal">-</div>
+          <div class="card-note">จาก Master Person</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">🟢 ทำงาน</div>
+          <div class="card-value" id="driverWorking">-</div>
+          <div class="card-note">พขร.ที่มีการจัดรถ</div>
+        </div>
+        <div class="card card-orange">
+          <div class="card-label">🟠 วิ่งงาน LOCO</div>
+          <div class="card-value" id="driverLoco">-</div>
+          <div class="card-note">ทะเบียนไม่อยู่ใน Master Car</div>
+        </div>
+        <div class="card card-gray">
+          <div class="card-label">⚪ ไม่มีงาน</div>
+          <div class="card-value" id="driverNoJob">-</div>
+          <div class="card-note">ไม่มีการจัดรถ</div>
+        </div>
       </div>
 
-      <div
-        class="card-value"
-        id="vehicleWorking"
-      >
-        -
+      <div class="table-wrapper" id="driverTableWrapper">
+        <table class="data-table">
+          <thead>
+            <tr><th>สาขา</th><th>พขร.</th><th>ชื่อ EN</th><th>สถานะงาน</th><th>ทะเบียนที่จัด</th><th>ตำแหน่ง</th></tr>
+          </thead>
+          <tbody id="driverTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>👨‍✈️ สถานะ พขร.</h2>
+          <p class="section-subtitle">สถานะการทำงานจากตารางกะ</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn btn-secondary" id="shiftTableToggle" type="button" onclick="toggleTable('shiftTableWrapper','shiftTableToggle')">ซ่อนตาราง</button>
+        </div>
       </div>
 
-      <div class="card-note">
-        มีการจัดงาน
+      <div class="cards shift-cards">
+        <div class="card">
+          <div class="card-label">พขร.ในตารางกะ</div>
+          <div class="card-value" id="shiftTotal">-</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">🟢 ทำงาน</div>
+          <div class="card-value" id="shiftWorking">-</div>
+        </div>
+        <div class="card card-orange">
+          <div class="card-label">🟠 สแตนบาย</div>
+          <div class="card-value" id="shiftStandby">-</div>
+        </div>
+        <div class="card">
+          <div class="card-label">เบรค</div>
+          <div class="card-value" id="shiftBreak">-</div>
+        </div>
+        <div class="card card-red">
+          <div class="card-label">🔴 ลางาน</div>
+          <div class="card-value" id="shiftLeave">-</div>
+        </div>
+        <div class="card card-gray">
+          <div class="card-label">⚪ วันหยุด</div>
+          <div class="card-value" id="shiftOff">-</div>
+        </div>
+        <div class="card">
+          <div class="card-label">อื่นๆ</div>
+          <div class="card-value" id="shiftOther">-</div>
+        </div>
       </div>
 
-    </div>
-
-
-    <div class="card card-gray">
-
-      <div class="card-label">
-        ⚪ ไม่มีงาน
+      <div class="table-wrapper" id="shiftTableWrapper">
+        <table class="data-table">
+          <thead>
+            <tr><th>พขร.</th><th>ชื่อ EN</th><th>สถานะการทำงาน</th><th>รหัสสถานะ</th><th>แหล่งข้อมูล</th></tr>
+          </thead>
+          <tbody id="shiftTableBody"></tbody>
+        </table>
       </div>
-
-      <div
-        class="card-value"
-        id="vehicleNoJob"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        ไม่มีการจัดงาน
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- VEHICLE TABLE -->
-
-  <div
-    class="table-wrapper"
-    id="vehicleTableWrapper"
-  >
-
-    <table class="data-table">
-
-      <thead>
-
-        <tr>
-
-          <th>
-            สาขา
-          </th>
-
-          <th>
-            เบอร์รถ
-          </th>
-
-          <th>
-            ทะเบียน
-          </th>
-
-          <th>
-            ประเภทรถ
-          </th>
-
-          <th>
-            สถานะงาน
-          </th>
-
-          <th>
-            สถานะรถ
-          </th>
-
-          <th>
-            วางแผน
-          </th>
-
-          <th>
-            LTS
-          </th>
-
-          <th>
-            พขร.
-          </th>
-
-          <th>
-            ช่วงเวลา
-          </th>
-
-          <th>
-            หนัก/เบา
-          </th>
-
-          <th>
-            จำนวนงาน
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody id="vehicleTableBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     DRIVER ASSIGNMENT
-     =================================================== -->
-
-<section class="section">
-
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        👨‍✈️ การจัดงาน พขร.
-      </h2>
-
-      <p class="section-subtitle">
-        พขร.จาก Master Person เทียบกับรถที่จัดงาน
-      </p>
-
-    </div>
-
-
-    <div class="section-actions">
-
-      <button
-        class="btn btn-secondary"
-        id="driverTableToggle"
-        type="button"
-        onclick="
-          toggleTable(
-            'driverTableWrapper',
-            'driverTableToggle'
-          )
-        "
-      >
-        ซ่อนตาราง
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- DRIVER KPI -->
-
-  <div class="cards driver-cards">
-
-
-    <div class="card">
-
-      <div class="card-label">
-        พขร.ทั้งหมด
-      </div>
-
-      <div
-        class="card-value"
-        id="driverTotal"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        จาก Master Person
-      </div>
-
-    </div>
-
-
-    <div class="card card-green">
-
-      <div class="card-label">
-        🟢 ทำงาน
-      </div>
-
-      <div
-        class="card-value"
-        id="driverWorking"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        พขร.ที่มีการจัดรถ
-      </div>
-
-    </div>
-
-
-    <div class="card card-orange">
-
-      <div class="card-label">
-        🟠 วิ่งงาน LOCO
-      </div>
-
-      <div
-        class="card-value"
-        id="driverLoco"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        ทะเบียนไม่อยู่ใน Master Car
-      </div>
-
-    </div>
-
-
-    <div class="card card-gray">
-
-      <div class="card-label">
-        ⚪ ไม่มีงาน
-      </div>
-
-      <div
-        class="card-value"
-        id="driverNoJob"
-      >
-        -
-      </div>
-
-      <div class="card-note">
-        ไม่มีการจัดรถ
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- DRIVER TABLE -->
-
-  <div
-    class="table-wrapper"
-    id="driverTableWrapper"
-  >
-
-    <table class="data-table">
-
-      <thead>
-
-        <tr>
-
-          <th>
-            สาขา
-          </th>
-
-          <th>
-            พขร.
-          </th>
-
-          <th>
-            ชื่อ EN
-          </th>
-
-          <th>
-            สถานะงาน
-          </th>
-
-          <th>
-            ทะเบียนที่จัด
-          </th>
-
-          <th>
-            ตำแหน่ง
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody id="driverTableBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     DRIVER SHIFT STATUS
-     =================================================== -->
-
-<section class="section">
-
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        👨‍✈️ สถานะ พขร.
-      </h2>
-
-      <p class="section-subtitle">
-        สถานะการทำงานจากตารางกะ
-      </p>
-
-    </div>
-
-
-    <div class="section-actions">
-
-      <button
-        class="btn btn-secondary"
-        id="shiftTableToggle"
-        type="button"
-        onclick="
-          toggleTable(
-            'shiftTableWrapper',
-            'shiftTableToggle'
-          )
-        "
-      >
-        ซ่อนตาราง
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- SHIFT KPI -->
-
-  <div class="cards shift-cards">
-
-
-    <div class="card">
-
-      <div class="card-label">
-        พขร.ในตารางกะ
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftTotal"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card card-green">
-
-      <div class="card-label">
-        🟢 ทำงาน
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftWorking"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card card-orange">
-
-      <div class="card-label">
-        🟠 สแตนบาย
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftStandby"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      <div class="card-label">
-        เบรค
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftBreak"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card card-red">
-
-      <div class="card-label">
-        🔴 ลางาน
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftLeave"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card card-gray">
-
-      <div class="card-label">
-        ⚪ วันหยุด
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftOff"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      <div class="card-label">
-        อื่นๆ
-      </div>
-
-      <div
-        class="card-value"
-        id="shiftOther"
-      >
-        -
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- SHIFT TABLE -->
-
-  <div
-    class="table-wrapper"
-    id="shiftTableWrapper"
-  >
-
-    <table class="data-table">
-
-      <thead>
-
-        <tr>
-
-          <th>
-            พขร.
-          </th>
-
-          <th>
-            ชื่อ EN
-          </th>
-
-          <th>
-            สถานะการทำงาน
-          </th>
-
-          <th>
-            รหัสสถานะ
-          </th>
-
-          <th>
-            แหล่งข้อมูล
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody id="shiftTableBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
+    </section>
 
   </main>
 
-  <!-- =====================================================
-       SCRIPT
-       ===================================================== -->
-
   <script src="daily-report.js"></script>
-
 </body>
-
 </html>
