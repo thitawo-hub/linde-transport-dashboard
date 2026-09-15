@@ -1341,10 +1341,25 @@ function renderVehicleSection() {
           '-';
 
 
+        // ==================================================
+        // TIME PERIOD - แสดงทั้งเช้า + เย็น
+        // ==================================================
+
+        const timePeriods = [
+          ...new Set(
+            [
+              daily?.time_period,
+              ...schedules
+                .map(s => s.time_period)
+                .filter(Boolean)
+            ].filter(Boolean)
+          )
+        ];
+
         const timePeriod =
-          daily?.time_period ||
-          schedules[0]?.time_period ||
-          '-';
+          timePeriods.length > 0
+            ? timePeriods.join(' / ')
+            : '-';
 
 
         const weightType =
@@ -1670,6 +1685,15 @@ function renderDriverSection() {
 
 
   // ==========================================================
+  // TRACK TIME PERIOD FOR EACH DRIVER
+  // เพื่อแสดงช่วงเวลาที่แต่ละคนทำงาน
+  // ==========================================================
+
+  const driverTimePeriods =
+    new Map(); // driverKey -> Set of time_periods
+
+
+  // ==========================================================
   // WORKING DRIVER SET
   // ==========================================================
 
@@ -1755,6 +1779,18 @@ function renderDriverSection() {
 
         return;
 
+      }
+
+
+      // ======================================================
+      // เก็บ time_period ของคนนี้
+      // ======================================================
+
+      if (!driverTimePeriods.has(driverKey)) {
+        driverTimePeriods.set(driverKey, new Set());
+      }
+      if (row.time_period) {
+        driverTimePeriods.get(driverKey).add(row.time_period);
       }
 
 
@@ -2111,6 +2147,17 @@ function renderDriverSection() {
 
 
         // ====================================================
+        // TIME PERIOD - รวมทั้งเช้า + เย็น
+        // ====================================================
+
+        const timePeriods = driverTimePeriods.get(canonicalKey);
+        const timePeriodDisplay = 
+          timePeriods && timePeriods.size > 0
+            ? Array.from(timePeriods).join(' / ')
+            : '-';
+
+
+        // ====================================================
         // TABLE ROW
         // ====================================================
 
@@ -2173,6 +2220,12 @@ function renderDriverSection() {
 
           <td>
             ${assignedJobCount}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              timePeriodDisplay
+            )}
           </td>
 
           <td>
