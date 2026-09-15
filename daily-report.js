@@ -1266,107 +1266,41 @@ function renderVehicleSection() {
 
 
         // ==================================================
-        // DRIVERS
+        // ROWS = 1 แถวต่อ 1 รอบงาน (ช่วงเวลา)
         //
-        // ไม่เปลี่ยน logic ส่วนนี้
-        // ==================================================
-
-        const drivers = [
-
-          ...new Set(
-
-            schedules
-              .map(
-                row =>
-                  String(
-                    row.driver_name || ''
-                  ).trim()
-              )
-              .filter(Boolean)
-
-          )
-
-        ];
-
-
-        // ==================================================
-        // JOB STATUS
-        // ==================================================
-
-        const hasJob =
-          getVehicleJobStatus(
-            daily,
-            schedules
-          );
-
-
-        const jobStatus =
-          hasJob
-            ? 'มีงาน'
-            : 'ไม่มีงาน';
-
-
-        const jobStatusClass =
-          hasJob
-            ? 'status-green'
-            : 'status-gray';
-
-
-        // ==================================================
-        // 🚛 VEHICLE STATUS
+        // รถ 1 คันที่วิ่งทั้งเช้าและเย็น = 2 แถว
+        // เบอร์รถจึงซ้ำกันได้ในตาราง
         //
-        // ใช้เฉพาะรถที่อยู่ Master Car
+        // ถ้าไม่มีรอบงานเลย = 1 แถว (รถไม่มีงาน)
+        //
+        // หมายเหตุ: KPI ด้านบนยังนับ "จำนวนคัน" เท่าเดิม
+        // ไม่ได้นับตามจำนวนแถว
         // ==================================================
 
-        const carStatus =
-          getVehicleStatus(
-            daily,
-            schedules
-          );
+        const scheduleRows =
+          schedules.length
+            ? schedules
+                .slice()
+                .sort(
+                  (a, b) =>
+                    getTimePeriodOrder(
+                      a?.time_period
+                    ) -
+                    getTimePeriodOrder(
+                      b?.time_period
+                    ) ||
+                    Number(
+                      a?.id || 0
+                    ) -
+                    Number(
+                      b?.id || 0
+                    )
+                )
+            : [null];
 
 
-        // ==================================================
-        // OTHER DATA
-        // ==================================================
-
-        const planning =
-          daily?.planning ||
-          schedules[0]?.planning ||
-          '-';
-
-
-        const ltsNo =
-          daily?.lts_no ||
-          schedules[0]?.lts_no ||
-          '-';
-
-
-        // ==================================================
-        // TIME PERIOD - แสดงทั้งเช้า + เย็น
-        // ==================================================
-
-        const timePeriods = [
-          ...new Set(
-            [
-              daily?.time_period,
-              ...schedules
-                .map(s => s.time_period)
-                .filter(Boolean)
-            ].filter(Boolean)
-          )
-        ];
-
-        const timePeriod =
-          timePeriods.length > 0
-            ? timePeriods.join(' / ')
-            : '-';
-
-
-        const weightType =
-          daily?.weight_type ||
-          schedules[0]?.weight_type ||
-          '-';
-
+        // จำนวนรอบงานทั้งหมดของรถคันนี้
+        // (เท่ากันทุกแถวของรถคันเดียวกัน)
 
         const scheduleCount =
           Number(
@@ -1376,118 +1310,260 @@ function renderVehicleSection() {
           0;
 
 
-        // ==================================================
-        // ROW
-        // ==================================================
+        scheduleRows.forEach(
+          schedule => {
 
-        const tr =
-          document.createElement(
-            'tr'
-          );
+            // ==============================================
+            // JOB STATUS (ของรอบงานนี้)
+            // ==============================================
+
+            const hasJob =
+              schedule
+                ? getVehicleJobStatus(
+                    daily,
+                    [schedule]
+                  )
+                : getVehicleJobStatus(
+                    daily,
+                    schedules
+                  );
 
 
-        tr.innerHTML = `
+            const jobStatus =
+              hasJob
+                ? 'มีงาน'
+                : 'ไม่มีงาน';
 
-          <td>
-            ${escapeHtml(
-              car.branch || '-'
-            )}
-          </td>
 
-          <td>
-            <strong>
-              ${escapeHtml(
-                car.car_no || '-'
-              )}
-            </strong>
-          </td>
+            const jobStatusClass =
+              hasJob
+                ? 'status-green'
+                : 'status-gray';
 
-          <td>
-            ${escapeHtml(
-              plate
-            )}
-          </td>
 
-          <td>
-            ${escapeHtml(
-              car.vehicle_type || '-'
-            )}
-          </td>
+            // ==============================================
+            // 🚛 VEHICLE STATUS
+            // ==============================================
 
-          <td>
+            const carStatus =
+              String(
+                schedule?.car_status || ''
+              ).trim() ||
+              getVehicleStatus(
+                daily,
+                schedules
+              );
 
-            <span class="status-badge ${jobStatusClass}">
-              ${escapeHtml(
-                jobStatus
-              )}
-            </span>
 
-          </td>
+            // ==============================================
+            // OTHER DATA — อ่านจากรอบงานนี้ก่อน
+            // ==============================================
 
-          <td>
-            ${escapeHtml(
-              carStatus
-            )}
-          </td>
+            const planning =
+              schedule?.planning ||
+              daily?.planning ||
+              '-';
 
-          <td>
-            ${escapeHtml(
-              planning
-            )}
-          </td>
 
-          <td>
-            ${escapeHtml(
-              ltsNo
-            )}
-          </td>
+            const ltsNo =
+              schedule?.lts_no ||
+              daily?.lts_no ||
+              '-';
 
-          <td>
 
-            ${
-              drivers.length
+            const timePeriod =
+              schedule?.time_period ||
+              daily?.time_period ||
+              '-';
 
-                ? drivers
-                    .map(
-                      driver =>
-                        `<span class="driver-chip">
-                          ${escapeHtml(
-                            driver
-                          )}
-                        </span>`
+
+            const weightType =
+              schedule?.weight_type ||
+              daily?.weight_type ||
+              '-';
+
+
+            // ==============================================
+            // DRIVERS — เฉพาะ พขร.ของรอบงานนี้
+            // ==============================================
+
+            const drivers =
+              schedule
+                ? [
+                    ...new Set(
+                      String(
+                        schedule.driver_name || ''
+                      )
+                        .split('+')
+                        .map(
+                          name =>
+                            name.trim()
+                        )
+                        .filter(Boolean)
                     )
-                    .join('<br>')
-
-                : '-'
-            }
-
-          </td>
-
-          <td>
-            ${escapeHtml(
-              timePeriod
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              weightType
-            )}
-          </td>
-
-          <td>
-            ${scheduleCount}
-          </td>
-
-        `;
+                  ]
+                : [];
 
 
-        tbody.appendChild(
-          tr
+            // ==============================================
+            // ROW
+            // ==============================================
+
+            const tr =
+              document.createElement(
+                'tr'
+              );
+
+
+            tr.innerHTML = `
+
+              <td>
+                ${escapeHtml(
+                  car.branch || '-'
+                )}
+              </td>
+
+              <td>
+                <strong>
+                  ${escapeHtml(
+                    car.car_no || '-'
+                  )}
+                </strong>
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  plate
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  car.vehicle_type || '-'
+                )}
+              </td>
+
+              <td>
+
+                <span class="status-badge ${jobStatusClass}">
+                  ${escapeHtml(
+                    jobStatus
+                  )}
+                </span>
+
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  carStatus
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  planning
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  ltsNo
+                )}
+              </td>
+
+              <td>
+
+                ${
+                  drivers.length
+
+                    ? drivers
+                        .map(
+                          driver =>
+                            `<span class="driver-chip">
+                              ${escapeHtml(
+                                driver
+                              )}
+                            </span>`
+                        )
+                        .join('<br>')
+
+                    : '-'
+                }
+
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  timePeriod
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  weightType
+                )}
+              </td>
+
+              <td>
+                ${scheduleCount}
+              </td>
+
+            `;
+
+
+            tbody.appendChild(
+              tr
+            );
+
+          }
         );
 
       }
     );
+
+}
+
+
+// ============================================================
+// TIME PERIOD ORDER
+//
+// ใช้เรียงรอบงานในตาราง: เช้า -> บ่าย -> เย็น -> กลางคืน
+// ค่าที่ไม่รู้จักให้ไปอยู่ท้ายสุด
+// ============================================================
+
+function getTimePeriodOrder(
+  value
+) {
+
+  const period =
+    String(
+      value || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const order = [
+    'เช้า',
+    'บ่าย',
+    'เย็น',
+    'กลางคืน',
+    'ดึก'
+  ];
+
+
+  const index =
+    order.findIndex(
+      item =>
+        period.includes(
+          item
+        )
+    );
+
+
+  return index === -1
+    ? order.length
+    : index;
 
 }
 
@@ -1685,15 +1761,6 @@ function renderDriverSection() {
 
 
   // ==========================================================
-  // TRACK TIME PERIOD FOR EACH DRIVER
-  // เพื่อแสดงช่วงเวลาที่แต่ละคนทำงาน
-  // ==========================================================
-
-  const driverTimePeriods =
-    new Map(); // driverKey -> Set of time_periods
-
-
-  // ==========================================================
   // WORKING DRIVER SET
   // ==========================================================
 
@@ -1779,18 +1846,6 @@ function renderDriverSection() {
 
         return;
 
-      }
-
-
-      // ======================================================
-      // เก็บ time_period ของคนนี้
-      // ======================================================
-
-      if (!driverTimePeriods.has(driverKey)) {
-        driverTimePeriods.set(driverKey, new Set());
-      }
-      if (row.time_period) {
-        driverTimePeriods.get(driverKey).add(row.time_period);
       }
 
 
@@ -2147,17 +2202,6 @@ function renderDriverSection() {
 
 
         // ====================================================
-        // TIME PERIOD - รวมทั้งเช้า + เย็น
-        // ====================================================
-
-        const timePeriods = driverTimePeriods.get(canonicalKey);
-        const timePeriodDisplay = 
-          timePeriods && timePeriods.size > 0
-            ? Array.from(timePeriods).join(' / ')
-            : '-';
-
-
-        // ====================================================
         // TABLE ROW
         // ====================================================
 
@@ -2220,12 +2264,6 @@ function renderDriverSection() {
 
           <td>
             ${assignedJobCount}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              timePeriodDisplay
-            )}
           </td>
 
           <td>
