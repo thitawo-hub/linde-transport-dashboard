@@ -6,7 +6,7 @@
 const SUPABASE_URL = 'https://hhsqijlcebaijtklskag.supabase.co';
 
 // ใช้ Publishable Key เท่านั้น
-const SUPABASE_KEY = 'ใส่ Publishable Key เดิมของคุณตรงนี้';
+const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 // ============================================================
 // GLOBAL
