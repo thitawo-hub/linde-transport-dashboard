@@ -582,3 +582,393 @@ tbody td { color: var(--text-700); font-size: 11px; }
 @media (max-width: 1300px) { .chart-wrapper, .distance-chart-wrapper { height: 140px; } }
 @media (max-width: 700px) { .chart-wrapper, .distance-chart-wrapper { height: 160px; } }
 @media (max-width: 480px) { .chart-wrapper, .distance-chart-wrapper { height: 150px; } }
+
+/* ================================================================
+   LINDE TRANSPORT — SECONDARY TEXT READABILITY
+   ปรับเฉพาะตัวอักษรรอง / รายละเอียด
+   ไม่เปลี่ยนขนาดตัวเลขหลักในการ์ด
+   ================================================================ */
+
+/* ---------- Header ---------- */
+.brand-subtitle,
+.header-brand .subtitle,
+.subtitle {
+  font-size: 12px;
+}
+
+.header-brand .eyebrow,
+.eyebrow {
+  font-size: 11px;
+}
+
+.nav button,
+.page-nav a,
+.navlink,
+.back-link {
+  font-size: 12px;
+}
+
+
+/* ---------- Page description ---------- */
+.page-header p,
+.page-title p {
+  font-size: 13px;
+}
+
+
+/* ---------- Filters ---------- */
+.filters label,
+.filter-item label,
+.filter-group label {
+  font-size: 11.5px;
+}
+
+.filters input,
+.filters select,
+.filter-bar input,
+.filter-bar select {
+  font-size: 13px;
+}
+
+.filter-cycle-text {
+  font-size: 12px;
+}
+
+
+/* ================================================================
+   KPI / CARD
+   ------------------------------------------------
+   ตัวเลขหลักไม่แตะ
+   .kpi-value       = 26px เดิม
+   .card-value      = 22px เดิม
+   ================================================================ */
+
+.kpi-title,
+.kpi-label,
+.card-title,
+.card-label {
+  font-size: 12px;
+}
+
+.kpi-sub,
+.card-status,
+.card-note,
+.card-breakdown {
+  font-size: 11.5px;
+}
+
+.card-breakdown strong {
+  font-size: inherit;
+}
+
+
+/* ---------- Section ---------- */
+.section-heading h2,
+.section-heading h3 {
+  font-size: 14.5px;
+}
+
+.section-heading p,
+.section-subtitle {
+  font-size: 11.5px;
+}
+
+
+/* ---------- Chart summary ---------- */
+.chart-summary-label {
+  font-size: 11px;
+}
+
+
+/* ---------- Forecast ---------- */
+.forecast-title,
+.forecast-note,
+.forecast-side-title,
+.forecast-label {
+  font-size: 11.5px;
+}
+
+
+/* ---------- Performance ---------- */
+.performance-status-title {
+  font-size: 11.5px;
+}
+
+.performance-status strong {
+  font-size: 12px;
+}
+
+
+/* ---------- Status / Badge / Chip ---------- */
+.status,
+.distance-status,
+.driver-status,
+.status-badge {
+  font-size: 11px;
+}
+
+.driver-chip,
+.car-chip {
+  font-size: 11px;
+}
+
+
+/* ---------- Alerts ---------- */
+.alert-title {
+  font-size: 12px;
+}
+
+.alert-description {
+  font-size: 11.5px;
+}
+
+.alert-box-header h3 {
+  font-size: 12px;
+}
+
+.alert-box-header p {
+  font-size: 11.5px;
+}
+
+.alert-list li {
+  font-size: 11.5px;
+}
+
+
+/* ---------- Watchlist / Ranking ---------- */
+.watchlist-header,
+.ranking-header {
+  font-size: 11.5px;
+}
+
+.ranking-list li {
+  font-size: 11.5px;
+}
+
+
+/* ================================================================
+   TABLE
+   ------------------------------------------------
+   ตารางเดิมเล็กมาก โดยเฉพาะ th 9.5px / td 10.5px
+   ปรับขึ้นเล็กน้อย ไม่ให้ตารางกินพื้นที่มากเกินไป
+   ================================================================ */
+
+.table-wrapper table {
+  font-size: 12px;
+}
+
+.table-wrapper th {
+  font-size: 11px;
+}
+
+.table-wrapper td {
+  font-size: 12px;
+}
+
+thead th {
+  font-size: 11px;
+}
+
+tbody td {
+  font-size: 12px;
+}
+
+.vehicle-type-summary th {
+  font-size: 11px;
+}
+
+.vehicle-type-summary td {
+  font-size: 12px;
+}
+
+
+/* ---------- Report ---------- */
+/* ไม่แตะ .report-kpi-value */
+.report-header .sub {
+  font-size: 12px;
+}
+
+.report-kpi-label {
+  font-size: 11.5px;
+}
+
+
+/* ---------- Page status / error / loading ---------- */
+.page-status,
+#pageStatus {
+  font-size: 11px;
+}
+
+#errorMessage:not(:empty),
+.error-message:not(:empty) {
+  font-size: 11.5px;
+}
+
+.loading {
+  font-size: 11.5px !important;
+}
+
+.meta {
+  font-size: 11px;
+}
+
+.meta-item {
+  font-size: 11px;
+}
+
+.empty-state {
+  font-size: 11.5px;
+}
+
+
+/* ---------- Cycle information ---------- */
+/* ไม่แตะ cycle-info-value */
+.cycle-info-label {
+  font-size: 11.5px;
+}
+
+.cycle-meta-item {
+  font-size: 11px;
+}
+
+.cycle-meta-item strong {
+  font-size: 12px;
+}
+
+
+/* ---------- Achievement ---------- */
+/* ไม่แตะ achievement-main-value */
+.achievement-main-label {
+  font-size: 11.5px;
+}
+
+.achievement-main-note {
+  font-size: 11.5px;
+}
+
+.achievement-side-item span {
+  font-size: 11.5px;
+}
+
+
+/* ---------- Buttons ---------- */
+/* ปุ่มเดิม 11px → ขึ้นเล็กน้อย */
+.btn {
+  font-size: 12px;
+}
+
+
+/* ================================================================
+   MOBILE
+   ------------------------------------------------
+   ยังรักษาขนาดตัวเลขหลักเดิมของการ์ด
+   ================================================================ */
+
+@media (max-width: 700px) {
+
+  .nav button,
+  .page-nav a,
+  .navlink {
+    font-size: 11px;
+  }
+
+  .page-header p,
+  .page-title p {
+    font-size: 12px;
+  }
+
+  .filters label,
+  .filter-item label,
+  .filter-group label {
+    font-size: 11.5px;
+  }
+
+  .filters input,
+  .filters select,
+  .filter-bar input,
+  .filter-bar select {
+    font-size: 13px;
+  }
+
+  .kpi-title,
+  .kpi-label,
+  .card-title,
+  .card-label {
+    font-size: 11.5px;
+  }
+
+  .kpi-sub,
+  .card-status,
+  .card-note,
+  .card-breakdown {
+    font-size: 11px;
+  }
+
+  .section-heading h2,
+  .section-heading h3 {
+    font-size: 14px;
+  }
+
+  .section-heading p,
+  .section-subtitle {
+    font-size: 11px;
+  }
+
+  .table-wrapper th {
+    font-size: 11px;
+  }
+
+  .table-wrapper td {
+    font-size: 11.5px;
+  }
+
+  .status,
+  .distance-status,
+  .driver-status,
+  .status-badge {
+    font-size: 11px;
+  }
+
+  .driver-chip,
+  .car-chip {
+    font-size: 11px;
+  }
+
+  .alert-description,
+  .alert-box-header p,
+  .alert-list li {
+    font-size: 11px;
+  }
+}
+
+
+/* ---------- Very small screens ---------- */
+@media (max-width: 480px) {
+
+  .header-brand .title,
+  .title {
+    font-size: 15px;
+  }
+
+  .kpi-title,
+  .kpi-label,
+  .card-title,
+  .card-label {
+    font-size: 11.5px;
+  }
+
+  .kpi-sub,
+  .card-status,
+  .card-note,
+  .card-breakdown {
+    font-size: 11px;
+  }
+
+  .table-wrapper th {
+    font-size: 10.5px;
+  }
+
+  .table-wrapper td {
+    font-size: 11.5px;
+  }
+}
