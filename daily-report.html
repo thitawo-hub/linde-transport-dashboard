@@ -58,8 +58,8 @@
     <section class="section">
       <div class="section-heading">
         <div>
-          <h2>🚛 สถานะรถ</h2>
-          <p class="section-subtitle">ข้อมูลรถจาก Master Car และการจัดงานจากตารางจัดรถ</p>
+          <h2>🚛 สถานะรถ &amp; พขร.</h2>
+          <p class="section-subtitle">ข้อมูลรถจาก Master Car และ พขร.จาก Master Person เทียบกับรถที่จัดงาน</p>
         </div>
         <div class="section-actions">
           <button class="btn btn-secondary" id="vehicleTableToggle" type="button" onclick="toggleTable('vehicleTableWrapper','vehicleTableToggle')">ซ่อนตาราง</button>
@@ -82,34 +82,6 @@
           <div class="card-value" id="vehicleNoJob">-</div>
           <div class="card-note">ไม่มีการจัดงาน</div>
         </div>
-      </div>
-
-      <div class="table-wrapper" id="vehicleTableWrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>สาขา</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>ประเภทรถ</th>
-              <th>สถานะงาน</th><th>สถานะรถ</th><th>วางแผน</th><th>LTS</th>
-              <th>พขร.</th><th>ช่วงเวลา</th><th>หนัก/เบา</th><th>จำนวนงาน</th>
-            </tr>
-          </thead>
-          <tbody id="vehicleTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <h2>👨‍✈️ การจัดงาน พขร.</h2>
-          <p class="section-subtitle">พขร.จาก Master Person เทียบกับรถที่จัดงาน</p>
-        </div>
-        <div class="section-actions">
-          <button class="btn btn-secondary" id="driverTableToggle" type="button" onclick="toggleTable('driverTableWrapper','driverTableToggle')">ซ่อนตาราง</button>
-        </div>
-      </div>
-
-      <div class="cards driver-cards">
         <div class="card">
           <div class="card-label">พขร.ทั้งหมด</div>
           <div class="card-value" id="driverTotal">-</div>
@@ -132,12 +104,16 @@
         </div>
       </div>
 
-      <div class="table-wrapper" id="driverTableWrapper">
+      <div class="table-wrapper" id="vehicleTableWrapper">
         <table class="data-table">
           <thead>
-            <tr><th>สาขา</th><th>พขร.</th><th>ชื่อ EN</th><th>สถานะงาน</th><th>ทะเบียนที่จัด</th><th>จำนวนงาน</th><th>ตำแหน่ง</th></tr>
+            <tr>
+              <th>สาขา</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>ประเภทรถ</th>
+              <th>สถานะงาน</th><th>สถานะรถ</th><th>วางแผน</th><th>LTS</th>
+              <th>พขร.</th><th>ช่วงเวลา</th><th>หนัก/เบา</th><th>จำนวนงาน</th>
+            </tr>
           </thead>
-          <tbody id="driverTableBody"></tbody>
+          <tbody id="vehicleTableBody"></tbody>
         </table>
       </div>
     </section>
