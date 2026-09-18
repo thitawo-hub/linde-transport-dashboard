@@ -15,6 +15,34 @@
   >
 
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Page-only override: make the car table compact and let it show
+       every row without its own inner scrollbar (only style.css's
+       .table-wrapper is shared across pages, so this is scoped to
+       .compact-table instead of touching that shared rule). */
+    .compact-table {
+      max-height: none;
+      overflow-y: visible;
+    }
+    .compact-table table {
+      font-size: 11px;
+    }
+    .compact-table th {
+      height: 24px;
+      padding: 4px 8px;
+      font-size: 10.5px;
+    }
+    .compact-table td {
+      height: 24px;
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+    .compact-table .empty-state {
+      min-height: 60px;
+      padding: 12px;
+    }
+  </style>
 </head>
 
 <body>
@@ -305,7 +333,7 @@
         </div>
       </div>
 
-      <div class="table-wrapper">
+      <div class="table-wrapper compact-table">
         <table>
           <thead>
             <tr>
