@@ -186,73 +186,61 @@
 
 
     <!-- ===================================================
-         KPI CARDS (รวมเป็น grid เดียว 8 การ์ด — ล้นเป็น 2 แถวอัตโนมัติ
-         ตาม .kpi-grid ของ style.css โดยไม่ต้อง override เพิ่ม)
-    ==================================================== -->
-
-    <section class="kpi-grid">
-
-      <div class="kpi-card">
-        <div class="kpi-title">🚛 รถ COCO</div>
-        <div id="totalCars" class="kpi-value">-</div>
-        <div class="kpi-sub">จาก Master Car</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-title">📍 KM สะสม</div>
-        <div id="totalKm" class="kpi-value">-</div>
-        <div class="kpi-sub">ในรอบปัจจุบัน</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-title">🎯 KM เป้าหมาย</div>
-        <div id="totalTargetKm" class="kpi-value">-</div>
-        <div class="kpi-sub">รวม Target จากรถจริง</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-title">📊 Achievement</div>
-        <div id="achievement" class="kpi-value">-</div>
-        <div id="achievementStatus" class="kpi-sub">-</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-title">🚗 รถที่มี KM</div>
-        <div id="runningCars" class="kpi-value">-</div>
-        <div class="kpi-sub">รถที่มี KM สะสมมากกว่า 0</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-title">📏 KM / รถ</div>
-        <div id="avgKmCar" class="kpi-value">-</div>
-        <div class="kpi-sub">ค่าเฉลี่ย KM ต่อรถ</div>
-      </div>
-
-      <div class="kpi-card warning">
-        <div class="kpi-title">⚠️ ใกล้เป้า</div>
-        <div id="nearTargetCars" class="kpi-value">-</div>
-        <div class="kpi-sub">KM ≥ 90% ของ Target</div>
-      </div>
-
-      <div class="kpi-card danger">
-        <div class="kpi-title">🚨 Forecast เกินเป้า</div>
-        <div id="forecastOverCars" class="kpi-value">-</div>
-        <div class="kpi-sub">คาดว่าจะเกิน Target</div>
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         ACHIEVEMENT
+         KPI CARDS + ACHIEVEMENT (grouped together)
     ==================================================== -->
 
     <section class="section">
 
-      <div class="section-heading">
-        <div>
-          <h2>📊 ภาพรวมการทำ KM</h2>
+      <div class="kpi-grid">
+
+        <div class="kpi-card">
+          <div class="kpi-title">🚛 รถ COCO</div>
+          <div id="totalCars" class="kpi-value">-</div>
+          <div class="kpi-sub">จาก Master Car</div>
         </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">📍 KM สะสม</div>
+          <div id="totalKm" class="kpi-value">-</div>
+          <div class="kpi-sub">ในรอบปัจจุบัน</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">🎯 KM เป้าหมาย</div>
+          <div id="totalTargetKm" class="kpi-value">-</div>
+          <div class="kpi-sub">รวม Target จากรถจริง</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">📊 Achievement</div>
+          <div id="achievement" class="kpi-value">-</div>
+          <div id="achievementStatus" class="kpi-sub">-</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">🚗 รถที่มี KM</div>
+          <div id="runningCars" class="kpi-value">-</div>
+          <div class="kpi-sub">รถที่มี KM สะสมมากกว่า 0</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">📏 KM / รถ</div>
+          <div id="avgKmCar" class="kpi-value">-</div>
+          <div class="kpi-sub">ค่าเฉลี่ย KM ต่อรถ</div>
+        </div>
+
+        <div class="kpi-card warning">
+          <div class="kpi-title">⚠️ ใกล้เป้า</div>
+          <div id="nearTargetCars" class="kpi-value">-</div>
+          <div class="kpi-sub">KM ≥ 90% ของ Target</div>
+        </div>
+
+        <div class="kpi-card danger">
+          <div class="kpi-title">🚨 Forecast เกินเป้า</div>
+          <div id="forecastOverCars" class="kpi-value">-</div>
+          <div class="kpi-sub">คาดว่าจะเกิน Target</div>
+        </div>
+
       </div>
 
       <div class="achievement-box">
