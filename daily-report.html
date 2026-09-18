@@ -8,10 +8,137 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-</head>
-<body>
 
-  <header>
+  <!--
+    ============================================================
+    ONE-SCREEN LAYOUT OVERRIDE (daily-report.html only)
+    ------------------------------------------------------------
+    Goal: the page fills exactly 100vh — header + filters + the
+    3 report sections — with NO vertical scroll on the page
+    itself. Each section's table keeps its own internal scroll
+    (table-wrapper already had overflow:auto), so long tables
+    still work, they just scroll inside their own box instead
+    of pushing the page taller.
+
+    Approach:
+    - body becomes a column flexbox pinned to 100vh, overflow
+      hidden (kills page scroll).
+    - main.container becomes a column flexbox that fills the
+      remaining height after the header.
+    - The 3 <section class="section"> blocks are wrapped in
+      .report-sections, which distributes the remaining height
+      equally between them (flex: 1 1 0 each).
+    - Inside each section: heading + cards stay their natural
+      (auto) height; only .table-wrapper stretches/scrolls to
+      fill whatever height is left in that section.
+    - Cards, headings, and table rows are shrunk a bit so more
+      fits without feeling cramped.
+
+    NOTE: this optimizes for a normal desktop/monitor viewport.
+    On very short/narrow windows there just isn't room for 3
+    full sections + tables without scrolling — the existing
+    responsive rules in style.css still apply below ~1100px,
+    where per-section table scrolling is what keeps it usable.
+    ============================================================
+  -->
+  <style>
+    html, body { height: 100%; }
+    body.one-screen {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    body.one-screen .header { flex: 0 0 auto; }
+
+    body.one-screen main.container {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      gap: 8px;
+    }
+
+    body.one-screen .page-title { flex: 0 0 auto; margin-bottom: 0; }
+    body.one-screen .page-title p { display: none; } /* free up a line of height */
+    body.one-screen #errorMessage { flex: 0 0 auto; }
+
+    body.one-screen .filters {
+      flex: 0 0 auto;
+      margin-bottom: 0;
+      padding: 8px 12px;
+    }
+    body.one-screen .filters > div { min-width: 120px; }
+
+    /* wraps the 3 <section class="section"> blocks and splits the
+       remaining vertical space evenly between them */
+    .report-sections {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    body.one-screen .report-sections .section {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      margin-bottom: 0;
+      overflow: hidden;
+    }
+    body.one-screen .section-heading {
+      flex: 0 0 auto;
+      min-height: 30px;
+      padding: 6px 14px;
+    }
+    body.one-screen .section-heading h2 { font-size: 12.5px; }
+    body.one-screen .section-heading p { display: none; } /* subtitle hidden to save a row */
+
+    body.one-screen .section > .cards {
+      flex: 0 0 auto;
+      margin-bottom: 6px;
+      gap: 6px;
+    }
+    /* keep each card row on one line instead of wrapping to 2 rows */
+    body.one-screen .cards { grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); }
+    body.one-screen .driver-cards { grid-template-columns: repeat(4, 1fr); }
+    body.one-screen .shift-cards { grid-template-columns: repeat(7, 1fr); }
+
+    body.one-screen .card { padding: 7px 9px; }
+    body.one-screen .card-value { font-size: 17px; }
+    body.one-screen .card-label { font-size: 11.5px; margin-bottom: 2px; }
+    body.one-screen .card-note { font-size: 10.5px; margin-top: 2px; }
+
+    body.one-screen .section .table-wrapper {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      overflow: auto;
+    }
+    body.one-screen .table-wrapper th { height: 26px; padding: 5px 8px; font-size: 12px; }
+    body.one-screen .table-wrapper td { height: 24px; padding: 4px 8px; font-size: 11.5px; }
+
+    /* below this width there isn't enough room for 3 full sections
+       side-by-side vertically — fall back to normal page scroll so
+       the report stays usable rather than unreadably squeezed */
+    @media (max-width: 900px), (max-height: 650px) {
+      body.one-screen { height: auto; overflow: visible; }
+      body.one-screen main.container { overflow: visible; }
+      body.one-screen .report-sections { overflow: visible; }
+      body.one-screen .report-sections .section { flex: 0 0 auto; }
+      body.one-screen .section .table-wrapper { max-height: 260px; }
+    }
+  </style>
+</head>
+<body class="one-screen">
+
+  <header class="header">
     <div class="header-content">
       <div class="header-brand">
         <div class="brand-mark">LT</div>
@@ -55,144 +182,148 @@
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <h2>🚛 สถานะรถ</h2>
-          <p class="section-subtitle">ข้อมูลรถจาก Master Car และการจัดงานจากตารางจัดรถ</p>
-        </div>
-        <div class="section-actions">
-          <button class="btn btn-secondary" id="vehicleTableToggle" type="button" onclick="toggleTable('vehicleTableWrapper','vehicleTableToggle')">ซ่อนตาราง</button>
-        </div>
-      </div>
+    <div class="report-sections">
 
-      <div class="cards">
-        <div class="card">
-          <div class="card-label">รถทั้งหมด</div>
-          <div class="card-value" id="vehicleTotal">-</div>
-          <div class="card-note">จาก Master Car</div>
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>🚛 สถานะรถ</h2>
+            <p class="section-subtitle">ข้อมูลรถจาก Master Car และการจัดงานจากตารางจัดรถ</p>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary" id="vehicleTableToggle" type="button" onclick="toggleTable('vehicleTableWrapper','vehicleTableToggle')">ซ่อนตาราง</button>
+          </div>
         </div>
-        <div class="card card-green">
-          <div class="card-label">🟢 มีงาน</div>
-          <div class="card-value" id="vehicleWorking">-</div>
-          <div class="card-note">มีการจัดงาน</div>
-        </div>
-        <div class="card card-gray">
-          <div class="card-label">⚪ ไม่มีงาน</div>
-          <div class="card-value" id="vehicleNoJob">-</div>
-          <div class="card-note">ไม่มีการจัดงาน</div>
-        </div>
-      </div>
 
-      <div class="table-wrapper" id="vehicleTableWrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>สาขา</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>ประเภทรถ</th>
-              <th>สถานะงาน</th><th>สถานะรถ</th><th>วางแผน</th><th>LTS</th>
-              <th>พขร.</th><th>ช่วงเวลา</th><th>หนัก/เบา</th><th>จำนวนงาน</th>
-            </tr>
-          </thead>
-          <tbody id="vehicleTableBody"></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="cards">
+          <div class="card">
+            <div class="card-label">รถทั้งหมด</div>
+            <div class="card-value" id="vehicleTotal">-</div>
+            <div class="card-note">จาก Master Car</div>
+          </div>
+          <div class="card card-green">
+            <div class="card-label">🟢 มีงาน</div>
+            <div class="card-value" id="vehicleWorking">-</div>
+            <div class="card-note">มีการจัดงาน</div>
+          </div>
+          <div class="card card-gray">
+            <div class="card-label">⚪ ไม่มีงาน</div>
+            <div class="card-value" id="vehicleNoJob">-</div>
+            <div class="card-note">ไม่มีการจัดงาน</div>
+          </div>
+        </div>
 
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <h2>👨‍✈️ การจัดงาน พขร.</h2>
-          <p class="section-subtitle">พขร.จาก Master Person เทียบกับรถที่จัดงาน</p>
+        <div class="table-wrapper" id="vehicleTableWrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>สาขา</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>ประเภทรถ</th>
+                <th>สถานะงาน</th><th>สถานะรถ</th><th>วางแผน</th><th>LTS</th>
+                <th>พขร.</th><th>ช่วงเวลา</th><th>หนัก/เบา</th><th>จำนวนงาน</th>
+              </tr>
+            </thead>
+            <tbody id="vehicleTableBody"></tbody>
+          </table>
         </div>
-        <div class="section-actions">
-          <button class="btn btn-secondary" id="driverTableToggle" type="button" onclick="toggleTable('driverTableWrapper','driverTableToggle')">ซ่อนตาราง</button>
-        </div>
-      </div>
+      </section>
 
-      <div class="cards driver-cards">
-        <div class="card">
-          <div class="card-label">พขร.ทั้งหมด</div>
-          <div class="card-value" id="driverTotal">-</div>
-          <div class="card-note">จาก Master Person</div>
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>👨‍✈️ การจัดงาน พขร.</h2>
+            <p class="section-subtitle">พขร.จาก Master Person เทียบกับรถที่จัดงาน</p>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary" id="driverTableToggle" type="button" onclick="toggleTable('driverTableWrapper','driverTableToggle')">ซ่อนตาราง</button>
+          </div>
         </div>
-        <div class="card card-green">
-          <div class="card-label">🟢 ทำงาน</div>
-          <div class="card-value" id="driverWorking">-</div>
-          <div class="card-note">พขร.ที่มีการจัดรถ</div>
-        </div>
-        <div class="card card-orange">
-          <div class="card-label">🟠 วิ่งงาน LOCO</div>
-          <div class="card-value" id="driverLoco">-</div>
-          <div class="card-note">ทะเบียนไม่อยู่ใน Master Car</div>
-        </div>
-        <div class="card card-gray">
-          <div class="card-label">⚪ ไม่มีงาน</div>
-          <div class="card-value" id="driverNoJob">-</div>
-          <div class="card-note">ไม่มีการจัดรถ</div>
-        </div>
-      </div>
 
-      <div class="table-wrapper" id="driverTableWrapper">
-        <table class="data-table">
-          <thead>
-            <tr><th>สาขา</th><th>พขร.</th><th>ชื่อ EN</th><th>สถานะงาน</th><th>ทะเบียนที่จัด</th><th>จำนวนงาน</th><th>ตำแหน่ง</th></tr>
-          </thead>
-          <tbody id="driverTableBody"></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="cards driver-cards">
+          <div class="card">
+            <div class="card-label">พขร.ทั้งหมด</div>
+            <div class="card-value" id="driverTotal">-</div>
+            <div class="card-note">จาก Master Person</div>
+          </div>
+          <div class="card card-green">
+            <div class="card-label">🟢 ทำงาน</div>
+            <div class="card-value" id="driverWorking">-</div>
+            <div class="card-note">พขร.ที่มีการจัดรถ</div>
+          </div>
+          <div class="card card-orange">
+            <div class="card-label">🟠 วิ่งงาน LOCO</div>
+            <div class="card-value" id="driverLoco">-</div>
+            <div class="card-note">ทะเบียนไม่อยู่ใน Master Car</div>
+          </div>
+          <div class="card card-gray">
+            <div class="card-label">⚪ ไม่มีงาน</div>
+            <div class="card-value" id="driverNoJob">-</div>
+            <div class="card-note">ไม่มีการจัดรถ</div>
+          </div>
+        </div>
 
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <h2>👨‍✈️ สถานะ พขร.</h2>
-          <p class="section-subtitle">สถานะการทำงานจากตารางกะ</p>
+        <div class="table-wrapper" id="driverTableWrapper">
+          <table class="data-table">
+            <thead>
+              <tr><th>สาขา</th><th>พขร.</th><th>ชื่อ EN</th><th>สถานะงาน</th><th>ทะเบียนที่จัด</th><th>จำนวนงาน</th><th>ตำแหน่ง</th></tr>
+            </thead>
+            <tbody id="driverTableBody"></tbody>
+          </table>
         </div>
-        <div class="section-actions">
-          <button class="btn btn-secondary" id="shiftTableToggle" type="button" onclick="toggleTable('shiftTableWrapper','shiftTableToggle')">ซ่อนตาราง</button>
-        </div>
-      </div>
+      </section>
 
-      <div class="cards shift-cards">
-        <div class="card">
-          <div class="card-label">พขร.ในตารางกะ</div>
-          <div class="card-value" id="shiftTotal">-</div>
+      <section class="section">
+        <div class="section-heading">
+          <div>
+            <h2>👨‍✈️ สถานะ พขร.</h2>
+            <p class="section-subtitle">สถานะการทำงานจากตารางกะ</p>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary" id="shiftTableToggle" type="button" onclick="toggleTable('shiftTableWrapper','shiftTableToggle')">ซ่อนตาราง</button>
+          </div>
         </div>
-        <div class="card card-green">
-          <div class="card-label">🟢 ทำงาน</div>
-          <div class="card-value" id="shiftWorking">-</div>
-        </div>
-        <div class="card card-orange">
-          <div class="card-label">🟠 สแตนบาย</div>
-          <div class="card-value" id="shiftStandby">-</div>
-        </div>
-        <div class="card">
-          <div class="card-label">เบรค</div>
-          <div class="card-value" id="shiftBreak">-</div>
-        </div>
-        <div class="card card-red">
-          <div class="card-label">🔴 ลางาน</div>
-          <div class="card-value" id="shiftLeave">-</div>
-        </div>
-        <div class="card card-gray">
-          <div class="card-label">⚪ วันหยุด</div>
-          <div class="card-value" id="shiftOff">-</div>
-        </div>
-        <div class="card">
-          <div class="card-label">อื่นๆ</div>
-          <div class="card-value" id="shiftOther">-</div>
-        </div>
-      </div>
 
-      <div class="table-wrapper" id="shiftTableWrapper">
-        <table class="data-table">
-          <thead>
-            <tr><th>พขร.</th><th>ชื่อ EN</th><th>สถานะการทำงาน</th><th>รหัสสถานะ</th><th>แหล่งข้อมูล</th></tr>
-          </thead>
-          <tbody id="shiftTableBody"></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="cards shift-cards">
+          <div class="card">
+            <div class="card-label">พขร.ในตารางกะ</div>
+            <div class="card-value" id="shiftTotal">-</div>
+          </div>
+          <div class="card card-green">
+            <div class="card-label">🟢 ทำงาน</div>
+            <div class="card-value" id="shiftWorking">-</div>
+          </div>
+          <div class="card card-orange">
+            <div class="card-label">🟠 สแตนบาย</div>
+            <div class="card-value" id="shiftStandby">-</div>
+          </div>
+          <div class="card">
+            <div class="card-label">เบรค</div>
+            <div class="card-value" id="shiftBreak">-</div>
+          </div>
+          <div class="card card-red">
+            <div class="card-label">🔴 ลางาน</div>
+            <div class="card-value" id="shiftLeave">-</div>
+          </div>
+          <div class="card card-gray">
+            <div class="card-label">⚪ วันหยุด</div>
+            <div class="card-value" id="shiftOff">-</div>
+          </div>
+          <div class="card">
+            <div class="card-label">อื่นๆ</div>
+            <div class="card-value" id="shiftOther">-</div>
+          </div>
+        </div>
+
+        <div class="table-wrapper" id="shiftTableWrapper">
+          <table class="data-table">
+            <thead>
+              <tr><th>พขร.</th><th>ชื่อ EN</th><th>สถานะการทำงาน</th><th>รหัสสถานะ</th><th>แหล่งข้อมูล</th></tr>
+            </thead>
+            <tbody id="shiftTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
 
   </main>
 
