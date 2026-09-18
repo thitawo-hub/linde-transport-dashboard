@@ -87,6 +87,15 @@
     .achievement-side-item strong { font-size: 12px; }
 
     .alert-grid, .ranking-grid { gap: 8px; margin-bottom: 8px; }
+    .watch-ranking-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 900px) {
+      .watch-ranking-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     .alert-box { padding: 8px 10px; }
     .alert-box-header h3 { font-size: 11px; }
     .alert-box-header p { margin-bottom: 6px; font-size: 10.5px; }
@@ -273,12 +282,12 @@
 
       <div class="section-heading">
         <div>
-          <h2>🚨 รถที่ต้องระวัง</h2>
-          <p class="section-subtitle">ใช้ประกอบการตัดสินใจจัดงาน โดยเฉพาะรถที่มีแนวโน้ม KM สูงเกินเป้า</p>
+          <h2>🚨 รถที่ต้องระวัง &amp; 📋 Ranking รถ</h2>
+          <p class="section-subtitle">ใช้ประกอบการตัดสินใจจัดงาน และดูรถที่มี KM สูง/ต่ำ เพื่อช่วยจัดงาน</p>
         </div>
       </div>
 
-      <div class="alert-grid">
+      <div class="watch-ranking-grid">
 
         <div class="alert-box alert-danger">
           <div class="alert-box-header">
@@ -299,26 +308,6 @@
             <li class="empty-alert">กำลังโหลด...</li>
           </ul>
         </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         RANKING
-    ==================================================== -->
-
-    <section class="section">
-
-      <div class="section-heading">
-        <div>
-          <h2>📋 Ranking รถ</h2>
-          <p class="section-subtitle">ใช้ดูรถที่มี KM สูงและต่ำเพื่อช่วยประกอบการจัดงาน</p>
-        </div>
-      </div>
-
-      <div class="ranking-grid">
 
         <div class="ranking-box">
           <div class="ranking-header">
