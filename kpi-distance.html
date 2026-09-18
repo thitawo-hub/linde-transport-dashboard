@@ -62,7 +62,14 @@
     .section-heading p, .section-subtitle { font-size: 10.5px; }
     .section-heading + * { margin-top: 8px; }
 
-    .kpi-grid { gap: 8px; margin-bottom: 8px; }
+    .kpi-grid {
+      gap: 8px;
+      margin-bottom: 8px;
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @media (max-width: 900px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     .kpi-card { padding: 8px 10px; }
     .kpi-title { font-size: 10.5px; margin-bottom: 2px; }
     .kpi-value { font-size: 16px; }
@@ -244,7 +251,13 @@
         <div class="kpi-card">
           <div class="kpi-title">📊 ภาพรวมการทำ KM</div>
           <div id="achievementMain" class="kpi-value">-</div>
-          <div class="kpi-sub">Forecast <span id="forecastKm">-</span> · <span id="forecastAchievement">-</span></div>
+          <div class="kpi-sub">เทียบ KM สะสมกับ Target ของรถ COCO</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-title">📈 Forecast สิ้นรอบ</div>
+          <div class="kpi-value"><span id="forecastKm">-</span> · <span id="forecastAchievement">-</span></div>
+          <div class="kpi-sub">KM คาดการณ์ · Forecast Achievement</div>
         </div>
 
       </div>
