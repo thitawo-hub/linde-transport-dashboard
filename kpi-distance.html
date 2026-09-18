@@ -96,6 +96,11 @@
     @media (max-width: 900px) {
       .watch-ranking-grid { grid-template-columns: repeat(2, 1fr); }
     }
+    .watch-ranking-grid .alert-list,
+    .watch-ranking-grid .ranking-list {
+      max-height: 260px;
+      overflow-y: auto;
+    }
     .alert-box { padding: 8px 10px; }
     .alert-box-header h3 { font-size: 11px; }
     .alert-box-header p { margin-bottom: 6px; font-size: 10.5px; }
