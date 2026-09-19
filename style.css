@@ -76,7 +76,7 @@
 
   --content-width: 1920px;
 
-  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", "Sarabun", Arial, sans-serif;
+  --font-body: Tahoma, Verdana, "IBM Plex Sans Thai", "Noto Sans Thai", "Sarabun", Arial, sans-serif;
   --font-mono: "IBM Plex Mono", "Roboto Mono", ui-monospace, monospace;
 }
 
