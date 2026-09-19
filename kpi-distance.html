@@ -19,101 +19,31 @@
   <style>
     /* Page-only overrides — this <style> block only loads on this page,
        so these are safe to target shared class names from style.css
-       without affecting index.html / daily-report.html. */
+       without affecting index.html / daily-report.html.
+       Everything sizing/spacing-related now comes straight from
+       style.css (.kpi-grid.cols-5, .alert-box, .ranking-box, etc.) so
+       this page matches the same type scale as the other two pages.
+       The only things left here are layout this page needs that
+       style.css doesn't define yet: merging "รถที่ต้องระวัง" and
+       "Ranking รถ" into one 4-up row, and capping the height of their
+       lists so a long fleet doesn't stretch the row — .table-wrapper
+       already does this for tables, alert/ranking lists don't have
+       an equivalent yet. */
 
-    /* Car table: compact rows + its own scroll box so a long fleet list
-       doesn't stretch the whole page. */
-    .compact-table {
-      max-height: 260px;
-    }
-    .compact-table table {
-      font-size: 11px;
-    }
-    .compact-table th {
-      height: 24px;
-      padding: 4px 8px;
-      font-size: 10.5px;
-    }
-    .compact-table td {
-      height: 24px;
-      padding: 3px 8px;
-      font-size: 11px;
-    }
-    .compact-table .empty-state {
-      min-height: 60px;
-      padding: 12px;
-    }
-
-    /* Everything else: shrink padding/gaps/fonts further than the
-       shared defaults so the page needs less scrolling overall. */
-    .container { padding-top: 10px; padding-bottom: 10px; }
-    .page-header { margin-bottom: 8px; }
-    .page-header h1 { font-size: 18px; }
-    .page-header p { font-size: 11px; }
-
-    .filters { margin-bottom: 8px; padding: 8px 10px; }
-    .filters > div { min-width: 110px; }
-    .filters label { margin-bottom: 3px; font-size: 11px; }
-    .filters select, .filter-cycle-text { height: 28px; font-size: 11px; }
-
-    .section { margin-bottom: 8px; padding: 0 10px 10px; }
-    .section-heading { min-height: 30px; padding: 8px 10px; margin: 0 -10px; }
-    .section-heading h2, .section-heading h3 { font-size: 12px; }
-    .section-heading p, .section-subtitle { font-size: 10.5px; }
-    .section-heading + * { margin-top: 8px; }
-
-    .kpi-grid {
-      gap: 8px;
-      margin-bottom: 8px;
-      grid-template-columns: repeat(5, 1fr);
-    }
-    @media (max-width: 900px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .kpi-card { padding: 8px 10px; }
-    .kpi-title { font-size: 10.5px; margin-bottom: 2px; }
-    .kpi-value { font-size: 16px; }
-    .kpi-sub { font-size: 9.5px; margin-top: 2px; }
-
-    .cycle-info { padding: 8px 10px; gap: 10px; }
-    .cycle-info-value { font-size: 14px; }
-    .cycle-meta-item { min-height: 24px; padding: 2px 9px; font-size: 11px; }
-
-    .achievement-box > div:first-child { padding: 8px 10px; }
-    .achievement-main-value { font-size: 18px; }
-    .achievement-main-label, .achievement-main-note { font-size: 10.5px; }
-    .achievement-side { padding: 8px 10px; gap: 6px; }
-    .achievement-side-item span { font-size: 10.5px; }
-    .achievement-side-item strong { font-size: 12px; }
-
-    .alert-grid, .ranking-grid { gap: 8px; margin-bottom: 8px; }
     .watch-ranking-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
       .watch-ranking-grid { grid-template-columns: repeat(2, 1fr); }
     }
     .watch-ranking-grid .alert-list,
     .watch-ranking-grid .ranking-list {
-      max-height: 260px;
+      max-height: 285px;
       overflow-y: auto;
     }
-    .alert-box { padding: 8px 10px; }
-    .alert-box-header h3 { font-size: 11px; }
-    .alert-box-header p { margin-bottom: 6px; font-size: 10.5px; }
-    .alert-list { gap: 4px; }
-    .alert-list li { padding: 5px 8px; font-size: 11px; }
-
-    .ranking-header { min-height: 28px; padding: 5px 10px; font-size: 11px; }
-    .ranking-list { padding: 5px 8px; gap: 2px; }
-    .ranking-list li { padding: 4px 8px; font-size: 11px; }
-
-    .chart-wrapper { height: 150px; padding: 8px 10px; }
-
-    .page-status { margin-top: 4px; font-size: 10.5px; }
   </style>
 </head>
 
@@ -212,7 +142,7 @@
 
     <section class="section">
 
-      <div class="kpi-grid">
+      <div class="kpi-grid cols-5">
 
         <div class="kpi-card">
           <div class="kpi-title">🚛 รถ COCO</div>
@@ -350,7 +280,7 @@
         </div>
       </div>
 
-      <div class="table-wrapper compact-table">
+      <div class="table-wrapper">
         <table>
           <thead>
             <tr>
