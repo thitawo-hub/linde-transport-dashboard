@@ -14,6 +14,7 @@ const SUPABASE_KEY = 'sb_publishable_z5-j4hCd7dJ50-sLaUKraw_ZgM9ZA4W';
 
 let summaryData = null;
 let carData = [];
+let carTargetRows = [];
 
 // ============================================================
 // CONFIG
@@ -95,7 +96,7 @@ async function loadKpiDistance() {
   try {
     setPageStatus('กำลังโหลดข้อมูล KPI ระยะทาง...');
 
-    const [summary, cars] = await Promise.all([
+    const [summary, cars, carTargets] = await Promise.all([
       fetchSupabase(
         'v_kpi_distance_summary',
         'select=*'
@@ -104,10 +105,28 @@ async function loadKpiDistance() {
       fetchSupabase(
         'v_kpi_distance_car',
         'select=*'
+      ),
+
+      // ==========================================================
+      // จำนวนรถตาม Target
+      //
+      // มาจากตาราง targets (ชีท "Target")
+      // target_type = CAR, work_group = COCO
+      //
+      // ไม่ใช่การนับจาก master_cars.target_km
+      // เพราะเป็นคนละความหมายกัน:
+      // - master_cars.target_km  = เป้า KM ต่อคัน
+      // - targets (CAR)          = จำนวนรถตามสัญญา/แผนต่อสาขา
+      // ==========================================================
+
+      fetchSupabase(
+        'targets',
+        'select=*&target_type=eq.CAR&work_group=eq.COCO'
       )
     ]);
 
     summaryData = summary?.[0] || null;
+    carTargetRows = carTargets || [];
 
     // ใช้ข้อมูลรถจริงจาก Supabase
     // ไม่เติมรถ Virtual
@@ -225,7 +244,8 @@ function render() {
 
   renderSummary(
     filteredCars,
-    totalCars
+    totalCars,
+    branch
   );
 
   renderFleetBreakdown(
@@ -254,7 +274,8 @@ function render() {
 
 function renderSummary(
   cars,
-  totalCars
+  totalCars,
+  branchFilter
 ) {
 
   // รถที่มี Target จริง
@@ -381,16 +402,20 @@ function renderSummary(
   );
 
   // --------------------------------------------------------
-  // การ์ด "รถที่มี Target"
+  // การ์ด "จำนวนรถตาม Target"
   //
-  // เดิมเป็นจำนวนรถที่มี total_km > 0 (รถที่มี KM สะสม)
-  // เปลี่ยนเป็นจำนวนรถที่ "ตั้ง Target ไว้" แทน (targetCars.length)
+  // มาจากตาราง targets (target_type = CAR, work_group = COCO)
+  // ไม่ใช่การนับรถจาก master_cars
+  //
+  // รองรับ branch แบบสัญญาย่อย เช่น
+  // "ระยอง" (filter) จะรวม "ระยองสัญญา 1" + "ระยองสัญญา2" + "ระยอง10W"
+  // เพราะใช้ prefix match กับชื่อสาขาใน targets
   // --------------------------------------------------------
 
   setText(
     'runningCars',
     formatNumber(
-      targetCars.length
+      getCarTargetCount(branchFilter)
     )
   );
 
@@ -498,6 +523,40 @@ function renderFleetBreakdown(
       .join(
         ' &nbsp;•&nbsp; '
       );
+}
+
+// ============================================================
+// CAR TARGET COUNT
+//
+// รวม target_value จากตาราง targets
+// (target_type = CAR, work_group = COCO)
+//
+// ถ้าไม่เลือกสาขา (branchFilter ว่าง) → รวมทุกสาขา
+// ถ้าเลือกสาขา → รวมเฉพาะแถวที่ branch ใน targets
+// ขึ้นต้นด้วยชื่อสาขาที่เลือก (prefix match)
+// รองรับสัญญาย่อย เช่น "ระยองสัญญา 1", "ระยอง10W"
+// ที่ล้วนขึ้นต้นด้วย "ระยอง"
+// ============================================================
+
+function getCarTargetCount(branchFilter) {
+
+  const normalizedFilter =
+    normalizeText(branchFilter);
+
+  const rows =
+    normalizedFilter
+      ? carTargetRows.filter(
+          row =>
+            normalizeText(row.branch)
+              .startsWith(normalizedFilter)
+        )
+      : carTargetRows;
+
+  return rows.reduce(
+    (sum, row) =>
+      sum + toNumber(row.target_value),
+    0
+  );
 }
 
 // ============================================================
