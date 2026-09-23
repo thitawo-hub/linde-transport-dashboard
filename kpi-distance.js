@@ -263,13 +263,6 @@ function renderSummary(
       car => getTargetKm(car) > 0
     );
 
-  // รถที่มีการวิ่งงานจริง
-  const runningCars =
-    cars.filter(
-      car =>
-        toNumber(car.total_km) > 0
-    );
-
   // ==========================================================
   // TOTAL KM
   // ==========================================================
@@ -387,10 +380,17 @@ function renderSummary(
       : '-'
   );
 
+  // --------------------------------------------------------
+  // การ์ด "รถที่มี Target"
+  //
+  // เดิมเป็นจำนวนรถที่มี total_km > 0 (รถที่มี KM สะสม)
+  // เปลี่ยนเป็นจำนวนรถที่ "ตั้ง Target ไว้" แทน (targetCars.length)
+  // --------------------------------------------------------
+
   setText(
     'runningCars',
     formatNumber(
-      runningCars.length
+      targetCars.length
     )
   );
 
