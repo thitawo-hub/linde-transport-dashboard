@@ -2557,13 +2557,33 @@ function renderDriverShiftSection() {
 
           <td>
             ${escapeHtml(
-              row.driver_name_master || '-'
+              row.branch || '-'
             )}
           </td>
 
           <td>
             ${escapeHtml(
+              row.work_date || '-'
+            )}
+          </td>
+
+          <td>
+            <strong>
+              ${escapeHtml(
+                row.driver_name_master || '-'
+              )}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHtml(
               row.driver_name_en || '-'
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              row.status || '-'
             )}
           </td>
 
@@ -2575,12 +2595,6 @@ function renderDriverShiftSection() {
               )}
             </span>
 
-          </td>
-
-          <td>
-            ${escapeHtml(
-              row.status || '-'
-            )}
           </td>
 
         `;
