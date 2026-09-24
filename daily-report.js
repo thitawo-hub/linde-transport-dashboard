@@ -824,6 +824,14 @@ async function loadVehicleSchedules(
 // ============================================================
 // DRIVER SHIFTS
 // ============================================================
+//
+// FIX: 'branch' was missing from the select list below.
+// Without it, every row came back with row.branch === undefined,
+// which made renderDriverShiftSection()'s branch filter reject
+// every row (isAllowedBranch('') is always false), so the KPI
+// cards and table always showed 0 / empty even though Supabase
+// clearly had matching rows.
+// ============================================================
 
 async function loadDriverShifts(
   date
@@ -835,7 +843,7 @@ async function loadDriverShifts(
 
   params.set(
     'select',
-    'id,work_date,driver_name_master,driver_name_en,status,description'
+    'id,work_date,driver_name_master,branch,driver_name_en,status,description'
   );
 
 
