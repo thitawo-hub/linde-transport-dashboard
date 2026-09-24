@@ -602,13 +602,9 @@ function getFilteredDriverShifts() {
 
       const aliases = [
 
-        row.driver_key,
+        row.driver_name_master,
 
-        row.driver_name,
-
-        row.driver_name_en,
-
-        row.driver_name_master
+        row.driver_name_en
 
       ];
 
@@ -839,7 +835,7 @@ async function loadDriverShifts(
 
   params.set(
     'select',
-    'id,work_date,driver_name,driver_name_en,status,description,driver_name_master,driver_key,source_sheet'
+    'id,work_date,driver_name_master,driver_name_en,status,description'
   );
 
 
@@ -2301,15 +2297,9 @@ function renderDriverShiftSection() {
     row => {
 
       const key =
-
         normalizeDriverName(
-          row.driver_key
+          row.driver_name_master
         ) ||
-
-        normalizeDriverName(
-          row.driver_name
-        ) ||
-
         normalizeDriverName(
           row.driver_name_en
         );
@@ -2459,10 +2449,10 @@ function renderDriverShiftSection() {
     .sort(
       (a, b) =>
         String(
-          a.driver_name || ''
+          a.driver_name_master || ''
         ).localeCompare(
           String(
-            b.driver_name || ''
+            b.driver_name_master || ''
           ),
           'th'
         )
@@ -2518,7 +2508,7 @@ function renderDriverShiftSection() {
 
           <td>
             ${escapeHtml(
-              row.driver_name || '-'
+              row.driver_name_master || '-'
             )}
           </td>
 
@@ -2541,12 +2531,6 @@ function renderDriverShiftSection() {
           <td>
             ${escapeHtml(
               row.status || '-'
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              row.source_sheet || '-'
             )}
           </td>
 
