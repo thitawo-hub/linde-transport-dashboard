@@ -1,541 +1,197 @@
 <!DOCTYPE html>
-
 <html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LINDE TRANSPORT OVERVIEW</title>
-
+  <title>LINDE TRANSPORT DAILY REPORT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-  <!-- =====================================================
-       HEADER
-       ===================================================== -->
 
   <header>
     <div class="header-content">
+      <div class="header-brand">
+        <div class="brand-mark">LT</div>
+        <div class="brand-text">
+          <h1 class="brand-title">LINDE TRANSPORT</h1>
+          <p class="brand-subtitle">Transport Performance &amp; Operational Monitoring</p>
+        </div>
+      </div>
 
-  <div class="header-brand">
-
-    <div class="brand-mark">
-      LT
+      <nav class="page-nav">
+        <a href="index.html">📊 ภาพรวม</a>
+        <a href="daily-report.html" class="active">📅 รายงานประจำวัน</a>
+        <a href="kpi-distance.html">📍 KPI ระยะทาง</a>
+      </nav>
     </div>
-
-    <div class="brand-text">
-      <h1 class="brand-title">
-        LINDE TRANSPORT
-      </h1>
-
-      <p class="brand-subtitle">
-        Transport Performance &amp; Operational Monitoring
-      </p>
-    </div>
-
-  </div>
-
-  <!-- Navigation -->
-  <nav class="page-nav">
-
-    <a href="index.html" class="active">
-      📊 ภาพรวม
-    </a>
-
-    <a href="daily-report.html">
-      📅 รายงานประจำวัน
-    </a>
-
-    <a href="kpi-distance.html">
-      📍 KPI ระยะทาง
-    </a>
-
-  </nav>
-
-</div>
-
   </header>
-
-  <!-- =====================================================
-       MAIN
-       ===================================================== -->
 
   <main class="container">
 
-<!-- PAGE TITLE -->
-
-<div class="page-title">
-
-  <h1>
-    ภาพรวมการขนส่ง
-  </h1>
-
-  <p>
-    Transport Performance &amp; Operational Monitoring
-  </p>
-
-</div>
-
-
-<!-- ===================================================
-     FILTER
-     =================================================== -->
-
-<section class="filters">
-
-  <div class="filter-group">
-
-    <label for="startDate">
-      วันที่เริ่มต้น
-    </label>
-
-    <input
-      type="date"
-      id="startDate"
-    >
-
-  </div>
-
-
-  <div class="filter-group">
-
-    <label for="endDate">
-      วันที่สิ้นสุด
-    </label>
-
-    <input
-      type="date"
-      id="endDate"
-    >
-
-  </div>
-
-
-  <div class="filter-group">
-
-    <label for="branchFilter">
-      สาขา
-    </label>
-
-    <select id="branchFilter">
-      <option value="ทั้งหมด">
-        ทั้งหมด
-      </option>
-    </select>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     MASTER KPI
-     =================================================== -->
-
-<section class="section">
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        👥 Fleet &amp; Driver Overview
-      </h2>
-
-      <p class="section-subtitle">
-        จำนวนรถและ พขร. จากข้อมูล Master
-      </p>
-
+    <div class="page-title">
+      <h1>📅 รายงานประจำวัน</h1>
+      <p>Daily Transport Operations Report</p>
+      <div id="reportInfo" class="card-status">-</div>
     </div>
 
-  </div>
+    <div id="errorMessage" class="error-message"></div>
 
-
-  <div class="kpi-grid">
-
-    <!-- รถ COCO -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        🚛 รถ COCO
+    <section class="filters">
+      <div class="filter-group">
+        <label for="dateFilter">วันที่</label>
+        <input type="date" id="dateFilter" onchange="loadReport()">
       </div>
-
-      <div
-        class="card-value"
-        id="cocoCars"
-      >
-        -
+      <div class="filter-group">
+        <label for="branchFilter">สาขา</label>
+        <select id="branchFilter" onchange="applyFilters()">
+          <option value="">ทั้งหมด</option>
+        </select>
       </div>
-
-      <div class="card-breakdown">
-
-        <span>
-          Trailer
-          <strong id="cocoCarsTrailer">-</strong>
-        </span>
-
-        <span>
-          10W
-          <strong id="cocoCarsW10">-</strong>
-        </span>
-
+      <div class="filter-action">
+        <button class="btn btn-primary" type="button" onclick="refreshReport()">↻ รีเฟรช</button>
       </div>
-
-    </div>
-
-
-    <!-- พขร. -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        👨‍✈️ พขร.
-      </div>
-
-      <div
-        class="card-value"
-        id="cocoDrivers"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        จาก Master Person
-      </div>
-
-    </div>
-
-
-    <!-- Driver Ratio -->
-
-    <div class="kpi-card primary">
-
-      <div class="card-title">
-        📊 Driver Ratio
-      </div>
-
-      <div
-        class="card-value"
-        id="driverRatio"
-      >
-        -
-      </div>
-
-      <div
-        class="card-status"
-        id="driverRatioDetail"
-      >
-        -
-      </div>
-
-    </div>
-
-
-    <!-- Target KM -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        🎯 Target KM / รถ
-      </div>
-
-      <div
-        class="card-value"
-        id="targetKm"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        KM / คัน / เดือน
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     KM PERFORMANCE + FORECAST — แถวเดียว 5 การ์ด
-     element id เดิมทั้งหมดยังอยู่ครบ ไม่กระทบ app.js —
-     kmAchievement / forecastAchievement ย้ายมาแสดงเป็น
-     "คิดเป็น X%" ใต้ตัวเลข Target KM / Forecast KM แทน
-     การ์ดแยกและ achievement-box เดิม
-     =================================================== -->
-
-<section class="section">
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        📍 Distance Performance &amp; Forecast
-      </h2>
-
-    </div>
-
-  </div>
-
-
-  <div class="kpi-grid cols-5">
-
-    <!-- Total KM -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        KM สะสม
-      </div>
-
-      <div
-        class="card-value"
-        id="totalKm"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        ระยะทางรวม
-      </div>
-
-    </div>
-
-
-    <!-- Average / Day -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        KM / วัน
-      </div>
-
-      <div
-        class="card-value"
-        id="avgKmDay"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        ค่าเฉลี่ยต่อวัน
-      </div>
-
-    </div>
-
-
-    <!-- Average / Car -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        KM / รถ
-      </div>
-
-      <div
-        class="card-value"
-        id="avgKmCar"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        ค่าเฉลี่ยต่อคัน
-      </div>
-
-    </div>
-
-
-    <!-- Target KM -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        Target KM
-      </div>
-
-      <div
-        class="card-value"
-        id="forecastTargetKm"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        คิดเป็น <span id="kmAchievement">-</span>
-      </div>
-
-    </div>
-
-
-    <!-- Forecast KM -->
-
-    <div class="kpi-card">
-
-      <div class="card-title">
-        Forecast KM
-      </div>
-
-      <div
-        class="card-value"
-        id="forecastKm"
-      >
-        -
-      </div>
-
-      <div class="card-status">
-        คิดเป็น <span id="forecastAchievement">-</span>
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================
-     KM TRENDS — วางกราฟรายวัน + สะสมคู่กัน แทนการเรียงต่อ
-     เต็มความกว้างทีละอัน (ใช้ .chart-grid ที่มี CSS อยู่แล้ว
-     แต่ของเดิมไม่เคยถูกใช้)
-     =================================================== -->
-
-<section class="section">
-
-  <div class="section-heading">
-
-    <div>
-
-      <h2>
-        📈 แนวโน้ม KM
-      </h2>
-
-      <p class="section-subtitle">
-        รายวันและสะสมตลอดช่วงที่เลือก
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <div class="chart-grid">
-
-    <!-- รายวัน -->
-
-    <div class="card chart-card-narrow">
-
-      <div class="chart-summary">
-
-        <div class="chart-summary-item">
-
-          <div class="chart-summary-label">
-            KM รวม
-          </div>
-
-          <div
-            class="chart-summary-value"
-            id="chartTotalKm"
-          >
-            -
-          </div>
-
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>🚛 สถานะรถ &amp; พขร.</h2>
+          <p class="section-subtitle">ข้อมูลรถจาก Master Car และ พขร.จาก Master Person เทียบกับรถที่จัดงาน</p>
         </div>
-
-
-        <div class="chart-summary-item">
-
-          <div class="chart-summary-label">
-            ค่าเฉลี่ย / วัน
-          </div>
-
-          <div
-            class="chart-summary-value"
-            id="chartAvgKm"
-          >
-            -
-          </div>
-
+        <div class="section-actions">
+          <button class="btn btn-secondary" id="vehicleTableToggle" type="button" onclick="toggleTable('vehicleTableWrapper','vehicleTableToggle')">ซ่อนตาราง</button>
         </div>
+      </div>
 
-
-        <div class="chart-summary-item">
-
-          <div class="chart-summary-label">
-            วันที่วิ่ง
-          </div>
-
-          <div
-            class="chart-summary-value"
-            id="chartRunningDays"
-          >
-            -
-          </div>
-
+      <div class="cards">
+        <div class="card">
+          <div class="card-label">รถทั้งหมด</div>
+          <div class="card-value" id="vehicleTotal">-</div>
+          <div class="card-note">จาก Master Car</div>
         </div>
-
+        <div class="card card-green">
+          <div class="card-label">🟢 มีงาน</div>
+          <div class="card-value" id="vehicleWorking">-</div>
+          <div class="card-note">มีการจัดงาน</div>
+        </div>
+        <div class="card card-gray">
+          <div class="card-label">⚪ ไม่มีงาน</div>
+          <div class="card-value" id="vehicleNoJob">-</div>
+          <div class="card-note">ไม่มีการจัดงาน</div>
+        </div>
+        <div class="card">
+          <div class="card-label">พขร.ทั้งหมด</div>
+          <div class="card-value" id="driverTotal">-</div>
+          <div class="card-note">จาก Master Person</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">🟢 ทำงาน</div>
+          <div class="card-value" id="driverWorking">-</div>
+          <div class="card-note">พขร.ที่มีการจัดรถ</div>
+        </div>
+        <div class="card card-orange">
+          <div class="card-label">🟠 วิ่งงาน LOCO</div>
+          <div class="card-value" id="driverLoco">-</div>
+          <div class="card-note">ทะเบียนไม่อยู่ใน Master Car</div>
+        </div>
+        <div class="card card-gray">
+          <div class="card-label">⚪ ไม่มีงาน</div>
+          <div class="card-value" id="driverNoJob">-</div>
+          <div class="card-note">ไม่มีการจัดรถ</div>
+        </div>
       </div>
 
+      <div class="table-wrapper" id="vehicleTableWrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>สาขา</th><th>เบอร์รถ</th><th>ทะเบียน</th><th>ประเภทรถ</th>
+              <th>สถานะงาน</th><th>สถานะรถ</th><th>วางแผน</th><th>LTS</th>
+              <th>พขร.</th><th>ช่วงเวลา</th><th>หนัก/เบา</th><th>จำนวนงาน</th>
+            </tr>
+          </thead>
+          <tbody id="vehicleTableBody"></tbody>
+        </table>
+      </div>
+    </section>
 
-      <div class="chart-wrapper">
-
-        <canvas id="kmChart"></canvas>
-
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>👨‍✈️ สถานะ พขร.</h2>
+          <p class="section-subtitle">สถานะการทำงานจากตารางกะ</p>
+        </div>
+        <div class="section-actions">
+          <button class="btn btn-secondary" id="shiftTableToggle" type="button" onclick="toggleTable('shiftTableWrapper','shiftTableToggle')">ซ่อนตาราง</button>
+        </div>
       </div>
 
-    </div>
-
-
-    <!-- สะสม -->
-
-    <div class="card chart-card-narrow">
-
-      <div
-        class="section-heading"
-        style="min-height: auto; padding: 12px 14px; border-bottom: 1px solid var(--border-2);"
-      >
-        <p style="margin: 0; color: var(--text-600); font-size: 11px; font-weight: 700;">
-          KM สะสมตามรอบ
-        </p>
+      <div class="cards shift-cards">
+        <div class="card">
+          <div class="card-label">พขร.ในตารางกะ</div>
+          <div class="card-value" id="shiftTotal">-</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">🟢 ทำงาน</div>
+          <div class="card-value" id="shiftWorking">-</div>
+        </div>
+        <div class="card card-orange">
+          <div class="card-label">🟠 สแตนบาย</div>
+          <div class="card-value" id="shiftStandby">-</div>
+        </div>
+        <div class="card">
+          <div class="card-label">เบรค</div>
+          <div class="card-value" id="shiftBreak">-</div>
+        </div>
+        <div class="card card-red">
+          <div class="card-label">🔴 ลางาน</div>
+          <div class="card-value" id="shiftLeave">-</div>
+        </div>
+        <div class="card card-gray">
+          <div class="card-label">⚪ วันหยุด</div>
+          <div class="card-value" id="shiftOff">-</div>
+        </div>
+        <div class="card">
+          <div class="card-label">อื่นๆ</div>
+          <div class="card-value" id="shiftOther">-</div>
+        </div>
       </div>
 
-      <div class="chart-wrapper">
-
-        <canvas id="kmCumulativeChart"></canvas>
-
+      <div class="table-wrapper" id="shiftTableWrapper">
+        <table class="data-table">
+          <thead>
+            <tr><th>สาขา</th><th>วันที่</th><th>พขร.</th><th>ชื่อ EN</th><th>รหัสสถานะ</th><th>คำอธิบาย</th></tr>
+          </thead>
+          <tbody id="shiftTableBody"></tbody>
+        </table>
       </div>
-
-    </div>
-
-  </div>
-
-</section>
+    </section>
 
   </main>
 
-  <!-- =====================================================
-       LIBRARIES
-       ===================================================== -->
+  <script src="daily-report.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!--
+    Fix: the ซ่อน/แสดงตาราง buttons call toggleTable(wrapperId, btnId)
+    via inline onclick. This defines/overrides that function AFTER
+    daily-report.js loads, so it always wins even if daily-report.js
+    has no toggleTable (or a broken one) — that's what made the
+    buttons do nothing before.
+  -->
+  <script>
+    function toggleTable(wrapperId, btnId) {
+      var wrapper = document.getElementById(wrapperId);
+      var btn = document.getElementById(btnId);
+      if (!wrapper) return;
 
-  <!-- =====================================================
-       APPLICATION
-       ===================================================== -->
-
-  <script src="app.js"></script>
+      var isHidden = wrapper.style.display === 'none';
+      wrapper.style.display = isHidden ? '' : 'none';
+      if (btn) btn.textContent = isHidden ? 'ซ่อนตาราง' : 'แสดงตาราง';
+    }
+  </script>
 
 </body>
 </html>
