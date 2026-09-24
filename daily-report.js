@@ -2286,26 +2286,75 @@ function renderDriverSection() {
 function renderDriverShiftSection() {
 
   const rows =
-    getFilteredDriverShifts();
+    driverShifts;
 
+
+  // ========================================================
+  // FILTER BY BRANCH
+  // ========================================================
+
+  const filteredRows =
+    rows.filter(
+      row => {
+
+        const rowBranch =
+          String(
+            row.branch || ''
+          ).trim();
+
+
+        const branch =
+          selectedBranch ||
+          getSelectedBranch();
+
+
+        if (
+          isLindeOil(
+            rowBranch
+          )
+        ) {
+
+          return false;
+
+        }
+
+
+        if (
+          branch === DEFAULT_BRANCH
+        ) {
+
+          return isAllowedBranch(
+            rowBranch
+          );
+
+        }
+
+
+        return (
+          rowBranch === branch
+        );
+
+      }
+    );
+
+
+  // ========================================================
+  // GROUP BY UNIQUE
+  // (same row per date + driver_name_master)
+  // ========================================================
 
   const latestStatus =
     new Map();
 
 
-  rows.forEach(
+  filteredRows.forEach(
     row => {
 
       const key =
-        normalizeDriverName(
+        [
+          row.work_date,
           row.driver_name_master
-        ) ||
-        normalizeDriverName(
-          row.driver_name_en
-        );
-
-
-      if (!key) return;
+        ].join('|');
 
 
       latestStatus.set(
