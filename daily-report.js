@@ -2565,7 +2565,7 @@ function renderDriverShiftSection() {
 
           <td>
             ${escapeHtml(
-              row.branch || '-'
+              row.id ?? '-'
             )}
           </td>
 
@@ -2581,6 +2581,12 @@ function renderDriverShiftSection() {
                 row.driver_name_master || '-'
               )}
             </strong>
+          </td>
+
+          <td>
+            ${escapeHtml(
+              row.branch || '-'
+            )}
           </td>
 
           <td>
